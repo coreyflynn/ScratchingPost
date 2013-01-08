@@ -1,0 +1,256 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cjf.cmap.analytics.graph &mdash; CJF-CMAP 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/theme_extras.js"></script>
+    <link rel="top" title="CJF-CMAP 1.1 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body>
+      <div class="header"><img class="rightlogo" src="../../../../_static/CJF2.png" alt="Logo"/><h1 class="heading"><a href="../../../../index.html">
+          <span>CJF-CMAP 1.1 documentation</span></a></h1>
+        <h2 class="heading"><span>cjf.cmap.analytics.graph</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <h1>Source code for cjf.cmap.analytics.graph</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">tools to handle graph analytics in cmap</span>
+<span class="sd">Created on May 10, 2012</span>
+<span class="sd">@author: Corey Flynn</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="kn">as</span> <span class="nn">nx</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">cjf.cmap.analytics.query</span> <span class="kn">import</span> <span class="n">Query</span><span class="p">,</span> <span class="n">QueryResult</span>
+<span class="kn">import</span> <span class="nn">cjf.cmap.util.progress</span> <span class="kn">as</span> <span class="nn">progress</span>
+
+<div class="viewcode-block" id="CMapGraph"><a class="viewcode-back" href="../../../../graph.html#cjf.cmap.analytics.graph.CMapGraph">[docs]</a><span class="k">class</span> <span class="nc">CMapGraph</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    subclass of networkx.Graph to handle CMap graph instantiation and traversal</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;CMapGraph()&#39;</span>
+    
+<div class="viewcode-block" id="CMapGraph.add_nodes_from_query"><a class="viewcode-back" href="../../../../graph.html#cjf.cmap.analytics.graph.CMapGraph.add_nodes_from_query">[docs]</a>    <span class="k">def</span> <span class="nf">add_nodes_from_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Query</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        takes all of the entries in a query&#39;s database and enters them as nodes in the graph</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c">#add nodes</span>
+        <span class="n">num_nodes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">Query</span><span class="o">.</span><span class="n">database_cid</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_nodes_from</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">))</span>
+        
+        <span class="c">#add a name attribute to all nodes</span>
+        <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="s">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Query</span><span class="o">.</span><span class="n">database_cid</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>
+        </div>
+<div class="viewcode-block" id="CMapGraph.add_edges_from_query_result"><a class="viewcode-back" href="../../../../graph.html#cjf.cmap.analytics.graph.CMapGraph.add_edges_from_query_result">[docs]</a>    <span class="k">def</span> <span class="nf">add_edges_from_query_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">QueryResult</span><span class="p">,</span><span class="n">thresh</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        adds edges to the graph based on the results of the a query result set.  results in</span>
+<span class="sd">        the top thresh % of the data are included</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c">#instantiate a progressbar object</span>
+        <span class="n">progress_bar</span> <span class="o">=</span> <span class="n">progress</span><span class="o">.</span><span class="n">DeterminateProgressBar</span><span class="p">(</span><span class="s">&#39;Adding Edges&#39;</span><span class="p">)</span>
+        
+        <span class="c">#find the number of results in the query set and determine how many to use</span>
+        
+        <span class="n">num_results</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">QueryResult</span><span class="o">.</span><span class="n">rank_map</span><span class="p">[</span><span class="n">QueryResult</span><span class="o">.</span><span class="n">rank_map</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()</span><span class="o">.</span><span class="n">next</span><span class="p">()])</span>
+        <span class="n">num_sig_results</span> <span class="o">=</span>  <span class="nb">int</span><span class="p">(</span><span class="n">num_results</span><span class="o">*</span><span class="n">thresh</span><span class="p">)</span>
+        
+        <span class="c">#for each query in the query result set, find the id of the top thresh % of results</span>
+        <span class="n">node_id_dict</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">get_node_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;id&#39;</span><span class="p">)</span>
+        <span class="n">inds</span><span class="p">,</span><span class="n">ids</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">node_id_dict</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="n">num_queries</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">QueryResult</span><span class="o">.</span><span class="n">rank_map</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">it</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">QueryResult</span><span class="o">.</span><span class="n">rank_map</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">progress_bar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s">&#39;processing query </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">k</span><span class="p">,),</span> <span class="n">it</span><span class="p">,</span> <span class="n">num_queries</span><span class="p">)</span>
+            <span class="n">it</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">sig_results</span> <span class="o">=</span> <span class="n">QueryResult</span><span class="o">.</span><span class="n">rank_map</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="n">num_sig_results</span><span class="p">]</span>
+            <span class="n">sig_result_edges</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">sig_results</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+            <span class="n">sig_result_id1</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sig_result_edges</span><span class="p">]</span>
+            <span class="n">sig_result_id2</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sig_result_edges</span><span class="p">]</span>
+            <span class="n">sig_result_node1</span> <span class="o">=</span> <span class="p">[</span><span class="n">ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sig_result_id1</span><span class="p">]</span>
+            <span class="n">sig_result_node2</span> <span class="o">=</span> <span class="p">[</span><span class="n">ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sig_result_id2</span><span class="p">]</span>
+            <span class="n">sig_result_weight</span> <span class="o">=</span> <span class="p">[</span><span class="n">num_sig_results</span> <span class="o">-</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span><span class="o">/</span><span class="mi">2</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sig_result_edges</span><span class="p">]</span>
+            <span class="n">weighted_result_edges</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">sig_result_node1</span><span class="p">,</span><span class="n">sig_result_node2</span><span class="p">,</span><span class="n">sig_result_weight</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_weighted_edges_from</span><span class="p">(</span><span class="n">weighted_result_edges</span><span class="p">)</span>
+        
+        <span class="n">progress_bar</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        
+
+    </div>
+<div class="viewcode-block" id="CMapGraph.show_connected_graph"><a class="viewcode-back" href="../../../../graph.html#cjf.cmap.analytics.graph.CMapGraph.show_connected_graph">[docs]</a>    <span class="k">def</span> <span class="nf">show_connected_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        draws the subgraph of connected components to the screen</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c">#get the connected components of the graph and place all of their indices into one</span>
+        <span class="c">#list if they are larger than one compoent</span>
+        <span class="n">cc</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">all_large_cc</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cc</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">all_large_cc</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        
+        <span class="c">#make a subgraph and display it</span>
+        <span class="n">subG</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subgraph</span><span class="p">(</span><span class="n">all_large_cc</span><span class="p">)</span>
+        <span class="n">nx</span><span class="o">.</span><span class="n">draw_spring</span><span class="p">(</span><span class="n">subG</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s">&#39;dotted&#39;</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    </div>
+<div class="viewcode-block" id="CMapGraph.walk_connections"><a class="viewcode-back" href="../../../../graph.html#cjf.cmap.analytics.graph.CMapGraph.walk_connections">[docs]</a>    <span class="k">def</span> <span class="nf">walk_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">runs</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">steps</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">return_dict</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        walks the connections of the graph and keeps track of the proportion of the steps</span>
+<span class="sd">        spent on each node touched.  At each step, one edge is selected at random </span>
+<span class="sd">        from the current node and the edge is traversed</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c">#instantiate a progressbar object</span>
+        <span class="n">progress_bar</span> <span class="o">=</span> <span class="n">progress</span><span class="o">.</span><span class="n">DeterminateProgressBar</span><span class="p">(</span><span class="s">&#39;Walking Connections&#39;</span><span class="p">)</span>
+        
+        <span class="c">#get connected components</span>
+        <span class="n">cc</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">connected_nodes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cc</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">connected_nodes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        
+        
+        <span class="n">node_counts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">node_dist</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">run_num</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">run_num</span> <span class="o">&lt;</span> <span class="n">runs</span><span class="p">:</span>
+            <span class="n">progress_bar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s">&#39;run </span><span class="si">%s</span><span class="s"> of </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">run_num</span><span class="p">,</span><span class="n">runs</span><span class="p">),</span> <span class="n">run_num</span><span class="p">,</span> <span class="n">runs</span><span class="p">)</span>
+            <span class="n">current_node</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">connected_nodes</span><span class="p">)</span>
+            <span class="n">step</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+            <span class="k">while</span> <span class="n">step</span> <span class="o">&lt;</span> <span class="n">steps</span><span class="p">:</span>
+                <span class="c">#log the presence of the walker at current_node</span>
+                <span class="k">if</span> <span class="n">current_node</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">node_counts</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">node_counts</span><span class="p">[</span><span class="n">current_node</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">node_counts</span><span class="p">[</span><span class="n">current_node</span><span class="p">]</span> <span class="o">=</span> <span class="n">node_counts</span><span class="p">[</span><span class="n">current_node</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> 
+                
+                <span class="c">#choose and edge and traverse it</span>
+                <span class="k">if</span> <span class="n">current_node</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">node_dist</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">current_edges</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="n">current_node</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+                    <span class="n">current_edge_weights</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">current_edge_dist</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">current_edges</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="n">current_node</span><span class="p">][</span><span class="n">e</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                            <span class="n">tmp_weights</span> <span class="o">=</span> <span class="p">[]</span>
+                            <span class="n">tmp_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">current_node</span><span class="p">][</span><span class="n">e</span><span class="p">][</span><span class="n">key</span><span class="p">][</span><span class="s">&#39;weight&#39;</span><span class="p">])</span>
+                        <span class="n">tmp_weight_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tmp_weights</span><span class="p">)</span>
+                        <span class="n">current_edge_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_weight_mean</span><span class="p">)</span>
+                    
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">current_edges</span><span class="p">)):</span>
+                        <span class="n">current_edge_dist</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">current_edges</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">current_edge_weights</span><span class="p">[</span><span class="n">i</span><span class="p">])))</span>
+                    <span class="n">node_dist</span><span class="p">[</span><span class="n">current_node</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_edge_dist</span>
+                    
+                <span class="n">current_node</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">node_dist</span><span class="p">[</span><span class="n">current_node</span><span class="p">])</span>
+                
+                <span class="c">#update the step counter</span>
+                <span class="n">step</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">run_num</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">progress_bar</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">return_dict</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">node_counts</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">node_tuple_list</span> <span class="o">=</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">node_counts</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+            <span class="n">node_tuple_list</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">node_tuple_list</span><span class="p">:</span> <span class="n">node_tuple_list</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">node_tuple_list</span><span class="p">]</span>
+        </div>
+<div class="viewcode-block" id="CMapGraph.get_pagerank"><a class="viewcode-back" href="../../../../graph.html#cjf.cmap.analytics.graph.CMapGraph.get_pagerank">[docs]</a>    <span class="k">def</span> <span class="nf">get_pagerank</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_dict</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        gets the page rank of all nodes in the connected components of the graph and returns</span>
+<span class="sd">        them as a dictionary</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c">#get connected components</span>
+        <span class="n">cc</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">connected_nodes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cc</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">connected_nodes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        
+        <span class="c">#build a sub-graph containing only the connected components.  This graph must be a</span>
+        <span class="c">#non-MultiGraph for pagerank to work</span>
+        <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+        <span class="n">G</span><span class="o">.</span><span class="n">add_nodes_from</span><span class="p">(</span><span class="n">connected_nodes</span><span class="p">)</span>
+        <span class="n">node1</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">node2</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">weight</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">connected_nodes</span><span class="p">:</span>
+            <span class="n">edges</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="n">e</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">tmp_weights</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">tmp_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="n">e</span><span class="p">][</span><span class="n">key</span><span class="p">][</span><span class="s">&#39;weight&#39;</span><span class="p">])</span>
+                <span class="n">tmp_weight_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tmp_weights</span><span class="p">)</span>
+                <span class="n">node1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+                <span class="n">node2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="n">weight</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_weight_mean</span><span class="p">)</span>
+        <span class="n">G</span><span class="o">.</span><span class="n">add_weighted_edges_from</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">node1</span><span class="p">,</span><span class="n">node2</span><span class="p">,</span><span class="n">weight</span><span class="p">))</span>
+        
+        <span class="c">#get the pagerank of the graph and return it as a dictionary</span>
+        <span class="n">pr</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">pagerank</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">return_dict</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pr</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pr_tuple_list</span> <span class="o">=</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">pr</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+            <span class="n">pr_tuple_list</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">pr_tuple_list</span><span class="p">:</span> <span class="n">pr_tuple_list</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pr_tuple_list</span><span class="p">]</span>
+        
+                
+        
+        </div></div>
+</pre></div>
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Corey Flynn.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

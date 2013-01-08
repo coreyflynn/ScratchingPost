@@ -1,0 +1,112 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cjf.cmap.util.dom &mdash; CJF-CMAP 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/theme_extras.js"></script>
+    <link rel="top" title="CJF-CMAP 1.1 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body>
+      <div class="header"><img class="rightlogo" src="../../../../_static/CJF2.png" alt="Logo"/><h1 class="heading"><a href="../../../../index.html">
+          <span>CJF-CMAP 1.1 documentation</span></a></h1>
+        <h2 class="heading"><span>cjf.cmap.util.dom</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <h1>Source code for cjf.cmap.util.dom</h1><div class="highlight"><pre>
+<span class="c">#! /usr/bin/env python</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">provides custom DOM utilities </span>
+<span class="sd">Created on Feb 9, 2012</span>
+<span class="sd">@author: Corey Flynn, Broad Institute</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">mechanize</span>
+<span class="kn">from</span> <span class="nn">BeautifulSoup</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+
+<div class="viewcode-block" id="extract_svg_from_html"><a class="viewcode-back" href="../../../../dom.html#cjf.cmap.util.dom.extract_svg_from_html">[docs]</a><span class="k">def</span> <span class="nf">extract_svg_from_html</span><span class="p">(</span><span class="n">input_html</span><span class="p">,</span><span class="n">out_dir</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    reads input_html and finds all svg elements in the file.  These elements are then</span>
+<span class="sd">    written to individual svg files in out_dir</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c">#use mechanize to emulate a browser and read the input_html text after all scripts have </span>
+    <span class="c">#finished</span>
+    <span class="n">br</span> <span class="o">=</span> <span class="n">mechanize</span><span class="o">.</span><span class="n">Browser</span><span class="p">()</span>
+    <span class="n">site</span> <span class="o">=</span> <span class="n">br</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">input_html</span><span class="p">)</span>
+    <span class="n">html_text</span> <span class="o">=</span> <span class="n">site</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    
+    <span class="c">#parse input_html text with BeautifulSoup and find all svg elements</span>
+    <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">html_text</span><span class="p">)</span>
+    <span class="n">svgs</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&#39;svg&#39;</span><span class="p">)</span>
+    <span class="n">svg_counter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">svg</span> <span class="ow">in</span> <span class="n">svgs</span><span class="p">:</span>
+        <span class="n">write_to_standard_svg</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">svg</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">svg_counter</span><span class="p">)))</span>
+        <span class="n">svg_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+    
+</div>
+<div class="viewcode-block" id="write_to_standard_svg"><a class="viewcode-back" href="../../../../dom.html#cjf.cmap.util.dom.write_to_standard_svg">[docs]</a><span class="k">def</span> <span class="nf">write_to_standard_svg</span><span class="p">(</span><span class="n">svg_string</span><span class="p">,</span><span class="n">out_name</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    writes svg_string to out_name.svg, wrapping svg_string in a standard svg header</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_name</span> <span class="o">+</span> <span class="s">&#39;.svg&#39;</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;&lt;!-- Generator: cjf.cmap.util.dom SVG Version: 6.00 Build 0)  --&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;&lt;!DOCTYPE svg PUBLIC &quot;-//W3C//DTD SVG 1.1//EN&quot; &quot;http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd&quot;&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">svg_string</span><span class="p">)</span>
+    
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;wrote file to &#39;</span> <span class="o">+</span>  <span class="n">out_name</span> <span class="o">+</span> <span class="s">&#39;.svg&#39;</span><span class="p">)</span>
+    
+    
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="k">pass</span>
+</pre></div>
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Corey Flynn.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

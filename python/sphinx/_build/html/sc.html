@@ -1,0 +1,247 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sc &mdash; CJF-CMAP 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/theme_extras.js"></script>
+    <link rel="top" title="CJF-CMAP 1.1 documentation" href="index.html" />
+    <link rel="up" title="analytics" href="analytics.html" />
+    <link rel="next" title="kegg" href="kegg.html" />
+    <link rel="prev" title="graph" href="graph.html" /> 
+  </head>
+  <body>
+      <div class="header"><img class="rightlogo" src="_static/CJF2.png" alt="Logo"/><h1 class="heading"><a href="index.html">
+          <span>CJF-CMAP 1.1 documentation</span></a></h1>
+        <h2 class="heading"><span>sc</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        «&#160;&#160;<a href="graph.html">graph</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="kegg.html">kegg</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="module-cjf.cmap.analytics.sc">
+<span id="sc"></span><h1>sc<a class="headerlink" href="#module-cjf.cmap.analytics.sc" title="Permalink to this headline">¶</a></h1>
+<p>utilities to create Signature Strength - Correlation (SC) plots of gene expression data
+Created on Apr 2, 2012
+&#64;author: Corey Flynn, Broad Institute</p>
+<dl class="class">
+<dt id="cjf.cmap.analytics.sc.QuadInfo">
+<em class="property">class </em><tt class="descclassname">cjf.cmap.analytics.sc.</tt><tt class="descname">QuadInfo</tt><big>(</big><em>s_thresh=6</em>, <em>c_thresh=0.25</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/sc.html#QuadInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.sc.QuadInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>class to serve as a containing for sc plot quadrant information.  This class serves
+as a container for indexes and ids of the points falling in a given quadrant. A
+dictionary of id:index mapping is also constructed</p>
+<dl class="method">
+<dt id="cjf.cmap.analytics.sc.QuadInfo.add_points">
+<tt class="descname">add_points</tt><big>(</big><em>ids</em>, <em>indices</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/sc.html#QuadInfo.add_points"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.sc.QuadInfo.add_points" title="Permalink to this definition">¶</a></dt>
+<dd><p>adds the given ids and indices to the QuadInfo object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.sc.QuadInfo.clear_points">
+<tt class="descname">clear_points</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/sc.html#QuadInfo.clear_points"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.sc.QuadInfo.clear_points" title="Permalink to this definition">¶</a></dt>
+<dd><p>adds the given ids and indices to the QuadInfo object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.sc.QuadInfo.write_ids_to_file">
+<tt class="descname">write_ids_to_file</tt><big>(</big><em>out_path</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/sc.html#QuadInfo.write_ids_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.sc.QuadInfo.write_ids_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>write the ids of the points in the quad to file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.sc.QuadInfo.write_perts_to_file">
+<tt class="descname">write_perts_to_file</tt><big>(</big><em>out_path</em>, <em>unique=False</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/sc.html#QuadInfo.write_perts_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.sc.QuadInfo.write_perts_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>write only the pert_id portion of the the ids of the points in the quad to file.  If
+unique=True, no duplicate pert_ids are written to file</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cjf.cmap.analytics.sc.SC">
+<em class="property">class </em><tt class="descclassname">cjf.cmap.analytics.sc.</tt><tt class="descname">SC</tt><big>(</big><em>s_thresh=6</em>, <em>c_thresh=0.25</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/sc.html#SC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.sc.SC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Top level object to handle collection of signature strength and correlation information
+for the construction of SC plots</p>
+<dl class="method">
+<dt id="cjf.cmap.analytics.sc.SC.add_sc_from_brew">
+<tt class="descname">add_sc_from_brew</tt><big>(</big><em>brew_name</em>, <em>brew_path='/xchip/cogs/data/brew'</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/sc.html#SC.add_sc_from_brew"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.sc.SC.add_sc_from_brew" title="Permalink to this definition">¶</a></dt>
+<dd><p>reads the input sigstats file from within the specified brew folder and adds the 
+values for the SS and CC in the file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.sc.SC.add_sc_from_gct">
+<tt class="descname">add_sc_from_gct</tt><big>(</big><em>src</em>, <em>ss_column_name='distil_ss'</em>, <em>cc_column_name='distil_cc_q75'</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/sc.html#SC.add_sc_from_gct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.sc.SC.add_sc_from_gct" title="Permalink to this definition">¶</a></dt>
+<dd><p>reads the meta data of the given gct or gctx file and adds ss and cc values for
+samples in the file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.sc.SC.add_sc_from_grp">
+<tt class="descname">add_sc_from_grp</tt><big>(</big><em>grp_path</em>, <em>vehicle_control=False</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/sc.html#SC.add_sc_from_grp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.sc.SC.add_sc_from_grp" title="Permalink to this definition">¶</a></dt>
+<dd><p>reads the input sigstats file from all brew folders given in the specified grp file.
+The values for the SS and CC in the file are added. The grp file should contain one 
+brew folder per line</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.sc.SC.add_sc_from_sigstat">
+<tt class="descname">add_sc_from_sigstat</tt><big>(</big><em>sigstat_path</em>, <em>cc_field='cc_q75'</em>, <em>ss_field='sig_strength'</em>, <em>id_field='id'</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/sc.html#SC.add_sc_from_sigstat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.sc.SC.add_sc_from_sigstat" title="Permalink to this definition">¶</a></dt>
+<dd><p>reads the input sigstats file and adds the values for the SS and CC according to the
+parameters specified</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.sc.SC.clear_annots">
+<tt class="descname">clear_annots</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/sc.html#SC.clear_annots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.sc.SC.clear_annots" title="Permalink to this definition">¶</a></dt>
+<dd><p>clears the annotation dictionary in the SC object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.sc.SC.clear_data">
+<tt class="descname">clear_data</tt><big>(</big><em>s_thresh=6</em>, <em>c_thresh=0.25</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/sc.html#SC.clear_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.sc.SC.clear_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>clears the signature strength and correlation values in the SC object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.sc.SC.filter_sc">
+<tt class="descname">filter_sc</tt><big>(</big><em>include=None</em>, <em>exclude=None</em>, <em>control=None</em>, <em>destructive=True</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/sc.html#SC.filter_sc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.sc.SC.filter_sc" title="Permalink to this definition">¶</a></dt>
+<dd><p>filters the c and s arrays according to the include,exclude, and control parameters.
+If control is set, self.control_inds is set to the correct value</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.sc.SC.get_sensitivity">
+<tt class="descname">get_sensitivity</tt><big>(</big><em>control='DMSO'</em>, <em>include=None</em><big>)</big><a class="headerlink" href="#cjf.cmap.analytics.sc.SC.get_sensitivity" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculates the sensitivity of the sc_plot based on the current c_thresh. the
+control parameter is used to determine which points to exclude in the analysis</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.sc.SC.get_specificity">
+<tt class="descname">get_specificity</tt><big>(</big><em>control='DMSO'</em><big>)</big><a class="headerlink" href="#cjf.cmap.analytics.sc.SC.get_specificity" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculates the actual specificity of the sc_plot based on the current c_thresh. the
+control parameter is used to determine what to calculate the specificity on</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.sc.SC.plot">
+<tt class="descname">plot</tt><big>(</big><em>out=None, xlabel='CC', ylabel='SS', title=None, control=['DMSO'], include=None, exclude=None, pos_con=['SAHA', 'Trichostatin A', 'Fulvestrant', 'Genistein', 'LY-294002', 'Sirolimus', 'Thioridazine', 'Withaferin A', 'shERG#10']</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/sc.html#SC.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.sc.SC.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>plots and sc_plot.  The data is assumed to fall between a signature strength of 
+[0 20] and correlations between [-1 1]. Unless out is specified,the figure is drawn 
+on screen</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.sc.SC.set_thresh_by_specificity">
+<tt class="descname">set_thresh_by_specificity</tt><big>(</big><em>specificity</em>, <em>control='DMSO'</em><big>)</big><a class="headerlink" href="#cjf.cmap.analytics.sc.SC.set_thresh_by_specificity" title="Permalink to this definition">¶</a></dt>
+<dd><p>based on the the control string, find all of the control entries and set the 
+c_thresh and s_thresh to the the highest they can be with the given specificity</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.sc.SC.update_annotation_dict_from_table">
+<tt class="descname">update_annotation_dict_from_table</tt><big>(</big><em>annotation_table</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/sc.html#SC.update_annotation_dict_from_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.sc.SC.update_annotation_dict_from_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>updates the annotation dictionary from a table containing the ids under a column 
+headed by &#8216;name&#8217; and any number of additional columns with headers</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.sc.SC.update_quad_info">
+<tt class="descname">update_quad_info</tt><big>(</big><em>clear=True</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/sc.html#SC.update_quad_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.sc.SC.update_quad_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>take the current value of s and c and compute the quadrant membership of all points
+based on cutoffs</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.sc.SC.update_sc_cuttofs_from_perm_cutoff">
+<tt class="descname">update_sc_cuttofs_from_perm_cutoff</tt><big>(</big><em>perm_cutoff_path</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/sc.html#SC.update_sc_cuttofs_from_perm_cutoff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.sc.SC.update_sc_cuttofs_from_perm_cutoff" title="Permalink to this definition">¶</a></dt>
+<dd><p>reads the given perm_cutoff_file for signature strength and correlation cutoffs
+computed during a brew run</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.sc.SC.write_all_quad_perts_to_file">
+<tt class="descname">write_all_quad_perts_to_file</tt><big>(</big><em>base_string</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/sc.html#SC.write_all_quad_perts_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.sc.SC.write_all_quad_perts_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>writes the pert ids of each quad to file in four files (&#8216;<a href="#id1"><span class="problematic" id="id2">*</span></a>top_right_perts.grp&#8217;,
+&#8216;<a href="#id3"><span class="problematic" id="id4">*</span></a>top_left_perts.grp&#8217;,&#8217;<a href="#id5"><span class="problematic" id="id6">*</span></a>bottom_left_perts.grp&#8217;,&#8217;<a href="#id7"><span class="problematic" id="id8">*</span></a>bottom_right_perts.grp&#8217;) by calling
+each quad&#8217;s write_pert_to_file method</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.sc.SC.write_sc_table">
+<tt class="descname">write_sc_table</tt><big>(</big><em>out_path</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/sc.html#SC.write_sc_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.sc.SC.write_sc_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>writes the pid, signature strength, and correlation values in the SC object to
+file</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cjf.cmap.analytics.sc.sc_plot_from_brew">
+<tt class="descclassname">cjf.cmap.analytics.sc.</tt><tt class="descname">sc_plot_from_brew</tt><big>(</big><em>brew_name</em>, <em>include=None</em>, <em>exclude=None</em>, <em>control=None</em>, <em>title=None</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/sc.html#sc_plot_from_brew"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.sc.sc_plot_from_brew" title="Permalink to this definition">¶</a></dt>
+<dd><p>builds and sc plot from the given brew folder name.  This function will only work on
+systems where /xchip/cogs/data/brew is a valid path</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cjf.cmap.analytics.sc.sc_plot_from_grp">
+<tt class="descclassname">cjf.cmap.analytics.sc.</tt><tt class="descname">sc_plot_from_grp</tt><big>(</big><em>grp_path</em>, <em>include=None</em>, <em>exclude=None</em>, <em>control=None</em>, <em>title=None</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/sc.html#sc_plot_from_grp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.sc.sc_plot_from_grp" title="Permalink to this definition">¶</a></dt>
+<dd><p>builds and sc plot from the given grp file containing brew folder names.  This function
+will only work on systems where /xchip/cogs/data/brew is a valid path</p>
+</dd></dl>
+
+</div>
+
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        «&#160;&#160;<a href="graph.html">graph</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="kegg.html">kegg</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Corey Flynn.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

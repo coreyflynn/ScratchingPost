@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:CEL2QNORM.sh">
+   </FileRef>
+   <FileRef
+      location = "group:runGSEA.sh">
+   </FileRef>
+   <FileRef
+      location = "group:tmpscript.sh">
+   </FileRef>
+</Workspace>

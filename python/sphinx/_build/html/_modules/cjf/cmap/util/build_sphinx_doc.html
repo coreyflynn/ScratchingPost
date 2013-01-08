@@ -1,0 +1,124 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cjf.cmap.util.build_sphinx_doc &mdash; CJF-CMAP 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/theme_extras.js"></script>
+    <link rel="top" title="CJF-CMAP 1.1 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body>
+      <div class="header"><img class="rightlogo" src="../../../../_static/CJF2.png" alt="Logo"/><h1 class="heading"><a href="../../../../index.html">
+          <span>CJF-CMAP 1.1 documentation</span></a></h1>
+        <h2 class="heading"><span>cjf.cmap.util.build_sphinx_doc</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <h1>Source code for cjf.cmap.util.build_sphinx_doc</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">automatically builds sphinx .rst files for generation of documentations for the cjf package</span>
+
+<span class="sd">Created on Jan 25, 2012</span>
+<span class="sd">@author: Corey Flynn</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<div class="viewcode-block" id="get_source_files"><a class="viewcode-back" href="../../../../build_sphinx_doc.html#cjf.cmap.util.build_sphinx_doc.get_source_files">[docs]</a><span class="k">def</span> <span class="nf">get_source_files</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    walks the cjf directory and finds all source files with .py extensions that are not</span>
+<span class="sd">    under .svn directories</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">walk_result</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="s">&#39;/xchip/cogs/cflynn/sandboxCodeWorking/python/cjf&#39;</span><span class="p">)</span>
+    <span class="n">file_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">root_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">walk_result</span><span class="p">:</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">root</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">root_list</span><span class="p">:</span>
+            <span class="n">root_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s">&#39;cjf&#39;</span> <span class="ow">in</span> <span class="n">root</span> <span class="ow">and</span> <span class="s">&#39;.svn&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">root</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&#39;scanning &#39;</span> <span class="o">+</span> <span class="n">root</span>
+            <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">res</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="s">&#39;py&#39;</span> <span class="ow">in</span> <span class="n">file_name</span> <span class="ow">and</span> <span class="s">&#39;.pyc&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">file_name</span> <span class="ow">and</span> <span class="s">&#39;__init__&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">file_name</span><span class="p">:</span>
+                    <span class="n">file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span><span class="n">file_name</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">root_list</span><span class="p">,</span><span class="n">file_list</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="make_source_rst"><a class="viewcode-back" href="../../../../build_sphinx_doc.html#cjf.cmap.util.build_sphinx_doc.make_source_rst">[docs]</a><span class="k">def</span> <span class="nf">make_source_rst</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span><span class="n">output_dir</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    write an rst file to output_dir containing a title and an automodule call for the source</span>
+<span class="sd">    file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span><span class="n">base</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;.py&#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;.rst&#39;</span><span class="p">),</span><span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;.py&#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;=&#39;</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">base</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;.. automodule:: &#39;</span> <span class="o">+</span> <span class="n">input_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;/xchip/cogs/cflynn/sandboxCodeWorking/python/&#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;.py&#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">,</span><span class="s">&#39;.&#39;</span><span class="p">)</span>
+                 <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n\t</span><span class="s">&#39;</span> <span class="o">+</span> <span class="s">&#39;:members:&#39;</span><span class="p">)</span></div>
+<div class="viewcode-block" id="make_dir_rst"><a class="viewcode-back" href="../../../../build_sphinx_doc.html#cjf.cmap.util.build_sphinx_doc.make_dir_rst">[docs]</a><span class="k">def</span> <span class="nf">make_dir_rst</span><span class="p">(</span><span class="n">root_list</span><span class="p">,</span><span class="n">output_dir</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    create TOC pages for the root hierarchy formed in root_list  </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">root</span> <span class="ow">in</span> <span class="n">root_list</span><span class="p">:</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">base</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span><span class="n">base</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;.py&#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;.rst&#39;</span><span class="p">),</span><span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">base</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;=&#39;</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">base</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n\n</span><span class="s">&#39;</span><span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;.. toctree::</span><span class="se">\n\t</span><span class="s">:maxdepth: 2</span><span class="se">\n\n</span><span class="s">&#39;</span><span class="p">)</span>
+                <span class="n">contents</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s">&#39;.svn&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">c</span> <span class="ow">and</span> <span class="s">&#39;.pyc&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">c</span> <span class="ow">and</span> <span class="s">&#39;__init__&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+                        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span> <span class="o">+</span> <span class="n">c</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;.py&#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="p">(</span><span class="n">roots</span><span class="p">,</span><span class="n">source_files</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_source_files</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">sf</span> <span class="ow">in</span> <span class="n">source_files</span><span class="p">:</span>
+        <span class="n">make_source_rst</span><span class="p">(</span><span class="n">sf</span><span class="p">,</span> <span class="s">&#39;/xchip/cogs/cflynn/sandboxCodeWorking/python/sphinx&#39;</span><span class="p">)</span>
+    <span class="n">make_dir_rst</span><span class="p">(</span><span class="n">roots</span><span class="p">,</span> <span class="s">&#39;/xchip/cogs/cflynn/sandboxCodeWorking/python/sphinx&#39;</span><span class="p">)</span>
+</pre></div>
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Corey Flynn.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

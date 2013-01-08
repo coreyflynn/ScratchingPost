@@ -1,0 +1,106 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>gsea &mdash; CJF-CMAP 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/theme_extras.js"></script>
+    <link rel="top" title="CJF-CMAP 1.1 documentation" href="index.html" />
+    <link rel="up" title="analytics" href="analytics.html" />
+    <link rel="next" title="graph" href="graph.html" />
+    <link rel="prev" title="signature_strength" href="signature_strength.html" /> 
+  </head>
+  <body>
+      <div class="header"><img class="rightlogo" src="_static/CJF2.png" alt="Logo"/><h1 class="heading"><a href="index.html">
+          <span>CJF-CMAP 1.1 documentation</span></a></h1>
+        <h2 class="heading"><span>gsea</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        «&#160;&#160;<a href="signature_strength.html">signature_strength</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="graph.html">graph</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="module-cjf.cmap.analytics.gsea">
+<span id="gsea"></span><h1>gsea<a class="headerlink" href="#module-cjf.cmap.analytics.gsea" title="Permalink to this headline">¶</a></h1>
+<p>methods for GSEA analysis
+Created on May 16, 2012
+&#64;author: Corey Flynn</p>
+<dl class="function">
+<dt id="cjf.cmap.analytics.gsea.add_to_perm_database">
+<tt class="descclassname">cjf.cmap.analytics.gsea.</tt><tt class="descname">add_to_perm_database</tt><big>(</big><em>gene_set_size</em>, <em>rank_list_size</em><big>)</big><a class="headerlink" href="#cjf.cmap.analytics.gsea.add_to_perm_database" title="Permalink to this definition">¶</a></dt>
+<dd><p>adds the permutation of the given sizes to the permutation database</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cjf.cmap.analytics.gsea.check_perm_database">
+<tt class="descclassname">cjf.cmap.analytics.gsea.</tt><tt class="descname">check_perm_database</tt><big>(</big><em>gene_set_size</em>, <em>rank_list_size</em><big>)</big><a class="headerlink" href="#cjf.cmap.analytics.gsea.check_perm_database" title="Permalink to this definition">¶</a></dt>
+<dd><p>checks to see if a permutation of the given gene set size and rank list size has already
+been performed. If it has, returns True.  If not, returns False</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cjf.cmap.analytics.gsea.get_perm_means">
+<tt class="descclassname">cjf.cmap.analytics.gsea.</tt><tt class="descname">get_perm_means</tt><big>(</big><em>gene_set_size</em>, <em>rank_list_size</em><big>)</big><a class="headerlink" href="#cjf.cmap.analytics.gsea.get_perm_means" title="Permalink to this definition">¶</a></dt>
+<dd><p>grabs the up and down means for the bimodal gsea permutation distribution of the given
+sizes</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cjf.cmap.analytics.gsea.preranked">
+<tt class="descclassname">cjf.cmap.analytics.gsea.</tt><tt class="descname">preranked</tt><big>(</big><em>gene_set</em>, <em>ranked_list</em>, <em>p=1</em>, <em>plot=False</em>, <em>perm_check=True</em>, <em>do_NES=True</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/gsea.html#preranked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.gsea.preranked" title="Permalink to this definition">¶</a></dt>
+<dd><p>preranked gsea using gene_set and ranks</p>
+</dd></dl>
+
+</div>
+
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        «&#160;&#160;<a href="signature_strength.html">signature_strength</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="graph.html">graph</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Corey Flynn.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

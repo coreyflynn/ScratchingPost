@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:brute_force_cell_mat_analysis.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:grouped_cm.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:cm2gct.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:get_replicate_corrs.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:overlay_rep_corrs.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:replicate_dict_to_table.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:density_plot.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:gaus2D.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:probe_rank_entropy.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:eudist.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:get_eigen_instances.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:combine_plate_replicates.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:cids_from_cdesc.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:get_cell_inds.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:cids_from_pert_id.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:tmpscript.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:cnafplot.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:sc_plot_from_rep_corr.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:sc_plot.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:fermifilt.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:sc_permutations.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:greedy_cell_mat_analysis.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:get_ss.m">
+   </FileRef>
+   <FileRef
+      location = "group:generate_permuted_rr_ss_point.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:corr_stats_smash.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:plot_CP_replicate_corrs.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:replicate_corr_output_to_table.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:plate_zscore_dist_plot.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:combine_gct.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:build_tag_file.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:bouton_results_compile.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:mkcm.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:consensus_cluster_report_tool.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:cjfSandboxGenDoc.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:RMSE_table_gen.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:gctcombine_tool.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:run_java_cc.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:signiture_similarity_tool.m">
+   </FileRef>
+   <FileRef
+      location = "group:strip_infer_tool.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:correlation_report_tool.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:regexp_list_inds.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:KD_get_matrix.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:KD_compare.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:CMap_bioGraph.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:mergeBioGraph.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:CMap_build_comparison.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:CMap_query_matrix.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:CMap_enrichment_score_confidence.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:CMap_bar_plot.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:CMap_instance_test.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:exp2list.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:str_split.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:CMap_enrichment_score.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:sdfToTextExpList.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:correlation_ecdf.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:uiparse_gct.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:uiparse_grp.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:cluster_label_shuffle.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:filter_probes.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:filter_probes_var.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:filter_probes_var_list.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:filter_probes_exp_list.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:ensure_landmarks.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:filter_samples.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:combine_samples.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:gene_list_strip.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:ListBasedMontiLymphomaAnalysis.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:plot_Gene_InfVsObs.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:plot_geneSet_range.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:plot_Sample_InfVsObs.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:range_subsample_genes.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:reorder_Expression.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:reorder_genes.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:reorder_probes.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:normalize_probes.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:filter_columns.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:filter_row_by_header.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:reorder_M.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:uniform_subsample_genes.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:VarianceBasedMontiLymphomaAnalysis.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:inferred_correlation_tool.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:GseaInferredComparison.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:gct_genesym2ps.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:gct_ps2genesym.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:stringsplit.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:tex_line.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:tex_fig.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:tex_fig_two_panel.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:tex_title_author_date.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:tex_includes.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:texSpecialCharReplace.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:sample_correlations_gct.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:gene_correlations_gct.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+   <FileRef
+      location = "group:colored_label_table.m"
+      assignedFileDataType = "public.php-script">
+   </FileRef>
+</Workspace>

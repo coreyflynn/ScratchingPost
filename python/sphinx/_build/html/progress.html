@@ -1,0 +1,128 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>progress &mdash; CJF-CMAP 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/theme_extras.js"></script>
+    <link rel="top" title="CJF-CMAP 1.1 documentation" href="index.html" />
+    <link rel="up" title="util" href="util.html" />
+    <link rel="next" title="cmap_build_annotations_sdf" href="cmap_build_annotations_sdf.html" />
+    <link rel="prev" title="setup_path" href="setup_path.html" /> 
+  </head>
+  <body>
+      <div class="header"><img class="rightlogo" src="_static/CJF2.png" alt="Logo"/><h1 class="heading"><a href="index.html">
+          <span>CJF-CMAP 1.1 documentation</span></a></h1>
+        <h2 class="heading"><span>progress</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        «&#160;&#160;<a href="setup_path.html">setup_path</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="cmap_build_annotations_sdf.html">cmap_build_annotations_sdf</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="module-cjf.cmap.util.progress">
+<span id="progress"></span><h1>progress<a class="headerlink" href="#module-cjf.cmap.util.progress" title="Permalink to this headline">¶</a></h1>
+<p>classes for determinate and indeterminate update bars
+Created on Apr 10, 2012</p>
+<p>&#64;author: cflynn</p>
+<dl class="class">
+<dt id="cjf.cmap.util.progress.DeterminateProgressBar">
+<em class="property">class </em><tt class="descclassname">cjf.cmap.util.progress.</tt><tt class="descname">DeterminateProgressBar</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/util/progress.html#DeterminateProgressBar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.util.progress.DeterminateProgressBar" title="Permalink to this definition">¶</a></dt>
+<dd><p>provides an interface for determinate progress bars</p>
+<dl class="method">
+<dt id="cjf.cmap.util.progress.DeterminateProgressBar.clear">
+<tt class="descname">clear</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/cjf/cmap/util/progress.html#DeterminateProgressBar.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.util.progress.DeterminateProgressBar.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>clears the screen</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.util.progress.DeterminateProgressBar.update">
+<tt class="descname">update</tt><big>(</big><em>message</em>, <em>progress</em>, <em>total</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/util/progress.html#DeterminateProgressBar.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.util.progress.DeterminateProgressBar.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>update the update displayed on screen</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cjf.cmap.util.progress.IndeteriminateProgressBar">
+<em class="property">class </em><tt class="descclassname">cjf.cmap.util.progress.</tt><tt class="descname">IndeteriminateProgressBar</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/util/progress.html#IndeteriminateProgressBar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.util.progress.IndeteriminateProgressBar" title="Permalink to this definition">¶</a></dt>
+<dd><p>provides an interface for indeterminate progress bars</p>
+<dl class="method">
+<dt id="cjf.cmap.util.progress.IndeteriminateProgressBar.animate">
+<tt class="descname">animate</tt><big>(</big><em>i</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/util/progress.html#IndeteriminateProgressBar.animate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.util.progress.IndeteriminateProgressBar.animate" title="Permalink to this definition">¶</a></dt>
+<dd><p>underlying animate function for the progress bar</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.util.progress.IndeteriminateProgressBar.start">
+<tt class="descname">start</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/cjf/cmap/util/progress.html#IndeteriminateProgressBar.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.util.progress.IndeteriminateProgressBar.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>start the indeterminate progress bar</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.util.progress.IndeteriminateProgressBar.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/cjf/cmap/util/progress.html#IndeteriminateProgressBar.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.util.progress.IndeteriminateProgressBar.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>stop the indeterminate progress bar</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.util.progress.IndeteriminateProgressBar.test">
+<tt class="descname">test</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/cjf/cmap/util/progress.html#IndeteriminateProgressBar.test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.util.progress.IndeteriminateProgressBar.test" title="Permalink to this definition">¶</a></dt>
+<dd><p>test the progress bar</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        «&#160;&#160;<a href="setup_path.html">setup_path</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="cmap_build_annotations_sdf.html">cmap_build_annotations_sdf</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Corey Flynn.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,692 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cjf.cmap.analytics.signature_strength &mdash; CJF-CMAP 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/theme_extras.js"></script>
+    <link rel="top" title="CJF-CMAP 1.1 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body>
+      <div class="header"><img class="rightlogo" src="../../../../_static/CJF2.png" alt="Logo"/><h1 class="heading"><a href="../../../../index.html">
+          <span>CJF-CMAP 1.1 documentation</span></a></h1>
+        <h2 class="heading"><span>cjf.cmap.analytics.signature_strength</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <h1>Source code for cjf.cmap.analytics.signature_strength</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Created on Jan 9, 2012</span>
+
+<span class="sd">@author: cflynn</span>
+
+<span class="sd">signature_strength provides modules for processing of signatures in the form of .rnk files.</span>
+<span class="sd">These files are typically produced by bsig_gen and must be tab-delimited text files </span>
+<span class="sd">containing a column of signal to noise (or other comparator) scores and probeset names.  The</span>
+<span class="sd">provided methods allow for the comparison of signatures within and across logical groupings</span>
+<span class="sd">of signatures provided by their grouping into folders on disc.  </span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">BeautifulSoup</span>
+
+<span class="kn">import</span> <span class="nn">cjf.cmap.util.text</span> <span class="kn">as</span> <span class="nn">cjf_text</span>
+<span class="kn">import</span> <span class="nn">cjf.cmap.io.gct</span> <span class="kn">as</span> <span class="nn">cjf_gct</span>
+<span class="kn">import</span> <span class="nn">cjf.cmap.util.url</span> <span class="kn">as</span> <span class="nn">cjf_url</span>
+
+<div class="viewcode-block" id="make_rnks_from_tag"><a class="viewcode-back" href="../../../../signature_strength.html#cjf.cmap.analytics.signature_strength.make_rnks_from_tag">[docs]</a><span class="k">def</span> <span class="nf">make_rnks_from_tag</span><span class="p">(</span><span class="n">gct_file</span><span class="p">,</span><span class="n">tag_file</span><span class="p">,</span><span class="n">rnk_dir</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Generate a .rnk file with a column of probe ids and a column of scores for each phenotype</span>
+<span class="sd">    in the specified tag file using the specified gct file</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c">#defaults</span>
+    <span class="n">do_mean</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">do_median</span> <span class="o">=</span> <span class="bp">False</span>
+    
+    <span class="c">#parse kwargs</span>
+    <span class="k">if</span> <span class="s">&#39;do_median&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;do_median&#39;</span><span class="p">]:</span>
+            <span class="n">do_mean</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">do_median</span> <span class="o">=</span> <span class="bp">True</span>
+    
+    <span class="c">#read in gct data</span>
+    <span class="n">gct_data</span> <span class="o">=</span> <span class="n">cjf_gct</span><span class="o">.</span><span class="n">parse_gct_dict</span><span class="p">(</span><span class="n">gct_file</span><span class="p">)</span>
+    
+    <span class="c">#read in the tag file and make a dictionary with of all phenotypes as keys and the </span>
+    <span class="c">#samples in those phenotypes as the keys</span>
+    <span class="n">exclude_classes</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;EMPTY&#39;</span><span class="p">,</span><span class="s">&#39;DMSO&#39;</span><span class="p">]</span>
+    <span class="n">phenotypes</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">(</span><span class="nb">file</span><span class="p">(</span><span class="n">tag_file</span><span class="p">,</span><span class="s">&#39;rU&#39;</span><span class="p">),</span> <span class="n">delimiter</span><span class="o">=</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">col</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="n">row</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">if</span> <span class="s">&#39;Sample_id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">col</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">val</span> <span class="ow">and</span> <span class="n">val</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exclude_classes</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">phenotypes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="n">phenotypes</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s">&#39;Sample_id&#39;</span><span class="p">])]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">phenotypes</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s">&#39;Sample_id&#39;</span><span class="p">]))</span>
+    
+    <span class="c">#for each entry in the dictionary, grab the probe data from gct_data and for all</span>
+    <span class="c">#phenotype members.  Sort this data on the probe values and write a .rnk file to the </span>
+    <span class="c">#directory given in rnk_dir</span>
+    <span class="n">tag_base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">tag_file</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_tag&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">phenotypes</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="n">probe_vals</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">gct_data</span><span class="p">[</span><span class="s">&#39;SAMPLES&#39;</span><span class="p">][</span><span class="n">sample</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s">&#39;PROBE_VALS&#39;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">)):</span>
+            <span class="n">probe_vals</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">gct_data</span><span class="p">[</span><span class="s">&#39;SAMPLES&#39;</span><span class="p">][</span><span class="n">sample</span><span class="p">[</span><span class="n">ii</span><span class="p">]][</span><span class="s">&#39;PROBE_VALS&#39;</span><span class="p">],</span><span class="n">probe_vals</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">do_mean</span><span class="p">:</span>
+            <span class="n">probe_means</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">probe_vals</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">do_median</span><span class="p">:</span>
+            <span class="n">probe_means</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">probe_vals</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">probe_names</span> <span class="o">=</span> <span class="n">gct_data</span><span class="p">[</span><span class="s">&#39;SAMPLES&#39;</span><span class="p">][</span><span class="n">sample</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s">&#39;PROBE_NAMES&#39;</span><span class="p">]</span>
+        <span class="n">probe_tuples</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">probe_names</span><span class="p">,</span><span class="n">probe_means</span><span class="p">)</span>
+        <span class="n">probe_tuples</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">probe_tuples</span><span class="p">:</span><span class="n">probe_tuples</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">rnk_file</span> <span class="o">=</span> <span class="n">rnk_dir</span> <span class="o">+</span> <span class="s">&#39;/&#39;</span> <span class="o">+</span> <span class="n">tag_base</span> <span class="o">+</span> <span class="s">&#39;_&#39;</span> <span class="o">+</span> <span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;p:&#39;</span><span class="p">,</span><span class="s">&#39;__&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;.rnk&#39;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">rnk_file</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">ii</span><span class="p">,</span><span class="n">probe_tuple</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">probe_tuples</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">ii</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">probe_tuples</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">probe_tuple</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">probe_tuple</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">probe_tuple</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">probe_tuple</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+</div>
+<div class="viewcode-block" id="make_rnks_from_gct"><a class="viewcode-back" href="../../../../signature_strength.html#cjf.cmap.analytics.signature_strength.make_rnks_from_gct">[docs]</a><span class="k">def</span> <span class="nf">make_rnks_from_gct</span><span class="p">(</span><span class="n">gct_file</span><span class="p">,</span><span class="n">rnk_dir</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Generate a .rnk file with a column of probe ids and a column of scores for each sample</span>
+<span class="sd">    in the specified tag file using the specified gct file</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c">#open the gct file to be operated on using a GCT object</span>
+    <span class="n">gct_obj</span> <span class="o">=</span> <span class="n">cjf_gct</span><span class="o">.</span><span class="n">GCT</span><span class="p">()</span>
+    <span class="n">gct_obj</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">gct_file</span><span class="p">)</span>
+    
+    <span class="c">#for each sample in the gct file, create a .rnk file</span>
+    <span class="n">cids</span> <span class="o">=</span> <span class="n">gct_obj</span><span class="o">.</span><span class="n">get_cids</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;building </span><span class="si">%i</span><span class="s"> .rnk files&#39;</span> <span class="o">%</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cids</span><span class="p">),))</span>
+    <span class="n">probes</span> <span class="o">=</span> <span class="n">gct_obj</span><span class="o">.</span><span class="n">get_rids</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">ii</span><span class="p">,</span><span class="n">cid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cids</span><span class="p">):</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="n">gct_obj</span><span class="o">.</span><span class="n">get_inds_by_cdesc</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">,</span> <span class="n">cid</span><span class="p">)</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">gct_obj</span><span class="o">.</span><span class="n">matrix</span><span class="p">[:,</span><span class="n">ind</span><span class="p">]</span>
+        <span class="n">probes_scores</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">probes</span><span class="p">,</span><span class="n">scores</span><span class="p">)</span>
+        <span class="n">probes_scores</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">probes_scores</span><span class="p">:</span><span class="n">probes_scores</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">rnk_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rnk_dir</span><span class="p">,</span><span class="n">cid</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;:&#39;</span><span class="p">,</span><span class="s">&#39;_&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;.rnk&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">rnk_name</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">jj</span><span class="p">,</span> <span class="n">ps</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">probes_scores</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">jj</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">probes_scores</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ps</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ps</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">update</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">cids</span><span class="p">))</span>
+        
+        
+    
+</div>
+<div class="viewcode-block" id="sig_stregth"><a class="viewcode-back" href="../../../../signature_strength.html#cjf.cmap.analytics.signature_strength.sig_stregth">[docs]</a><span class="k">def</span> <span class="nf">sig_stregth</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Generate a signature strength measure for the specified .rnk file.  The signature </span>
+<span class="sd">    strength is the mean z-score difference between the top and bottom probe_num </span>
+<span class="sd">    probesets in each signature.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c">#parse kwargs</span>
+    <span class="k">if</span> <span class="s">&#39;probe_num&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">probe_num</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;probe_num&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">probe_num</span> <span class="o">=</span> <span class="mi">100</span>
+    
+    <span class="n">num_lines</span> <span class="o">=</span> <span class="n">cjf_text</span><span class="o">.</span><span class="n">line_count</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+    <span class="n">up_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">down_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">f</span><span class="p">):</span> <span class="c">#@UnusedVariable</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">probe_num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">up_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">num_lines</span> <span class="o">-</span> <span class="n">probe_num</span><span class="p">:</span>
+                <span class="n">down_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">strength</span> <span class="o">=</span> <span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">up_list</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">up_list</span><span class="p">))</span><span class="o">-</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">down_list</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">down_list</span><span class="p">))</span>
+    <span class="n">sig_name</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">:][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.rnk&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">sig_name</span><span class="p">,</span> <span class="n">strength</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="edge_overlap"><a class="viewcode-back" href="../../../../signature_strength.html#cjf.cmap.analytics.signature_strength.edge_overlap">[docs]</a><span class="k">def</span> <span class="nf">edge_overlap</span><span class="p">(</span><span class="n">rnk_one</span><span class="p">,</span><span class="n">rnk_two</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Calculate the number of probesets that overlap at the top and bottom edges of two .rnk </span>
+<span class="sd">    files. The .rnk files are assumed to be in the same probe space. Return two values, one </span>
+<span class="sd">    for the overlap at the top of the file and one for the overlap at the bottom.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c">#defaults</span>
+    <span class="n">do_probes</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">do_zs</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">probe_num</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">z_thresh</span> <span class="o">=</span> <span class="mi">2</span>
+    
+    <span class="c">#parse kwargs</span>
+    <span class="k">if</span> <span class="s">&#39;probe_num&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">probe_num</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;probe_num&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s">&#39;do_probes&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">do_probes</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;do_probes&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s">&#39;do_zs&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">do_zs</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;do_zs&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">do_zs</span><span class="p">:</span>
+            <span class="n">do_probes</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">if</span> <span class="s">&#39;z_thresh&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">z_thresh</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;z_thresh&#39;</span><span class="p">]</span>
+    
+    <span class="c">#make lists of the top and bottom probesets in each file</span>
+    <span class="n">num_lines</span> <span class="o">=</span> <span class="n">cjf_text</span><span class="o">.</span><span class="n">line_count</span><span class="p">(</span><span class="n">rnk_one</span><span class="p">)</span>
+    <span class="n">rnk_one_top</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">rnk_one_bot</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">rnk_two_top</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">rnk_two_bot</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">rnk_one</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">f</span><span class="p">):</span> <span class="c">#@UnusedVariable</span>
+            <span class="k">if</span> <span class="n">do_probes</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">probe_num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">rnk_one_top</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">num_lines</span> <span class="o">-</span> <span class="n">probe_num</span><span class="p">:</span>
+                    <span class="n">rnk_one_bot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">do_zs</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">score</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;=</span> <span class="n">z_thresh</span><span class="p">:</span>
+                    <span class="n">rnk_one_top</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">score</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="n">z_thresh</span><span class="p">:</span>
+                    <span class="n">rnk_one_bot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">rnk_two</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">f</span><span class="p">):</span> <span class="c">#@UnusedVariable</span>
+            <span class="k">if</span> <span class="n">do_probes</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">probe_num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">rnk_two_top</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">num_lines</span> <span class="o">-</span> <span class="n">probe_num</span><span class="p">:</span>
+                    <span class="n">rnk_two_bot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">do_zs</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">score</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;=</span> <span class="n">z_thresh</span><span class="p">:</span>
+                    <span class="n">rnk_two_top</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">score</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="n">z_thresh</span><span class="p">:</span>
+                    <span class="n">rnk_two_bot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="c">#calculate the overlap using set operations and return the counts</span>
+    <span class="n">top_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">rnk_one_top</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">rnk_two_top</span><span class="p">)))</span>
+    <span class="n">bot_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">rnk_one_bot</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">rnk_two_bot</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">top_count</span><span class="p">,</span><span class="n">bot_count</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="sig_strength_summary_from_rnk"><a class="viewcode-back" href="../../../../signature_strength.html#cjf.cmap.analytics.signature_strength.sig_strength_summary_from_rnk">[docs]</a><span class="k">def</span> <span class="nf">sig_strength_summary_from_rnk</span><span class="p">(</span><span class="n">directory_path</span><span class="p">,</span><span class="n">summary_file</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Generate summary_file containing signatures for all of the .rnk files found in </span>
+<span class="sd">    directory_path and its sub-directories along with signature strength measures.  </span>
+<span class="sd">    The output file is sorted by descending signature strength </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c">#parse kwargs</span>
+    <span class="k">if</span> <span class="s">&#39;probe_num&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">probe_num</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;probe_num&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">probe_num</span> <span class="o">=</span> <span class="mi">100</span>
+        
+    <span class="c">#calculate signature strengths for all found .rnk files</span>
+    <span class="n">rnk_files</span> <span class="o">=</span> <span class="n">get_rnk_files</span><span class="p">(</span><span class="n">directory_path</span><span class="p">)</span>
+    <span class="n">sig_strengths</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">rf</span> <span class="ow">in</span> <span class="n">rnk_files</span><span class="p">:</span>
+        <span class="n">sig_strengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sig_stregth</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="n">probe_num</span><span class="o">=</span><span class="n">probe_num</span><span class="p">))</span>
+    <span class="n">sig_strengths</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">sig_strengths</span><span class="p">:</span> <span class="n">sig_strengths</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    
+    <span class="c">#write the summary file</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">summary_file</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">sig_strengths</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ss</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span></div>
+<div class="viewcode-block" id="sig_strength_summary_from_gct"><a class="viewcode-back" href="../../../../signature_strength.html#cjf.cmap.analytics.signature_strength.sig_strength_summary_from_gct">[docs]</a><span class="k">def</span> <span class="nf">sig_strength_summary_from_gct</span><span class="p">(</span><span class="n">gct_file</span><span class="p">,</span><span class="n">probe_num</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">do_zthresh</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span><span class="n">return_list</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span><span class="n">summary_file</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Generate summary_file containing signatures for all of the columns in gct_file </span>
+<span class="sd">    along with signature strength measures.  The output file is sorted by descending </span>
+<span class="sd">    signature strength</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c">#open the gct file to be operated on using a GCT object</span>
+    <span class="n">gct_obj</span> <span class="o">=</span> <span class="n">cjf_gct</span><span class="o">.</span><span class="n">GCT</span><span class="p">()</span>
+    <span class="n">gct_obj</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">gct_file</span><span class="p">)</span>
+    
+    <span class="c">#for each sample in the gct file, calculate a sig_strength</span>
+    <span class="n">cids</span> <span class="o">=</span> <span class="n">gct_obj</span><span class="o">.</span><span class="n">get_cids</span><span class="p">()</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;sorting gct matrix</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+    <span class="n">gct_obj</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">progress_message</span> <span class="o">=</span> <span class="s">&#39;computing </span><span class="si">%i</span><span class="s"> signature strengths: &#39;</span> <span class="o">%</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cids</span><span class="p">),)</span>
+    <span class="n">sig_strengths</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">ii</span><span class="p">,</span><span class="n">cid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cids</span><span class="p">):</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="n">gct_obj</span><span class="o">.</span><span class="n">get_inds_by_cdesc</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">,</span> <span class="n">cid</span><span class="p">)</span>
+        <span class="n">rnk_name</span> <span class="o">=</span> <span class="n">cid</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;:&#39;</span><span class="p">,</span><span class="s">&#39;_&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">do_zthresh</span><span class="p">:</span>
+            <span class="n">bot</span> <span class="o">=</span> <span class="n">gct_obj</span><span class="o">.</span><span class="n">matrix</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">gct_obj</span><span class="o">.</span><span class="n">matrix</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">2</span><span class="p">)]</span>
+            <span class="n">top</span> <span class="o">=</span> <span class="n">gct_obj</span><span class="o">.</span><span class="n">matrix</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">gct_obj</span><span class="o">.</span><span class="n">matrix</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">bot</span> <span class="o">=</span> <span class="n">gct_obj</span><span class="o">.</span><span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">probe_num</span><span class="p">,</span><span class="n">ind</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">top</span> <span class="o">=</span> <span class="n">gct_obj</span><span class="o">.</span><span class="n">matrix</span><span class="p">[</span><span class="n">gct_obj</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">probe_num</span><span class="p">:,</span><span class="n">ind</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">bot_mean</span> <span class="o">=</span> <span class="n">bot</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="n">top_mean</span> <span class="o">=</span> <span class="n">top</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="n">strength</span> <span class="o">=</span> <span class="n">top_mean</span><span class="o">-</span><span class="n">bot_mean</span>
+        <span class="n">sig_strengths</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">rnk_name</span><span class="p">,</span><span class="n">strength</span><span class="p">))</span>
+        <span class="n">update</span><span class="p">(</span><span class="n">progress_message</span><span class="p">,</span> <span class="n">ii</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">cids</span><span class="p">))</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\r</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="o">*</span><span class="mi">100</span><span class="p">,))</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\r</span><span class="s">finished computing </span><span class="si">%i</span><span class="s"> signature strengths</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cids</span><span class="p">),))</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+    
+    <span class="c">#give output if required</span>
+    <span class="k">if</span> <span class="n">return_list</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">sig_strengths</span>
+    
+    <span class="c">#sort the results and write them to file if required.</span>
+    <span class="k">if</span> <span class="n">summary_file</span><span class="p">:</span>
+        <span class="n">sig_strengths</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">sig_strengths</span><span class="p">:</span> <span class="n">sig_strengths</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">summary_file</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">ii</span><span class="p">,</span><span class="n">ss</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sig_strengths</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">ii</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">sig_strengths</span><span class="p">):</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">ss</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">ss</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="se">\t</span><span class="si">%f</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">ss</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">ss</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;wrote summary to </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">summary_file</span><span class="p">,))</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>   
+    </div>
+<div class="viewcode-block" id="edge_overlap_summary"><a class="viewcode-back" href="../../../../signature_strength.html#cjf.cmap.analytics.signature_strength.edge_overlap_summary">[docs]</a><span class="k">def</span> <span class="nf">edge_overlap_summary</span><span class="p">(</span><span class="n">directory_one</span><span class="p">,</span><span class="n">directory_two</span><span class="p">,</span><span class="n">summary_file</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Generate summary_file containing the name of all signature classes and their overlap</span>
+<span class="sd">    between the contexts specified by directory_one and directory_two.  Overlaps at the top</span>
+<span class="sd">    and the bottom of the .rnk files are reported</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c">#defaults</span>
+    <span class="n">do_probes</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">do_zs</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">probe_num</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">z_thresh</span> <span class="o">=</span> <span class="mi">2</span>
+    
+    <span class="c">#parse kwargs</span>
+    <span class="k">if</span> <span class="s">&#39;probe_num&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">probe_num</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;probe_num&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s">&#39;do_probes&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">do_probes</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;do_probes&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s">&#39;do_zs&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">do_zs</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;do_zs&#39;</span><span class="p">]</span>
+        <span class="n">do_probes</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">if</span> <span class="s">&#39;z_thresh&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">z_thresh</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;z_thresh&#39;</span><span class="p">]</span>
+    
+    <span class="c">#get rnk files</span>
+    <span class="n">directory_one_rnks</span> <span class="o">=</span> <span class="n">get_rnk_files</span><span class="p">(</span><span class="n">directory_one</span><span class="p">)</span>
+    <span class="n">directory_two_rnks</span> <span class="o">=</span> <span class="n">get_rnk_files</span><span class="p">(</span><span class="n">directory_two</span><span class="p">)</span>
+    
+    <span class="c">#for each rnk file in directory_one_rnks, find its match in directory_two_rnks and </span>
+    <span class="c">#compute their overlap</span>
+    <span class="n">edge_results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">r1</span> <span class="ow">in</span> <span class="n">directory_one_rnks</span><span class="p">:</span>
+        <span class="n">base1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">r1</span><span class="p">)</span>
+        <span class="n">class_name</span> <span class="o">=</span> <span class="n">base1</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">:][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">r2</span> <span class="ow">in</span> <span class="n">directory_two_rnks</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">class_name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">r2</span><span class="p">):</span>
+                <span class="n">top</span><span class="p">,</span> <span class="n">bot</span> <span class="o">=</span> <span class="n">edge_overlap</span><span class="p">(</span><span class="n">r1</span><span class="p">,</span> <span class="n">r2</span><span class="p">,</span><span class="n">probe_num</span><span class="o">=</span><span class="n">probe_num</span><span class="p">,</span> <span class="n">z_thresh</span><span class="o">=</span><span class="n">z_thresh</span><span class="p">,</span>
+                                        <span class="n">do_probes</span><span class="o">=</span><span class="n">do_probes</span><span class="p">,</span> <span class="n">do_zs</span><span class="o">=</span><span class="n">do_zs</span><span class="p">)</span>
+                <span class="n">edge_results</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">class_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.rnk&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span><span class="n">top</span><span class="p">,</span><span class="n">bot</span><span class="p">))</span>
+    
+    <span class="c">#write the results to summary_file</span>
+    
+    <span class="n">edge_results</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">edge_results</span><span class="p">:</span> <span class="n">edge_results</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">edge_results</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">summary_file</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">er</span> <span class="ow">in</span> <span class="n">edge_results</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">er</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">er</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">er</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        
+    </div>
+<div class="viewcode-block" id="get_rnk_files"><a class="viewcode-back" href="../../../../signature_strength.html#cjf.cmap.analytics.signature_strength.get_rnk_files">[docs]</a><span class="k">def</span> <span class="nf">get_rnk_files</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Collect all of the .rnk files in the specified folder and return their full paths in</span>
+<span class="sd">    a list.  </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">walk_result</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
+    <span class="n">file_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">walk_result</span><span class="p">:</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">print</span> <span class="s">&#39;scanning &#39;</span> <span class="o">+</span> <span class="n">root</span>
+        <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">res</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+            <span class="n">file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">root</span> <span class="o">+</span> <span class="s">&#39;/&#39;</span> <span class="o">+</span> <span class="n">file_name</span><span class="p">)</span>
+    <span class="n">rnk_list</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="n">is_rnk</span><span class="p">,</span><span class="n">file_list</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rnk_list</span>
+</div>
+<div class="viewcode-block" id="sig_strength_summary_to_json"><a class="viewcode-back" href="../../../../signature_strength.html#cjf.cmap.analytics.signature_strength.sig_strength_summary_to_json">[docs]</a><span class="k">def</span> <span class="nf">sig_strength_summary_to_json</span><span class="p">(</span><span class="n">summary_file</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Generates json_file containing an object for each signature class found in </span>
+<span class="sd">    summary_file.  Signature names in summary_file are assumed to be in the </span>
+<span class="sd">    CELL_CLASS naming scheme.  Json objects in json_file will contain a &#39;name&#39; field</span>
+<span class="sd">    as well as a field for the signature strength of each unique CELL found  </span>
+<span class="sd">    &#39;&#39;&#39;</span> 
+    <span class="c">#parse kwargs</span>
+    <span class="k">if</span> <span class="s">&#39;json_file&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">json_file</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;json_file&#39;</span><span class="p">]</span>
+        <span class="n">do_file</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">do_file</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">if</span> <span class="s">&#39;return_list&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">return_list</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;return_list&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">return_list</span> <span class="o">=</span> <span class="bp">False</span>
+    
+    <span class="c">#gather all represented cells</span>
+    <span class="n">cell_class_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">summary_file</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">):</span>
+        <span class="n">sig_name</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">sig_cell</span> <span class="o">=</span> <span class="n">sig_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">sig_cell</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cell_class_list</span><span class="p">:</span>
+            <span class="n">cell_class_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sig_cell</span><span class="p">)</span>
+    
+    <span class="c">#create a dictionary containing all signature classes as keys and a dictionary</span>
+    <span class="c">#of their expressions across cells as values        </span>
+    <span class="n">sig_class_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">summary_file</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">):</span>
+        <span class="n">sig_name</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">sig_strength</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+        <span class="n">sig_cell</span> <span class="o">=</span> <span class="n">sig_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">sig_class</span> <span class="o">=</span> <span class="n">sig_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">sig_class</span> <span class="ow">in</span> <span class="n">sig_class_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">sig_class_dict</span><span class="p">[</span><span class="n">sig_class</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">sig_cell</span><span class="p">:</span><span class="n">sig_strength</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sig_class_dict</span><span class="p">[</span><span class="n">sig_class</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">sig_cell</span><span class="p">:</span><span class="n">sig_strength</span><span class="p">})</span>
+        <span class="k">for</span> <span class="n">cell_class</span> <span class="ow">in</span> <span class="n">cell_class_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cell_class</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sig_class_dict</span><span class="p">[</span><span class="n">sig_class</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">sig_class_dict</span><span class="p">[</span><span class="n">sig_class</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">cell_class</span><span class="p">:</span><span class="s">&#39;0&#39;</span><span class="p">})</span>
+    
+    <span class="c">#format the data and export to json</span>
+    <span class="n">sig_class_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">sig_class_dict</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="n">tmp_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="n">key</span><span class="p">}</span>
+        <span class="n">tmp_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="n">sig_class_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_dict</span><span class="p">)</span>
+    <span class="n">class_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">sig_class_list</span><span class="p">,</span><span class="n">sort_keys</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    
+    <span class="c">#return sig_class_list if it is asked for</span>
+    <span class="k">if</span> <span class="n">return_list</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">sig_class_list</span>
+    
+    <span class="c">#write the json to file or return it</span>
+    <span class="k">if</span> <span class="n">do_file</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">json_file</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">class_json</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">class_json</span>
+</div>
+<div class="viewcode-block" id="sig_strength_summary_to_table"><a class="viewcode-back" href="../../../../signature_strength.html#cjf.cmap.analytics.signature_strength.sig_strength_summary_to_table">[docs]</a><span class="k">def</span> <span class="nf">sig_strength_summary_to_table</span><span class="p">(</span><span class="n">summary_file</span><span class="p">,</span><span class="n">table_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates table_file containing a line for each signature class found in </span>
+<span class="sd">    summary_file.  Signature names in summary_file are assumed to be in the </span>
+<span class="sd">    CELL_CLASS naming scheme.  lines in table_file will contain a &#39;name&#39; column</span>
+<span class="sd">    as well as a column for the signature strength of each unique CELL found</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">#create a dictionary containing all signature classes as keys and a dictionary</span>
+    <span class="c">#of their expressions across cells as values        </span>
+    <span class="n">sig_class_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">summary_file</span><span class="p">,</span><span class="s">&#39;rU&#39;</span><span class="p">):</span>
+        <span class="n">sig_name</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+        <span class="n">sig_strength</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+        <span class="n">sig_cell</span> <span class="o">=</span> <span class="n">sig_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">sig_class</span> <span class="o">=</span> <span class="n">sig_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">sig_class</span> <span class="ow">in</span> <span class="n">sig_class_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">sig_class_dict</span><span class="p">[</span><span class="n">sig_class</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">sig_cell</span><span class="p">:</span><span class="n">sig_strength</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sig_class_dict</span><span class="p">[</span><span class="n">sig_class</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">sig_cell</span><span class="p">:</span><span class="n">sig_strength</span><span class="p">})</span>
+    
+    <span class="c">#format the data and export to a tab delimited table</span>
+    <span class="n">sig_class_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">sig_class_dict</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="n">tmp_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="n">key</span><span class="p">}</span>
+        <span class="n">tmp_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="n">sig_class_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_dict</span><span class="p">)</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="n">sig_class_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">table_file</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="s">&#39;name&#39;</span> <span class="ow">in</span> <span class="n">field</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span> <span class="o">+</span> <span class="n">field</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sig_class_list</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="s">&#39;name&#39;</span> <span class="ow">in</span> <span class="n">field</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span> <span class="o">+</span> <span class="n">s</span><span class="p">[</span><span class="n">field</span><span class="p">])</span>
+                    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">0&#39;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+    
+    
+     </div>
+<div class="viewcode-block" id="edge_overlap_summary_to_json"><a class="viewcode-back" href="../../../../signature_strength.html#cjf.cmap.analytics.signature_strength.edge_overlap_summary_to_json">[docs]</a><span class="k">def</span> <span class="nf">edge_overlap_summary_to_json</span><span class="p">(</span><span class="n">summary_file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Generates json_file containing an object for each signature class found in </span>
+<span class="sd">    summary_file.  Signature names in summary_file are assumed to be in the </span>
+<span class="sd">    CELL_CLASS naming scheme.  Json objects in json_file will contain a &#39;name&#39; field</span>
+<span class="sd">    as well as &quot;up&quot; and &quot;down&quot; fields for overlap counts  </span>
+<span class="sd">    &#39;&#39;&#39;</span> 
+    <span class="c">#parse kwargs</span>
+    <span class="k">if</span> <span class="s">&#39;json_file&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">json_file</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;json_file&#39;</span><span class="p">]</span>
+        <span class="n">do_file</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">do_file</span> <span class="o">=</span> <span class="bp">False</span>
+    
+    <span class="c">#create a list containing all of the attribute fields and dump it to json</span>
+    <span class="n">sig_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">summary_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+            <span class="n">split_line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">sig_list</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&quot;name&quot;</span><span class="p">:</span><span class="n">split_line</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s">&quot;up&quot;</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="n">split_line</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span><span class="s">&quot;down&quot;</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="n">split_line</span><span class="p">[</span><span class="mi">2</span><span class="p">])})</span>
+    <span class="n">sig_list</span>
+    <span class="n">sig_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">sig_list</span><span class="p">,</span><span class="n">sort_keys</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    
+    
+    <span class="c">#write the json to file or return it</span>
+    <span class="k">if</span> <span class="n">do_file</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">json_file</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">sig_json</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">sig_json</span>
+        </div>
+<div class="viewcode-block" id="make_edge_overlap_html"><a class="viewcode-back" href="../../../../signature_strength.html#cjf.cmap.analytics.signature_strength.make_edge_overlap_html">[docs]</a><span class="k">def</span> <span class="nf">make_edge_overlap_html</span><span class="p">(</span><span class="n">rnk_one_dir</span><span class="p">,</span><span class="n">rnk_two_dir</span><span class="p">,</span><span class="n">out_dir</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Create an html report from edge overlap data.  The edge overlap data is computed from</span>
+<span class="sd">    two folders with .rnk files in them and a standard html template is used as the base</span>
+<span class="sd">    of the report</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c">#defaults</span>
+    <span class="n">probe_num</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">z_thresh</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">file_name</span> <span class="o">=</span> <span class="s">&#39;index&#39;</span>
+    
+    <span class="c">#parse kwargs</span>
+    <span class="k">if</span> <span class="s">&#39;probe_num&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">probe_num</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;probe_num&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s">&#39;z_thresh&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">z_thresh</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;z_thresh&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s">&#39;file_name&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;file_name&#39;</span><span class="p">]</span>
+        
+    <span class="c">#if out_dir does not exist, create it</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">out_dir</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+    
+    <span class="c">#output locations</span>
+    <span class="n">probe_summary_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span><span class="s">&#39;probe_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">probe_num</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;_edge_overlap_summary.txt&#39;</span><span class="p">)</span>
+    <span class="n">z_summary_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span><span class="s">&#39;z_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">z_thresh</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;_edge_overlap_summary.txt&#39;</span><span class="p">)</span>
+    
+    <span class="c">#compute the edge overlap scores for both probe_num and z-score</span>
+    <span class="n">edge_overlap_summary</span><span class="p">(</span><span class="n">rnk_one_dir</span><span class="p">,</span> <span class="n">rnk_two_dir</span><span class="p">,</span> 
+                         <span class="n">probe_summary_file</span><span class="p">,</span>
+                         <span class="n">probe_num</span><span class="o">=</span><span class="n">probe_num</span><span class="p">,</span><span class="n">do_probes</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">edge_overlap_summary</span><span class="p">(</span><span class="n">rnk_one_dir</span><span class="p">,</span> <span class="n">rnk_two_dir</span><span class="p">,</span> 
+                         <span class="n">z_summary_file</span><span class="p">,</span>
+                         <span class="n">z_thresh</span><span class="o">=</span><span class="n">z_thresh</span><span class="p">,</span><span class="n">do_zs</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="c">#make json objects</span>
+    <span class="n">probe_json</span> <span class="o">=</span> <span class="n">edge_overlap_summary_to_json</span><span class="p">(</span><span class="n">probe_summary_file</span><span class="p">)</span>
+    <span class="n">z_json</span> <span class="o">=</span> <span class="n">edge_overlap_summary_to_json</span><span class="p">(</span><span class="n">z_summary_file</span><span class="p">)</span>
+    
+    <span class="c">#place the summary objects in the correct location of the template html file and write</span>
+    <span class="c">#the output html file to disk</span>
+    <span class="n">report_template</span> <span class="o">=</span> <span class="n">cjf_url</span><span class="o">.</span><span class="n">cogs_open</span><span class="p">(</span><span class="s">&#39;http://www.broadinstitute.org/cogs/cfwork/html_templates/binary_edge_signature_comparison_template.html&#39;</span><span class="p">)</span>
+    
+    <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="o">.</span><span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">report_template</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+    
+    <span class="n">scripts</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&#39;script&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">script</span> <span class="ow">in</span> <span class="n">scripts</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s">&quot;//tb100 template&quot;</span> <span class="ow">in</span> <span class="n">script</span><span class="o">.</span><span class="n">text</span><span class="p">:</span>
+            <span class="n">script</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s">&quot;var data = &quot;</span> <span class="o">+</span> <span class="n">probe_json</span> <span class="o">+</span> <span class="s">&quot;;</span><span class="se">\n</span><span class="s">signature_bars(data)&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s">&quot;//z-score template&quot;</span> <span class="ow">in</span> <span class="n">script</span><span class="o">.</span><span class="n">text</span><span class="p">:</span>
+            <span class="n">script</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s">&quot;var data = &quot;</span> <span class="o">+</span> <span class="n">z_json</span> <span class="o">+</span> <span class="s">&quot;;</span><span class="se">\n</span><span class="s">signature_bars(data)&quot;</span><span class="p">)</span>
+    
+    <span class="n">paras</span>  <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&#39;p&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paras</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s">&quot;folder1&quot;</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="p">:</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s">&quot;&lt;b&gt;folder 1:&lt;/b&gt; &quot;</span> <span class="o">+</span> <span class="n">rnk_one_dir</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s">&quot;folder2&quot;</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="p">:</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s">&quot;&lt;b&gt;folder 2:&lt;/b&gt; &quot;</span> <span class="o">+</span> <span class="n">rnk_two_dir</span><span class="p">)</span>
+    
+    <span class="n">h1s</span>  <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&#39;h1&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">h1</span> <span class="ow">in</span> <span class="n">h1s</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s">&quot;probeset header&quot;</span> <span class="ow">in</span> <span class="n">h1</span><span class="o">.</span><span class="n">text</span><span class="p">:</span>
+            <span class="n">h1</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s">&quot;top and bottom &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">probe_num</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; probesets&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s">&quot;z-score header&quot;</span> <span class="ow">in</span> <span class="n">h1</span><span class="o">.</span><span class="n">text</span><span class="p">:</span>
+            <span class="n">h1</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s">&quot;top and bottom &amp;plusmn &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">z_thresh</span><span class="p">))</span>
+    
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span><span class="n">file_name</span> <span class="o">+</span> <span class="s">&quot;.html&quot;</span><span class="p">),</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f_out</span><span class="p">:</span>
+        <span class="n">f_out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">prettify</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="make_sig_strength_html"><a class="viewcode-back" href="../../../../signature_strength.html#cjf.cmap.analytics.signature_strength.make_sig_strength_html">[docs]</a><span class="k">def</span> <span class="nf">make_sig_strength_html</span><span class="p">(</span><span class="n">summary_file</span><span class="p">,</span><span class="n">out_dir</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Create an html report from signature strength data.  the signature strength data is </span>
+<span class="sd">    taken from summary_file and placed into a template html file.  The output is written to</span>
+<span class="sd">    out_dir.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c">#defaults</span>
+    <span class="n">file_name</span> <span class="o">=</span> <span class="s">&quot;signature_strength&quot;</span>
+    
+    <span class="c">#parse kwargs</span>
+    <span class="k">if</span> <span class="s">&#39;file_name&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;file_name&#39;</span><span class="p">]</span>
+        
+    <span class="c">#if out_dir does not exist, create it</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">out_dir</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+
+    <span class="c">#make json object</span>
+    <span class="n">summary_json</span> <span class="o">=</span> <span class="n">sig_strength_summary_to_json</span><span class="p">(</span><span class="n">summary_file</span><span class="p">)</span>
+    
+    <span class="c">#combine the entries in the summary to a summary json object</span>
+    <span class="n">json_list</span> <span class="o">=</span> <span class="n">sig_strength_summary_to_json</span><span class="p">(</span><span class="n">summary_file</span><span class="p">,</span><span class="n">return_list</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">json_keys</span> <span class="o">=</span> <span class="n">json_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    <span class="n">json_keys</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">json_keys</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">))</span>
+    <span class="n">json_keys</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="n">table_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">json_list</span><span class="p">:</span>
+        <span class="n">tmp_strengths</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">json_keys</span><span class="p">:</span>
+                <span class="n">tmp_strengths</span> <span class="o">+=</span> <span class="n">item</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;,&#39;</span>
+            <span class="n">tmp_strengths</span> <span class="o">=</span> <span class="n">tmp_strengths</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">tmp_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="n">item</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">],</span><span class="s">&#39;data&#39;</span><span class="p">:</span><span class="n">tmp_strengths</span><span class="p">}</span>
+        <span class="n">table_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_dict</span><span class="p">)</span>
+    <span class="n">table_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">table_list</span><span class="p">,</span><span class="n">sort_keys</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            
+    
+    
+    <span class="c">#open the template file from the cogs server</span>
+    <span class="n">report_template</span> <span class="o">=</span> <span class="n">cjf_url</span><span class="o">.</span><span class="n">cogs_open</span><span class="p">(</span><span class="s">&#39;http://www.broadinstitute.org/cogs/cfwork/html_templates/multi_sig_strength_comparison_template.html&#39;</span><span class="p">)</span>
+    
+    
+    <span class="c">#place the summary objects in the correct location of the template html file and write</span>
+    <span class="c">#the output html file to disk</span>
+    <span class="c">#place data into the template html heatmap file</span>
+    <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="o">.</span><span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">report_template</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+    <span class="n">scripts</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&#39;script&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">script</span> <span class="ow">in</span> <span class="n">scripts</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s">&quot;//connections_data&quot;</span> <span class="ow">in</span> <span class="n">script</span><span class="o">.</span><span class="n">text</span><span class="p">:</span>
+            <span class="n">script</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s">&quot;var connections = &quot;</span> <span class="o">+</span> <span class="n">summary_json</span> <span class="o">+</span> <span class="s">&#39;;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s">&quot;//table_data&quot;</span> <span class="ow">in</span> <span class="n">script</span><span class="o">.</span><span class="n">text</span><span class="p">:</span>
+            <span class="n">script</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s">&quot;var table_data = &quot;</span> <span class="o">+</span> <span class="n">table_json</span> <span class="o">+</span> <span class="s">&#39;;&#39;</span><span class="p">)</span>
+    
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span><span class="n">file_name</span> <span class="o">+</span> <span class="s">&quot;.html&quot;</span><span class="p">),</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f_out</span><span class="p">:</span>
+        <span class="n">f_out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">prettify</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="is_rnk"><a class="viewcode-back" href="../../../../signature_strength.html#cjf.cmap.analytics.signature_strength.is_rnk">[docs]</a><span class="k">def</span> <span class="nf">is_rnk</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Function for filtering lists to contain &#39;.rnk&#39;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&quot;.rnk&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+</div>
+<span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">message</span><span class="p">,</span><span class="n">update</span><span class="p">,</span> <span class="n">total</span><span class="p">):</span>
+    <span class="n">percent</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">update</span><span class="p">)</span><span class="o">/</span><span class="n">total</span><span class="o">*</span><span class="mi">100</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\r</span><span class="si">%s</span><span class="s">[</span><span class="si">%s</span><span class="s">] </span><span class="si">%.2f%%</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">message</span><span class="p">,</span><span class="s">&#39;#&#39;</span><span class="o">*</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">percent</span><span class="o">/</span><span class="mi">10</span><span class="p">))),</span> <span class="n">percent</span><span class="p">))</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pprint</span>
+    <span class="n">rnk_files</span> <span class="o">=</span> <span class="n">get_rnk_files</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">sig_strength</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">print</span> <span class="s">&quot;computing sig strengths...&quot;</span>
+    <span class="k">for</span> <span class="n">rf</span> <span class="ow">in</span> <span class="n">rnk_files</span><span class="p">:</span>
+        <span class="n">sig_strength</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sig_stregth</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="n">probe_num</span><span class="o">=</span><span class="mi">100</span><span class="p">))</span>
+    <span class="n">sig_strength</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">sig_strength</span><span class="p">:</span> <span class="n">sig_strength</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">&quot;top ten signatures(score,name):&quot;</span>
+    <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">sig_strength</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">10</span><span class="p">])</span>
+</pre></div>
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Corey Flynn.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

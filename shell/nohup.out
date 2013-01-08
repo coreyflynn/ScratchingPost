@@ -1,0 +1,254 @@
+------------------------------------------
+Setting up environment variables
+---
+LD_LIBRARY_PATH is .:/xchip/cogs/matlib/mcr/versions/v713//runtime/glnxa64:/xchip/cogs/matlib/mcr/versions/v713//bin/glnxa64:/xchip/cogs/matlib/mcr/versions/v713//sys/os/glnxa64:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64/native_threads:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64/server:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64/client:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64
+-[ GEX2NORM ]- Start
+gex2norm: Parameters
+res: /xchip/cogs/cflynn/InferenceEval/RNAi/test/RNAI6.txt_gex.gct
+overwrite: 0
+out: 
+yref: /xchip/cogs/ftp/pub/cmap/log_ybio_epsilon.gct
+invset: /xchip/cogs/ftp/pub/cmap/affx_invset_n80.gmx
+debug: 0
+rpt: gex2norm
+islog2: 0
+fitmodel: power
+precision: 4
+minval: 0
+maxval: 15
+mkcalplot: 1
+lowmem: 0
+censorbad: 1
+showfig: 0
+{??? Error using ==> gex2norm at 188
+Dataset not found: /xchip/cogs/cflynn/InferenceEval/RNAi/test/RNAI6.txt_gex.gct
+} 
+
+------------------------------------------
+Setting up environment variables
+---
+LD_LIBRARY_PATH is .:/xchip/cogs/matlib/mcr/versions/v713//runtime/glnxa64:/xchip/cogs/matlib/mcr/versions/v713//bin/glnxa64:/xchip/cogs/matlib/mcr/versions/v713//sys/os/glnxa64:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64/native_threads:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64/server:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64/client:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64
+-[ GEX2NORM ]- Start
+gex2norm: Parameters
+res: /xchip/cogs/cflynn/InferenceEval/RNAi/test/RNAI6.txt_gex.gct
+overwrite: 0
+out: 
+yref: /xchip/cogs/ftp/pub/cmap/log_ybio_epsilon.gct
+invset: /xchip/cogs/ftp/pub/cmap/affx_invset_n80.gmx
+debug: 0
+rpt: gex2norm
+islog2: 0
+fitmodel: power
+precision: 4
+minval: 0
+maxval: 15
+mkcalplot: 1
+lowmem: 0
+censorbad: 1
+showfig: 0
+{??? Error using ==> gex2norm at 188
+Dataset not found: /xchip/cogs/cflynn/InferenceEval/RNAi/test/RNAI6.txt_gex.gct
+} 
+
+------------------------------------------
+Setting up environment variables
+---
+LD_LIBRARY_PATH is .:/xchip/cogs/matlib/mcr/versions/v713//runtime/glnxa64:/xchip/cogs/matlib/mcr/versions/v713//bin/glnxa64:/xchip/cogs/matlib/mcr/versions/v713//sys/os/glnxa64:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64/native_threads:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64/server:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64/client:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64
+-[ GEX2NORM ]- Start
+gex2norm: Parameters
+res: RNAI6_gex.gct
+overwrite: 0
+out: 
+yref: /xchip/cogs/ftp/pub/cmap/log_ybio_epsilon.gct
+invset: /xchip/cogs/ftp/pub/cmap/affx_invset_n80.gmx
+debug: 0
+rpt: gex2norm
+islog2: 0
+fitmodel: power
+precision: 4
+minval: 0
+maxval: 15
+mkcalplot: 1
+lowmem: 0
+censorbad: 1
+showfig: 0
+{??? Error using ==> gex2norm at 188
+Dataset not found: RNAI6_gex.gct
+} 
+
+------------------------------------------
+Setting up environment variables
+---
+LD_LIBRARY_PATH is .:/xchip/cogs/matlib/mcr/versions/v713//runtime/glnxa64:/xchip/cogs/matlib/mcr/versions/v713//bin/glnxa64:/xchip/cogs/matlib/mcr/versions/v713//sys/os/glnxa64:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64/native_threads:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64/server:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64/client:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64
+-[ GEX2NORM ]- Start
+gex2norm: Parameters
+res: /xchip/cogs/cflynn/InferenceEval/RNAi/test.gct
+overwrite: 0
+out: 
+yref: /xchip/cogs/ftp/pub/cmap/log_ybio_epsilon.gct
+invset: /xchip/cogs/ftp/pub/cmap/affx_invset_n80.gmx
+debug: 0
+rpt: gex2norm
+islog2: 0
+fitmodel: power
+precision: 4
+minval: 0
+maxval: 15
+mkcalplot: 1
+lowmem: 0
+censorbad: 1
+showfig: 0
+{??? Error using ==> gex2norm at 188
+Dataset not found: /xchip/cogs/cflynn/InferenceEval/RNAi/test.gct
+} 
+
+------------------------------------------
+Setting up environment variables
+---
+LD_LIBRARY_PATH is .:/xchip/cogs/matlib/mcr/versions/v713//runtime/glnxa64:/xchip/cogs/matlib/mcr/versions/v713//bin/glnxa64:/xchip/cogs/matlib/mcr/versions/v713//sys/os/glnxa64:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64/native_threads:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64/server:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64/client:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64
+-[ GEX2NORM ]- Start
+gex2norm: Parameters
+res: /xchip/cogs/cflynn/InferenceEval/RNAi/test/.gct
+overwrite: 0
+out: 
+yref: /xchip/cogs/ftp/pub/cmap/log_ybio_epsilon.gct
+invset: /xchip/cogs/ftp/pub/cmap/affx_invset_n80.gmx
+debug: 0
+rpt: gex2norm
+islog2: 0
+fitmodel: power
+precision: 4
+minval: 0
+maxval: 15
+mkcalplot: 1
+lowmem: 0
+censorbad: 1
+showfig: 0
+{??? Error using ==> gex2norm at 188
+Dataset not found: /xchip/cogs/cflynn/InferenceEval/RNAi/test/.gct
+} 
+
+------------------------------------------
+Setting up environment variables
+---
+LD_LIBRARY_PATH is .:/xchip/cogs/matlib/mcr/versions/v713//runtime/glnxa64:/xchip/cogs/matlib/mcr/versions/v713//bin/glnxa64:/xchip/cogs/matlib/mcr/versions/v713//sys/os/glnxa64:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64/native_threads:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64/server:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64/client:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64
+-[ GEX2NORM ]- Start
+gex2norm: Parameters
+res: /xchip/cogs/cflynn/InferenceEval/RNAi/test/RNAI6_gex.gct
+overwrite: 0
+out: 
+yref: /xchip/cogs/ftp/pub/cmap/log_ybio_epsilon.gct
+invset: /xchip/cogs/ftp/pub/cmap/affx_invset_n80.gmx
+debug: 0
+rpt: gex2norm
+islog2: 0
+fitmodel: power
+precision: 4
+minval: 0
+maxval: 15
+mkcalplot: 1
+lowmem: 0
+censorbad: 1
+showfig: 0
+class:double
+Reading /xchip/cogs/ftp/pub/cmap/log_ybio_epsilon.gct [1x13]
+read:1/1
+Done.
+class:single
+Reading /xchip/cogs/cflynn/InferenceEval/RNAi/test/RNAI6_gex.gct [22277x48]
+read:4000/22277
+read:8000/22277
+read:12000/22277
+read:16000/22277
+read:20000/22277
+read:22277/22277
+Done.
+Log2 transforming...
+Performing normalization...
+Normalization complete.
+Samples passed qc: 48/48
+Elapsed time is 6.194632 seconds.
+0/48 samples failed QC
+Saving file to /xchip/cogs/cflynn/InferenceEval/RNAi/test/RNAI6_NORM_n48x22277.gct
+Dimensions of matrix: [22277x48]
+Setting precision to 4
+Saved.
+class:single
+Reading /xchip/cogs/cflynn/InferenceEval/RNAi/test/RNAI6_NORM_n48x22277.gct [22277x48]
+read:4000/22277
+read:8000/22277
+read:12000/22277
+read:16000/22277
+read:20000/22277
+read:22277/22277
+Done.
+Saving file to /xchip/cogs/cflynn/InferenceEval/RNAi/test/RNAI6_QNORM_n48x22277.gct
+Dimensions of matrix: [22277x48]
+Setting precision to 4
+Saved.
+Saving 2 figure(s) to /xchip/cogs/cflynn/InferenceEval/RNAi/test
+RNAI6_QCPLOT.png
+RNAI6_RANGEFC.png
+-[ GEX2NORM ]- Done. (24.20s)
+------------------------------------------
+Setting up environment variables
+---
+LD_LIBRARY_PATH is .:/xchip/cogs/matlib/mcr/versions/v713//runtime/glnxa64:/xchip/cogs/matlib/mcr/versions/v713//bin/glnxa64:/xchip/cogs/matlib/mcr/versions/v713//sys/os/glnxa64:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64/native_threads:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64/server:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64/client:/xchip/cogs/matlib/mcr/versions/v713//sys/java/jre/glnxa64/jre/lib/amd64
+-[ GEX2NORM ]- Start
+gex2norm: Parameters
+res: /xchip/cogs/cflynn/InferenceEval/RNAi/RNAI6_gex.gct
+overwrite: 0
+out: 
+yref: /xchip/cogs/ftp/pub/cmap/log_ybio_epsilon.gct
+invset: /xchip/cogs/ftp/pub/cmap/affx_invset_n80.gmx
+debug: 0
+rpt: gex2norm
+islog2: 0
+fitmodel: power
+precision: 4
+minval: 0
+maxval: 15
+mkcalplot: 1
+lowmem: 0
+censorbad: 1
+showfig: 0
+class:double
+Reading /xchip/cogs/ftp/pub/cmap/log_ybio_epsilon.gct [1x13]
+read:1/1
+Done.
+class:single
+Reading /xchip/cogs/cflynn/InferenceEval/RNAi/RNAI6_gex.gct [22277x48]
+read:4000/22277
+read:8000/22277
+read:12000/22277
+read:16000/22277
+read:20000/22277
+read:22277/22277
+Done.
+Log2 transforming...
+Performing normalization...
+Normalization complete.
+Samples passed qc: 48/48
+Elapsed time is 6.047358 seconds.
+0/48 samples failed QC
+Saving file to /xchip/cogs/cflynn/InferenceEval/RNAi/RNAI6_NORM_n48x22277.gct
+Dimensions of matrix: [22277x48]
+Setting precision to 4
+Saved.
+class:single
+Reading /xchip/cogs/cflynn/InferenceEval/RNAi/RNAI6_NORM_n48x22277.gct [22277x48]
+read:4000/22277
+read:8000/22277
+read:12000/22277
+read:16000/22277
+read:20000/22277
+read:22277/22277
+Done.
+Saving file to /xchip/cogs/cflynn/InferenceEval/RNAi/RNAI6_QNORM_n48x22277.gct
+Dimensions of matrix: [22277x48]
+Setting precision to 4
+Saved.
+Saving 2 figure(s) to /xchip/cogs/cflynn/InferenceEval/RNAi
+RNAI6_QCPLOT.png
+RNAI6_RANGEFC.png
+-[ GEX2NORM ]- Done. (22.96s)

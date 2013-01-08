@@ -1,0 +1,164 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>query &mdash; CJF-CMAP 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/theme_extras.js"></script>
+    <link rel="top" title="CJF-CMAP 1.1 documentation" href="index.html" />
+    <link rel="up" title="analytics" href="analytics.html" />
+    <link rel="next" title="tools" href="tools.html" />
+    <link rel="prev" title="d3graph" href="d3graph.html" /> 
+  </head>
+  <body>
+      <div class="header"><img class="rightlogo" src="_static/CJF2.png" alt="Logo"/><h1 class="heading"><a href="index.html">
+          <span>CJF-CMAP 1.1 documentation</span></a></h1>
+        <h2 class="heading"><span>query</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        «&#160;&#160;<a href="d3graph.html">d3graph</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="tools.html">tools</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="module-cjf.cmap.analytics.query">
+<span id="query"></span><h1>query<a class="headerlink" href="#module-cjf.cmap.analytics.query" title="Permalink to this headline">¶</a></h1>
+<p>provides methods for CMap like queries
+Created on May 8, 2012
+&#64;author: Corey Flynn</p>
+<dl class="class">
+<dt id="cjf.cmap.analytics.query.Query">
+<em class="property">class </em><tt class="descclassname">cjf.cmap.analytics.query.</tt><tt class="descname">Query</tt><big>(</big><em>queries=None</em>, <em>database=None</em>, <em>database_cid=None</em>, <em>database_rid=None</em>, <em>database_meta={}</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/query.html#Query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.query.Query" title="Permalink to this definition">¶</a></dt>
+<dd><p>object to handles queries.  The object assumes that there is a database of
+deltas(instances) that will be queried with one or more deltas(instances)
+using one of the provided methods</p>
+<dl class="method">
+<dt id="cjf.cmap.analytics.query.Query.add_to_database_from_gct">
+<tt class="descname">add_to_database_from_gct</tt><big>(</big><em>src</em>, <em>meta='pert_desc'</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/query.html#Query.add_to_database_from_gct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.query.Query.add_to_database_from_gct" title="Permalink to this definition">¶</a></dt>
+<dd><p>add deltas to the database from the given gct file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.query.Query.gsea_query">
+<tt class="descname">gsea_query</tt><big>(</big><em>query=None</em>, <em>cid=None</em>, <em>database=None</em>, <em>gene_set_size=50</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/query.html#Query.gsea_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.query.Query.gsea_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>query the database with all of the deltas in self.queries or in the specified query
+matrix using preranked gsea</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.query.Query.rrho_query">
+<tt class="descname">rrho_query</tt><big>(</big><em>query=None</em>, <em>cid=None</em>, <em>database=None</em>, <em>start=50</em>, <em>step=100</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/query.html#Query.rrho_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.query.Query.rrho_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>query the database with all of the deltas in self.queries or in the specified query
+matrix using rank-rank hypergeometric overlap</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.query.Query.save">
+<tt class="descname">save</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/query.html#Query.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.query.Query.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>save the query to file as a pickled binary file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.query.Query.show_break_out_table">
+<tt class="descname">show_break_out_table</tt><big>(</big><em>query_inds</em>, <em>query_type='spearman'</em>, <em>labels=None</em>, <em>scale=1</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/query.html#Query.show_break_out_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.query.Query.show_break_out_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>runs queries from the given indices into the dataset and displays them as a break
+out result table</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.query.Query.spearman_query">
+<tt class="descname">spearman_query</tt><big>(</big><em>query=None</em>, <em>cid=None</em>, <em>database=None</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/query.html#Query.spearman_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.query.Query.spearman_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>query the database with all of the deltas in self.queries or in the specified query
+matrix</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="cjf.cmap.analytics.query.QueryException">
+<em class="property">exception </em><tt class="descclassname">cjf.cmap.analytics.query.</tt><tt class="descname">QueryException</tt><a class="reference internal" href="_modules/cjf/cmap/analytics/query.html#QueryException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.query.QueryException" title="Permalink to this definition">¶</a></dt>
+<dd><p>custom exception class for Query object exceptions</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cjf.cmap.analytics.query.QueryResult">
+<em class="property">class </em><tt class="descclassname">cjf.cmap.analytics.query.</tt><tt class="descname">QueryResult</tt><big>(</big><em>query_type=''</em>, <em>data=</em><span class="optional">[</span><span class="optional">]</span>, <em>cid=</em><span class="optional">[</span><span class="optional">]</span>, <em>database_id=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/query.html#QueryResult"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.query.QueryResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>class to hold the results of queries inside of a top level Query object</p>
+<dl class="method">
+<dt id="cjf.cmap.analytics.query.QueryResult.save">
+<tt class="descname">save</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/query.html#QueryResult.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.query.QueryResult.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>save the query result to file as a pickled binary file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cjf.cmap.analytics.query.QueryResult.write_table">
+<tt class="descname">write_table</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/query.html#QueryResult.write_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.query.QueryResult.write_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>writes the query results to a table at the given path</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cjf.cmap.analytics.query.load_query">
+<tt class="descclassname">cjf.cmap.analytics.query.</tt><tt class="descname">load_query</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/query.html#load_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.query.load_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>loads the specified pickled query file into memory</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cjf.cmap.analytics.query.load_query_result">
+<tt class="descclassname">cjf.cmap.analytics.query.</tt><tt class="descname">load_query_result</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="_modules/cjf/cmap/analytics/query.html#load_query_result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cjf.cmap.analytics.query.load_query_result" title="Permalink to this definition">¶</a></dt>
+<dd><p>loads the specified pickled query result file into memory</p>
+</dd></dl>
+
+</div>
+
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        «&#160;&#160;<a href="d3graph.html">d3graph</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="tools.html">tools</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Corey Flynn.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

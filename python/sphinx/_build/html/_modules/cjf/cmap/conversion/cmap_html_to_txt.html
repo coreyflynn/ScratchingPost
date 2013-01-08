@@ -1,0 +1,138 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cjf.cmap.conversion.cmap_html_to_txt &mdash; CJF-CMAP 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/theme_extras.js"></script>
+    <link rel="top" title="CJF-CMAP 1.1 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body>
+      <div class="header"><img class="rightlogo" src="../../../../_static/CJF2.png" alt="Logo"/><h1 class="heading"><a href="../../../../index.html">
+          <span>CJF-CMAP 1.1 documentation</span></a></h1>
+        <h2 class="heading"><span>cjf.cmap.conversion.cmap_html_to_txt</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <h1>Source code for cjf.cmap.conversion.cmap_html_to_txt</h1><div class="highlight"><pre>
+<span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Utility to convert a raw html dump of a cmap search result table into a tab delimited table.</span>
+<span class="sd">INPUTS:</span>
+<span class="sd">(1) input_html: the html file to be parsed</span>
+<span class="sd">(2) output_txt: the txt file to be written</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">urllib2</span>
+<span class="kn">import</span> <span class="nn">BeautifulSoup</span>
+
+
+<div class="viewcode-block" id="stringify"><a class="viewcode-back" href="../../../../cmap_html_to_txt.html#cjf.cmap.conversion.cmap_html_to_txt.stringify">[docs]</a><span class="k">def</span> <span class="nf">stringify</span><span class="p">(</span><span class="n">soup_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; turn tag list into a list of strings&quot;&quot;&quot;</span>
+    <span class="n">string_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">soup_list</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">string_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="n">string_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;null&quot;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">string_list</span>
+
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">sys</span>
+    
+    <span class="n">input_html</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">output_txt</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    
+    <span class="k">print</span><span class="p">(</span> <span class="s">&quot;parsing &quot;</span> <span class="o">+</span> <span class="n">input_html</span><span class="p">)</span>
+    <span class="n">cmap_html</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="s">&quot;file://&quot;</span> <span class="o">+</span> <span class="n">input_html</span><span class="p">)</span>
+    <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="o">.</span><span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">cmap_html</span><span class="p">)</span>
+    
+    <span class="c">#grab the data from the data table and store the entries in lists for each column in the table</span>
+    <span class="k">print</span> <span class="s">&quot;splitting columns&quot;</span>
+    
+    <span class="n">ranks</span> <span class="o">=</span> <span class="n">stringify</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&quot;td&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;class&quot;</span> <span class="p">:</span> <span class="s">&quot;c1&quot;</span><span class="p">}</span> <span class="p">))</span>
+    <span class="k">print</span> <span class="s">&quot;.&quot;</span>
+    <span class="c">#batches = stringify(soup.findAll(&quot;td&quot;, {&quot;class&quot; : &quot;c2&quot;} ))</span>
+    <span class="k">print</span> <span class="s">&quot;..&quot;</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="n">stringify</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&quot;td&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;class&quot;</span> <span class="p">:</span> <span class="s">&quot;c3&quot;</span><span class="p">}</span> <span class="p">))</span>
+    <span class="k">print</span> <span class="s">&quot;...&quot;</span>
+    <span class="n">doses</span> <span class="o">=</span> <span class="n">stringify</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&quot;td&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;class&quot;</span> <span class="p">:</span> <span class="s">&quot;c5&quot;</span><span class="p">}</span> <span class="p">))</span>
+    <span class="k">print</span> <span class="s">&quot;....&quot;</span>
+    <span class="n">cells</span> <span class="o">=</span> <span class="n">stringify</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&quot;td&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;class&quot;</span> <span class="p">:</span> <span class="s">&quot;c6&quot;</span><span class="p">}</span> <span class="p">))</span>
+    <span class="k">print</span> <span class="s">&quot;.....&quot;</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="n">stringify</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&quot;td&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;class&quot;</span> <span class="p">:</span> <span class="s">&quot;c7&quot;</span><span class="p">}</span> <span class="p">))</span>
+    <span class="k">print</span> <span class="s">&quot;......&quot;</span>
+    <span class="c">#ups = stringify(soup.findAll(&quot;td&quot;, {&quot;class&quot; : &quot;c8&quot;} ))</span>
+    <span class="k">print</span> <span class="s">&quot;.......&quot;</span>
+    <span class="c">#downs = stringify(soup.findAll(&quot;td&quot;, {&quot;class&quot; : &quot;c9&quot;} ))</span>
+    <span class="k">print</span> <span class="s">&quot;........&quot;</span>
+    <span class="n">ATCs</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s">&quot;td&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;class&quot;</span> <span class="p">:</span> <span class="s">&quot;c10&quot;</span><span class="p">}</span> <span class="p">)</span>
+    <span class="n">ATCs_names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">ATC</span> <span class="ow">in</span> <span class="n">ATCs</span><span class="p">:</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ATC</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">string</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">code</span> <span class="o">==</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">:</span>
+            <span class="n">ATCs_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;null</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ATCs_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">code</span> <span class="o">+</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">&quot;.........&quot;</span>
+    <span class="c">#ids = stringify(soup.findAll(&quot;td&quot;, {&quot;class&quot; : &quot;c11&quot;} ))</span>
+    
+    <span class="c">#open a new file and write the entries to that file</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;writing data to &quot;</span> <span class="o">+</span> <span class="n">output_txt</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_txt</span><span class="p">,</span><span class="s">&quot;w&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ranks</span><span class="p">)):</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ranks</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">+</span><span class="s">&quot;</span><span class="se">\t</span><span class="s">&quot;</span> <span class="o">+</span> <span class="n">names</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">+</span><span class="s">&quot;</span><span class="se">\t</span><span class="s">&quot;</span>
+                  <span class="o">+</span> <span class="n">doses</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">+</span><span class="s">&quot;</span><span class="se">\t</span><span class="s">&quot;</span> <span class="o">+</span> <span class="n">cells</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">+</span><span class="s">&quot;</span><span class="se">\t</span><span class="s">&quot;</span> <span class="o">+</span> <span class="n">scores</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">+</span><span class="s">&quot;</span><span class="se">\t</span><span class="s">&quot;</span>
+                  <span class="o">+</span> <span class="n">ATCs_names</span><span class="p">[</span><span class="n">ii</span><span class="p">])</span>
+        
+    <span class="n">out</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Corey Flynn.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

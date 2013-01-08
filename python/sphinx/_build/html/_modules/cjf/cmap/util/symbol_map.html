@@ -1,0 +1,251 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cjf.cmap.util.symbol_map &mdash; CJF-CMAP 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/theme_extras.js"></script>
+    <link rel="top" title="CJF-CMAP 1.1 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body>
+      <div class="header"><img class="rightlogo" src="../../../../_static/CJF2.png" alt="Logo"/><h1 class="heading"><a href="../../../../index.html">
+          <span>CJF-CMAP 1.1 documentation</span></a></h1>
+        <h2 class="heading"><span>cjf.cmap.util.symbol_map</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <h1>Source code for cjf.cmap.util.symbol_map</h1><div class="highlight"><pre>
+<span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd"> Look up the set of probes associated with a gene symbol in the mapping provided by a</span>
+<span class="sd"> given pickled dictionary file.  If there is no dictionary file specified, a default file for the</span>
+<span class="sd"> Affymetrix U133A chip is used.</span>
+
+<span class="sd"> COMMAND LINE USAGE:</span>
+<span class="sd"> probeLookup geneSymbol dictFile</span>
+
+<span class="sd"> REQUIRED ARGUMENT DEFINITIONS:</span>
+<span class="sd"> geneSymbol: the gene symbol key to use in the dictionary lookup</span>
+
+<span class="sd"> OPTIONAL ARGUMENT DEFINITIONS:</span>
+<span class="sd"> dictFile: optional input location of the dictionary file to be used.  the default is the U133A chip mapping</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c">#imports</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">cPickle</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<div class="viewcode-block" id="get_default_symbol_dict"><a class="viewcode-back" href="../../../../symbol_map.html#cjf.cmap.util.symbol_map.get_default_symbol_dict">[docs]</a><span class="k">def</span> <span class="nf">get_default_symbol_dict</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;load the default Affymetrix U133A mapping dictionary&quot;&quot;&quot;</span>
+    <span class="c">#un-pickle the default dictionary file</span>
+    <span class="n">dict_file_path</span> <span class="o">=</span> <span class="s">&#39;/xchip/cogs/cflynn/InferenceEval/U133AGeneSymbolMappingDictPickle.txt&#39;</span>
+    <span class="n">dict_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">dict_file_path</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+    <span class="n">symbol_dict</span> <span class="o">=</span> <span class="n">cPickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">dict_file</span><span class="p">)</span>
+    <span class="n">dict_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">symbol_dict</span>
+</div>
+<div class="viewcode-block" id="get_user_symbol_dict"><a class="viewcode-back" href="../../../../symbol_map.html#cjf.cmap.util.symbol_map.get_user_symbol_dict">[docs]</a><span class="k">def</span> <span class="nf">get_user_symbol_dict</span><span class="p">(</span><span class="n">dict_file_path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;load a user specified mapping dictionary&quot;&quot;&quot;</span>
+    <span class="n">dict_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">dict_file_path</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+    <span class="n">symbol_dict</span> <span class="o">=</span> <span class="n">cPickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">dict_file</span><span class="p">)</span>
+    <span class="n">dict_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">symbol_dict</span>
+    
+</div>
+<div class="viewcode-block" id="match_symbol"><a class="viewcode-back" href="../../../../symbol_map.html#cjf.cmap.util.symbol_map.match_symbol">[docs]</a><span class="k">def</span> <span class="nf">match_symbol</span><span class="p">(</span><span class="n">symbol_dict</span><span class="p">,</span><span class="n">query</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    match a partial or full symbol name query to all keys in the specified symbol dictionary</span>
+<span class="sd">    and return the full name of all matching symbols in a list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">#build a regular expression pattern from the specified gene symbol</span>
+    <span class="n">rp</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+    <span class="c">#check for the specified gene symbol using the regular expression pattern</span>
+    <span class="n">symbols</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="n">rp</span><span class="o">.</span><span class="n">search</span><span class="p">,</span><span class="n">symbol_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    
+    <span class="k">return</span> <span class="n">symbols</span>
+</div>
+<div class="viewcode-block" id="match_probe"><a class="viewcode-back" href="../../../../symbol_map.html#cjf.cmap.util.symbol_map.match_probe">[docs]</a><span class="k">def</span> <span class="nf">match_probe</span><span class="p">(</span><span class="n">symbol_dict</span><span class="p">,</span><span class="n">query</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    match a partial or full probe name query to all values in the specified symbol dictionary</span>
+<span class="sd">    and return the full name of all matching probess in a list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">#build a regular expression pattern from the specified probe set query</span>
+    <span class="n">rp</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+    <span class="c">#check for the specified probe set using the regular expression pattern</span>
+    <span class="n">matched_probes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="n">symbol_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">probes</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="n">rp</span><span class="o">.</span><span class="n">search</span><span class="p">,</span><span class="n">symbol_dict</span><span class="p">[</span><span class="n">symbol</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">probes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">matched_probes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probes</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">matched_probes</span>
+</div>
+<div class="viewcode-block" id="probes_to_symbols"><a class="viewcode-back" href="../../../../symbol_map.html#cjf.cmap.util.symbol_map.probes_to_symbols">[docs]</a><span class="k">def</span> <span class="nf">probes_to_symbols</span><span class="p">(</span><span class="n">symbol_dict</span><span class="p">,</span><span class="n">probes</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    given a set of probes, map them back to the symbols that they correspond to</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">#map the found probe sets onto their gene symbols</span>
+    <span class="n">matched_symbols</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">probe</span> <span class="ow">in</span> <span class="n">probes</span><span class="p">:</span>
+        <span class="n">symbols</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">symbol_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">probe</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">symbols</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">matched_symbols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">symbols</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">matched_symbols</span>
+
+
+</div>
+<div class="viewcode-block" id="write_probe_list"><a class="viewcode-back" href="../../../../symbol_map.html#cjf.cmap.util.symbol_map.write_probe_list">[docs]</a><span class="k">def</span> <span class="nf">write_probe_list</span><span class="p">(</span><span class="n">symbol_dict</span><span class="p">,</span> <span class="n">out_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    write a grp file containing only the probes in the passed symbol dictionary to out_file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">symbol_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">probe_list</span> <span class="o">=</span> <span class="n">symbol_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">probe</span> <span class="ow">in</span> <span class="n">probe_list</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">probe</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="write_symbol_list"><a class="viewcode-back" href="../../../../symbol_map.html#cjf.cmap.util.symbol_map.write_symbol_list">[docs]</a><span class="k">def</span> <span class="nf">write_symbol_list</span><span class="p">(</span><span class="n">symbol_dict</span><span class="p">,</span> <span class="n">out_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    write a grp file containing only the symbols in the passed symbol dictionary to out_file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">symbol_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">key</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="write_symbol_probe_list"><a class="viewcode-back" href="../../../../symbol_map.html#cjf.cmap.util.symbol_map.write_symbol_probe_list">[docs]</a><span class="k">def</span> <span class="nf">write_symbol_probe_list</span><span class="p">(</span><span class="n">symbol_dict</span><span class="p">,</span> <span class="n">out_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    write a text file containing two columns, the first for gene symbols and the second for probe sets.</span>
+<span class="sd">    All probes in the given dictionary are written to the file with their associated probes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">f</span><span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">symbol_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">probes</span> <span class="o">=</span> <span class="n">symbol_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">probe</span> <span class="ow">in</span> <span class="n">probes</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">key</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span> <span class="o">+</span> <span class="n">probe</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="get_probes_for_symbol"><a class="viewcode-back" href="../../../../symbol_map.html#cjf.cmap.util.symbol_map.get_probes_for_symbol">[docs]</a><span class="k">def</span> <span class="nf">get_probes_for_symbol</span><span class="p">(</span><span class="n">symbol</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;get all of the probes for a matching partial of full symbol name and return them in a dictionary</span>
+<span class="sd">    containing a list of probes for each matching symbol.  The keys in the returned dictionary are</span>
+<span class="sd">    the names of the matched symbols and the values are the associated probe lists&quot;&quot;&quot;</span>
+    <span class="c">#load the symbol dictionary</span>
+    <span class="k">if</span> <span class="s">&#39;dict&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">dict_file_path</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;dict&#39;</span><span class="p">]</span>
+        <span class="n">symbol_dict</span> <span class="o">=</span> <span class="n">get_user_symbol_dict</span><span class="p">(</span><span class="n">dict_file_path</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">symbol_dict</span> <span class="o">=</span> <span class="n">get_default_symbol_dict</span><span class="p">()</span>
+    
+    <span class="c">#perform symbol matching in the symbol dictionary keys</span>
+    <span class="n">symbols</span> <span class="o">=</span> <span class="n">match_symbol</span><span class="p">(</span><span class="n">symbol_dict</span><span class="p">,</span> <span class="n">symbol</span><span class="p">)</span>
+    
+    <span class="c">#return the result of the search in a new dictionary</span>
+    <span class="n">filtered_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">symbols</span><span class="p">):</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="n">symbols</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">symbol_dict</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">symbol</span><span class="p">:</span>
+                    <span class="n">filtered_dict</span><span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">filtered_dict</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">optparse</span>
+    <span class="c">#parse the input arguments</span>
+    <span class="n">usage</span> <span class="o">=</span> <span class="s">&#39;usage: %prog [options] symbol&#39;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">optparse</span><span class="o">.</span><span class="n">OptionParser</span><span class="p">(</span><span class="n">usage</span><span class="o">=</span><span class="n">usage</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">probe</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s">&quot;-p&quot;</span><span class="p">,</span><span class="s">&quot;--probe&quot;</span><span class="p">,</span><span class="n">action</span><span class="o">=</span><span class="s">&quot;store_true&quot;</span><span class="p">,</span><span class="n">dest</span><span class="o">=</span><span class="s">&quot;probe&quot;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s">&quot;process symbol as a probeset&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s">&quot;-d&quot;</span><span class="p">,</span><span class="s">&quot;--dict&quot;</span><span class="p">,</span><span class="n">dest</span><span class="o">=</span><span class="s">&quot;dict&quot;</span><span class="p">,</span>
+                      <span class="n">metavar</span><span class="o">=</span><span class="s">&quot;DICT&quot;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s">&quot;use DICT for probe lookup&quot;</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">dict</span><span class="p">:</span>
+        <span class="n">symbol_dict</span> <span class="o">=</span> <span class="n">get_user_symbol_dict</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">dict</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">symbol_dict</span> <span class="o">=</span> <span class="n">get_default_symbol_dict</span><span class="p">()</span>
+    
+    <span class="n">query</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">probe</span><span class="p">:</span>
+        <span class="c">#query the loaded symbol dictionary with the given query</span>
+        <span class="n">probes</span> <span class="o">=</span> <span class="n">match_probe</span><span class="p">(</span><span class="n">symbol_dict</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
+        <span class="n">symbols</span> <span class="o">=</span> <span class="n">probes_to_symbols</span><span class="p">(</span><span class="n">symbol_dict</span><span class="p">,</span> <span class="n">probes</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">symbols</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;symbol matching probeset &#39;</span> <span class="o">+</span> <span class="n">query</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">symbols</span><span class="p">)):</span>
+                <span class="k">print</span> <span class="n">symbols</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>  <span class="o">+</span> <span class="n">probes</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;no matching symbols for &#39;</span> <span class="o">+</span> <span class="n">query</span><span class="p">)</span>
+
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c">#query the loaded symbol dictionary with the given query</span>
+        <span class="n">symbols</span> <span class="o">=</span> <span class="n">match_symbol</span><span class="p">(</span><span class="n">symbol_dict</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">symbols</span><span class="p">):</span>
+            <span class="k">print</span> <span class="p">(</span><span class="s">&#39;no symbols matching &#39;</span> <span class="o">+</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c">#for the specified gene symbol, display the mapped probes</span>
+        <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="n">symbols</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;probe mapping for &#39;</span> <span class="o">+</span> <span class="n">symbol</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">probe</span> <span class="ow">in</span> <span class="n">symbol_dict</span><span class="p">[</span><span class="n">symbol</span><span class="p">]:</span>
+                <span class="k">print</span><span class="p">(</span><span class="n">probe</span><span class="p">)</span>
+</pre></div>
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Corey Flynn.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

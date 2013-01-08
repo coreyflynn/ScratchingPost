@@ -1,0 +1,453 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cjf.cmap.plot.sc_plot &mdash; CJF-CMAP 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/theme_extras.js"></script>
+    <link rel="top" title="CJF-CMAP 1.1 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body>
+      <div class="header"><img class="rightlogo" src="../../../../_static/CJF2.png" alt="Logo"/><h1 class="heading"><a href="../../../../index.html">
+          <span>CJF-CMAP 1.1 documentation</span></a></h1>
+        <h2 class="heading"><span>cjf.cmap.plot.sc_plot</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <h1>Source code for cjf.cmap.plot.sc_plot</h1><div class="highlight"><pre>
+<span class="c">#! /usr/bin/env python</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">utilities to create Signature Strength - Correlation (SC) plots of gene expression data</span>
+<span class="sd">Created on Apr 2, 2012</span>
+<span class="sd">@author: Corey Flynn, Broad Institute</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.patches</span> <span class="kn">as</span>  <span class="nn">patches</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+
+<div class="viewcode-block" id="QuadInfo"><a class="viewcode-back" href="../../../../sc_plot.html#cjf.cmap.plot.sc_plot.QuadInfo">[docs]</a><span class="k">class</span> <span class="nc">QuadInfo</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    class to serve as a containing for sc plot quadrant information.  This class serves</span>
+<span class="sd">    as a container for indexes and ids of the points falling in a given quadrant. A</span>
+<span class="sd">    dictionary of id:index mapping is also constructed</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id_map</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s_thresh</span> <span class="o">=</span> <span class="mi">6</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c_thresh</span> <span class="o">=</span> <span class="mf">0.25</span>
+    
+<div class="viewcode-block" id="QuadInfo.add_points"><a class="viewcode-back" href="../../../../sc_plot.html#cjf.cmap.plot.sc_plot.QuadInfo.add_points">[docs]</a>    <span class="k">def</span> <span class="nf">add_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ids</span><span class="p">,</span><span class="n">indices</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        adds the given ids and indices to the QuadInfo object</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id_map</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span><span class="n">indices</span><span class="p">)))</span>
+        
+</div></div>
+<div class="viewcode-block" id="SC"><a class="viewcode-back" href="../../../../sc_plot.html#cjf.cmap.plot.sc_plot.SC">[docs]</a><span class="k">class</span> <span class="nc">SC</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Top level object to handle collection of signature strength and correlation information</span>
+<span class="sd">    for the construction of SC plots</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">src</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pid</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_inds</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">top_right</span> <span class="o">=</span> <span class="n">QuadInfo</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">top_left</span> <span class="o">=</span> <span class="n">QuadInfo</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_right</span> <span class="o">=</span> <span class="n">QuadInfo</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_left</span> <span class="o">=</span> <span class="n">QuadInfo</span><span class="p">()</span>
+    
+<div class="viewcode-block" id="SC.update_quad_info"><a class="viewcode-back" href="../../../../sc_plot.html#cjf.cmap.plot.sc_plot.SC.update_quad_info">[docs]</a>    <span class="k">def</span> <span class="nf">update_quad_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">s_thresh</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span> <span class="n">c_thresh</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        take the current value of s and c and compute the quadrant membership of all points</span>
+<span class="sd">        based on cutoffs</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c">#zip s and c for convenient iteration</span>
+        <span class="n">sc</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">)</span>
+        
+        <span class="c">#top right</span>
+        <span class="n">indices</span>  <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">s_thresh</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">c_thresh</span><span class="p">)]</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">top_right</span><span class="o">.</span><span class="n">add_points</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span>
+        
+        <span class="c">#top left</span>
+        <span class="n">indices</span>  <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">s_thresh</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">c_thresh</span><span class="p">)]</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">top_left</span><span class="o">.</span><span class="n">add_points</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span>
+        
+        <span class="c">#bottom right</span>
+        <span class="n">indices</span>  <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">s_thresh</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">c_thresh</span><span class="p">)]</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_right</span><span class="o">.</span><span class="n">add_points</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span>
+        
+        <span class="c">#bottom left</span>
+        <span class="n">indices</span>  <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">s_thresh</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">c_thresh</span><span class="p">)]</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_left</span><span class="o">.</span><span class="n">add_points</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="SC.add_sc_from_sigstat"><a class="viewcode-back" href="../../../../sc_plot.html#cjf.cmap.plot.sc_plot.SC.add_sc_from_sigstat">[docs]</a>    <span class="k">def</span> <span class="nf">add_sc_from_sigstat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">sigstat_path</span><span class="p">,</span><span class="n">cc_field</span><span class="o">=</span><span class="s">&#39;cc_mean&#39;</span><span class="p">,</span><span class="n">ss_field</span><span class="o">=</span><span class="s">&#39;sig_strength&#39;</span><span class="p">,</span><span class="n">id_field</span><span class="o">=</span><span class="s">&#39;id&#39;</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        reads the input sigstats file and adds the values for the SS and CC according to the</span>
+<span class="sd">        parameters specified</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c">#ensure that s and c are lists not numpy arrays</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
+        
+        <span class="c">#set up a dictionary reader to parse sigstats</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">sigstat_path</span><span class="p">,</span><span class="s">&#39;rU&#39;</span><span class="p">)</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)</span>
+        
+        <span class="c">#read in the specified cc value and the signature strength</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">cc_field</span><span class="p">]))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">ss_field</span><span class="p">]))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">id_field</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">E</span><span class="p">:</span>
+                <span class="k">print</span> <span class="p">(</span><span class="s">&#39;omitting </span><span class="si">%s</span><span class="s">:&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">sigstat_path</span><span class="p">,))</span>
+                <span class="k">print</span> <span class="p">(</span><span class="s">&#39;could not find column &quot;</span><span class="si">%s</span><span class="s">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">E</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                <span class="k">return</span>
+        
+        <span class="c">#add the file path to self.src</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">src</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sigstat_path</span><span class="p">)</span>
+        
+                </div>
+<div class="viewcode-block" id="SC.add_sc_from_brew"><a class="viewcode-back" href="../../../../sc_plot.html#cjf.cmap.plot.sc_plot.SC.add_sc_from_brew">[docs]</a>    <span class="k">def</span> <span class="nf">add_sc_from_brew</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">brew_name</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        reads the input sigstats file from within the specified brew folder and adds the </span>
+<span class="sd">        values for the SS and CC in the file.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c">#get the sigstats path from the specified brew folder</span>
+        <span class="n">sigstat_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;/xchip/cogs/data/brew&#39;</span><span class="p">,</span><span class="n">brew_name</span><span class="p">,</span>
+                                    <span class="s">&#39;sigstat&#39;</span><span class="p">,</span><span class="n">brew_name</span> <span class="o">+</span> <span class="s">&#39;_SIGSTATS.txt&#39;</span><span class="p">)</span>
+        
+        <span class="c">#add the data from sigstat_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_sc_from_sigstat</span><span class="p">(</span><span class="n">sigstat_path</span><span class="p">)</span>
+        
+        <span class="c">#update the quadrant information </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_quad_info</span><span class="p">()</span>
+    </div>
+<div class="viewcode-block" id="SC.add_sc_from_grp"><a class="viewcode-back" href="../../../../sc_plot.html#cjf.cmap.plot.sc_plot.SC.add_sc_from_grp">[docs]</a>    <span class="k">def</span> <span class="nf">add_sc_from_grp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">grp_path</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        reads the input sigstats file from all brew folders given in the specified grp file.</span>
+<span class="sd">        The values for the SS and CC in the file are added. The grp file should contain one </span>
+<span class="sd">        brew folder per line</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c">#read in all of the lines of the grp file</span>
+        <span class="n">brew_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">grp_path</span><span class="p">,</span><span class="s">&#39;rU&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">brew_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        
+        <span class="c">#get the sigstats path from each specified brew folder and add the data</span>
+        <span class="k">for</span> <span class="n">brew_name</span> <span class="ow">in</span> <span class="n">brew_names</span><span class="p">:</span>
+            <span class="n">sigstat_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;/xchip/cogs/data/brew&#39;</span><span class="p">,</span><span class="n">brew_name</span><span class="p">,</span>
+                                        <span class="s">&#39;sigstat&#39;</span><span class="p">,</span><span class="n">brew_name</span> <span class="o">+</span> <span class="s">&#39;_SIGSTATS.txt&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_sc_from_sigstat</span><span class="p">(</span><span class="n">sigstat_path</span><span class="p">)</span>
+        
+        <span class="c">#update the quadrant information </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_quad_info</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="SC.filter_sc"><a class="viewcode-back" href="../../../../sc_plot.html#cjf.cmap.plot.sc_plot.SC.filter_sc">[docs]</a>    <span class="k">def</span> <span class="nf">filter_sc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">include</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">exclude</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">control</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">destructive</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        filters the c and s arrays according to the include,exclude, and control parameters.</span>
+<span class="sd">        If control is set, self.control_inds is set to the correct value</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c">#convert the s and c lists to numpy arrays</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
+        
+        <span class="c">#set up internal variables if destructive is false</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">destructive</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span>
+            <span class="n">pid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pid</span>
+        
+        <span class="c">#include only those entries specified and exclude those entries specified</span>
+        <span class="k">if</span> <span class="n">exclude</span><span class="p">:</span>
+            <span class="n">exclude_inds</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exclude</span><span class="p">,</span><span class="nb">basestring</span><span class="p">):</span>
+                <span class="n">exclude</span> <span class="o">=</span> <span class="p">[</span><span class="n">exclude</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">exclude</span><span class="p">:</span>
+                <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+                <span class="n">entry_inds</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span> <span class="k">if</span> <span class="n">pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">v</span><span class="p">)]</span>
+                <span class="k">for</span> <span class="n">eind</span> <span class="ow">in</span> <span class="n">entry_inds</span><span class="p">:</span>
+                    <span class="n">exclude_inds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">eind</span><span class="p">)</span>
+            <span class="n">full_inds_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">)))</span>
+            <span class="n">exclude_removed_set</span> <span class="o">=</span> <span class="n">full_inds_set</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">exclude_inds</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">destructive</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">exclude_removed_set</span><span class="p">)]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">exclude_removed_set</span><span class="p">)]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pid</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">exclude_removed_set</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">exclude_removed_set</span><span class="p">)]</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">exclude_removed_set</span><span class="p">)]</span>
+                <span class="n">pid</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">exclude_removed_set</span><span class="p">]</span>
+        
+        <span class="k">if</span> <span class="n">include</span><span class="p">:</span>
+            <span class="n">include_inds</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">include</span><span class="p">,</span><span class="nb">basestring</span><span class="p">):</span>
+                <span class="n">include</span> <span class="o">=</span> <span class="p">[</span><span class="n">include</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">include</span><span class="p">:</span>
+                <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+                <span class="n">entry_inds</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span> <span class="k">if</span> <span class="n">pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">v</span><span class="p">)]</span>
+                <span class="k">for</span> <span class="n">eind</span> <span class="ow">in</span> <span class="n">entry_inds</span><span class="p">:</span>
+                    <span class="n">include_inds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">eind</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">destructive</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="n">include_inds</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">[</span><span class="n">include_inds</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pid</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">include_inds</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="n">include_inds</span><span class="p">]</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">[</span><span class="n">include_inds</span><span class="p">]</span>
+                <span class="n">pid</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">include_inds</span><span class="p">]</span>
+                
+                
+        <span class="c">#pull out the control inds if they are specified</span>
+        <span class="k">if</span> <span class="n">control</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">destructive</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_inds</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">control_inds</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">control</span><span class="p">,</span><span class="nb">basestring</span><span class="p">):</span>
+                <span class="n">control</span> <span class="o">=</span> <span class="p">[</span><span class="n">control</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">control</span><span class="p">:</span>
+                <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">destructive</span><span class="p">:</span>
+                    <span class="n">entry_inds</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span> <span class="k">if</span> <span class="n">pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">v</span><span class="p">)]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">entry_inds</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span> <span class="k">if</span> <span class="n">pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">v</span><span class="p">)]</span>
+                <span class="k">for</span> <span class="n">eind</span> <span class="ow">in</span> <span class="n">entry_inds</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">destructive</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">control_inds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">eind</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">control_inds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">eind</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">destructive</span><span class="p">:</span>
+                <span class="n">control_inds</span> <span class="o">=</span> <span class="bp">None</span>
+        
+        <span class="c">#return s,c,pid,and control_inds if destructive is false</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">destructive</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">pid</span><span class="p">,</span><span class="n">control_inds</span><span class="p">)</span>
+        <span class="c">#convert the numpy arrays back to lists</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    </div>
+<div class="viewcode-block" id="SC.plot"><a class="viewcode-back" href="../../../../sc_plot.html#cjf.cmap.plot.sc_plot.SC.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">s_thresh</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span><span class="n">c_tresh</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">xlabel</span><span class="o">=</span><span class="s">&#39;CC&#39;</span><span class="p">,</span><span class="n">ylabel</span><span class="o">=</span><span class="s">&#39;SS&#39;</span>
+                     <span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">control</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        plots and sc_plot.  The data is assumed to fall between a signature strengths of </span>
+<span class="sd">        [0 20] and correlations between [-1 1]. Unless out is specified,the figure is drawn </span>
+<span class="sd">        on screen</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c">#include controls if needed</span>
+        <span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">pid</span><span class="p">,</span><span class="n">control_inds</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_sc</span><span class="p">(</span><span class="n">control</span><span class="o">=</span><span class="n">control</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="n">include</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">,</span> <span class="n">destructive</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        
+        <span class="c">#convert the s and c lists to numpy arrays</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        
+        <span class="c">#build the figure container and axis</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+        
+        <span class="c">#grab controls for later plotting</span>
+        <span class="k">if</span> <span class="n">control_inds</span><span class="p">:</span>
+            <span class="n">control_c</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">control_inds</span><span class="p">]</span>
+            <span class="n">control_s</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">control_inds</span><span class="p">]</span>
+            <span class="n">exp_inds</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)))</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">control_inds</span><span class="p">)))</span>
+            <span class="n">exp_c</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">exp_inds</span><span class="p">]</span>
+            <span class="n">exp_s</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">exp_inds</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">exp_c</span> <span class="o">=</span> <span class="n">c</span>
+            <span class="n">exp_s</span> <span class="o">=</span> <span class="n">s</span>
+        
+        <span class="c">#find the number of data points in each quadrant</span>
+        <span class="n">top_right_s</span> <span class="o">=</span> <span class="n">exp_s</span><span class="p">[(</span><span class="n">exp_s</span> <span class="o">&gt;=</span> <span class="mi">6</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">exp_c</span> <span class="o">&gt;=</span> <span class="mf">0.25</span><span class="p">)]</span> 
+        <span class="n">top_left_s</span> <span class="o">=</span> <span class="n">exp_s</span><span class="p">[(</span><span class="n">exp_s</span> <span class="o">&gt;=</span> <span class="mi">6</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">exp_c</span> <span class="o">&lt;</span> <span class="mf">0.25</span><span class="p">)]</span>
+        <span class="n">bot_right_s</span> <span class="o">=</span> <span class="n">exp_s</span><span class="p">[(</span><span class="n">exp_s</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">exp_c</span> <span class="o">&gt;=</span> <span class="mf">0.25</span><span class="p">)]</span>
+        <span class="n">bot_left_s</span> <span class="o">=</span> <span class="n">exp_s</span><span class="p">[(</span><span class="n">exp_s</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">exp_c</span> <span class="o">&lt;</span> <span class="mf">0.25</span><span class="p">)]</span>
+        
+        <span class="c">#build quadrant colors</span>
+        <span class="n">top_right_color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">top_right_s</span><span class="o">.</span><span class="n">size</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">exp_s</span><span class="o">.</span><span class="n">size</span><span class="p">),</span>
+                           <span class="mi">1</span><span class="p">,</span>
+                           <span class="mi">1</span><span class="o">-</span><span class="n">top_right_s</span><span class="o">.</span><span class="n">size</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">exp_s</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+        <span class="n">top_left_color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">top_left_s</span><span class="o">.</span><span class="n">size</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">exp_s</span><span class="o">.</span><span class="n">size</span><span class="p">),</span>
+                           <span class="mi">1</span><span class="p">,</span>
+                           <span class="mi">1</span><span class="o">-</span><span class="n">top_left_s</span><span class="o">.</span><span class="n">size</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">exp_s</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+        <span class="n">bot_right_color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">bot_right_s</span><span class="o">.</span><span class="n">size</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">exp_s</span><span class="o">.</span><span class="n">size</span><span class="p">),</span>
+                           <span class="mi">1</span><span class="p">,</span>
+                           <span class="mi">1</span><span class="o">-</span><span class="n">bot_right_s</span><span class="o">.</span><span class="n">size</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">exp_s</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+        <span class="n">bot_left_color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">bot_left_s</span><span class="o">.</span><span class="n">size</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">exp_s</span><span class="o">.</span><span class="n">size</span><span class="p">),</span>
+                           <span class="mi">1</span><span class="p">,</span>
+                           <span class="mi">1</span><span class="o">-</span><span class="n">bot_left_s</span><span class="o">.</span><span class="n">size</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">exp_s</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+        
+        <span class="c">#build quadrant rectangles</span>
+        <span class="n">top_right_rect</span> <span class="o">=</span> <span class="n">patches</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">((</span><span class="mf">0.25</span><span class="p">,</span><span class="mi">6</span><span class="p">),</span><span class="mf">0.75</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span> 
+                                           <span class="n">color</span> <span class="o">=</span> <span class="n">top_right_color</span><span class="p">,</span>
+                                           <span class="n">zorder</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">top_right_rect</span><span class="p">)</span>
+        <span class="n">top_left_rect</span> <span class="o">=</span> <span class="n">patches</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">),</span><span class="mf">1.25</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span> 
+                                           <span class="n">color</span> <span class="o">=</span> <span class="n">top_left_color</span><span class="p">,</span> 
+                                           <span class="n">zorder</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">top_left_rect</span><span class="p">)</span>
+        <span class="n">bot_right_rect</span> <span class="o">=</span> <span class="n">patches</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">((</span><span class="mf">0.25</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span><span class="mf">0.75</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span> 
+                                           <span class="n">color</span> <span class="o">=</span> <span class="n">bot_right_color</span><span class="p">,</span> 
+                                           <span class="n">zorder</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">bot_right_rect</span><span class="p">)</span>
+        <span class="n">bot_left_rect</span> <span class="o">=</span> <span class="n">patches</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span><span class="mf">1.25</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span> 
+                                           <span class="n">color</span> <span class="o">=</span> <span class="n">bot_left_color</span><span class="p">,</span> 
+                                           <span class="n">zorder</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">bot_left_rect</span><span class="p">)</span>
+        
+        <span class="c">#build the scatter plot and label the axis</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">exp_c</span><span class="p">,</span><span class="n">exp_s</span><span class="p">,</span> <span class="n">zorder</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;pert&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">control_inds</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">control_c</span><span class="p">,</span><span class="n">control_s</span><span class="p">,</span><span class="n">facecolor</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">,</span><span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;control&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s">&#39;center left&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">)</span>
+        
+        
+        <span class="c">#add text annotations</span>
+        <span class="n">props</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">boxstyle</span><span class="o">=</span><span class="s">&#39;round&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s">&#39;wheat&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.90</span><span class="p">,</span> <span class="s">&#39;</span><span class="si">%.0f%%</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">top_left_s</span><span class="o">.</span><span class="n">size</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">exp_s</span><span class="o">.</span><span class="n">size</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span><span class="p">),</span>
+                 <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span>
+                  <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                  <span class="n">bbox</span> <span class="o">=</span> <span class="n">props</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.85</span><span class="p">,</span> <span class="mf">0.90</span><span class="p">,</span> <span class="s">&#39;</span><span class="si">%.0f%%</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">top_right_s</span><span class="o">.</span><span class="n">size</span><span class="p">)</span><span class="o">/</span><span class="n">exp_s</span><span class="o">.</span><span class="n">size</span><span class="o">*</span><span class="mi">100</span><span class="p">),</span>
+                 <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span>
+                  <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                  <span class="n">bbox</span> <span class="o">=</span> <span class="n">props</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s">&#39;</span><span class="si">%.0f%%</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">bot_left_s</span><span class="o">.</span><span class="n">size</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">exp_s</span><span class="o">.</span><span class="n">size</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span><span class="p">),</span>
+                 <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span>
+                  <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                  <span class="n">bbox</span> <span class="o">=</span> <span class="n">props</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.85</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s">&#39;</span><span class="si">%.0f%%</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">bot_right_s</span><span class="o">.</span><span class="n">size</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">exp_s</span><span class="o">.</span><span class="n">size</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span><span class="p">),</span>
+                 <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span>
+                  <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                  <span class="n">bbox</span> <span class="o">=</span> <span class="n">props</span><span class="p">)</span>
+        
+        <span class="c">#add cutoff annotation</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">s_thresh</span><span class="p">,</span><span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s">&#39;k&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">c_tresh</span><span class="p">,</span><span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s">&#39;k&#39;</span><span class="p">)</span>
+        
+        <span class="c">#add labels, add title, and increase tick font size</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">tick</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">get_major_ticks</span><span class="p">():</span>
+            <span class="n">tick</span><span class="o">.</span><span class="n">label1</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">tick</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">get_major_ticks</span><span class="p">():</span>
+            <span class="n">tick</span><span class="o">.</span><span class="n">label1</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+        
+        <span class="c">#show on screen unless out is specified.  If it is, write the figure to the path in out</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">out</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="sc_plot_from_brew"><a class="viewcode-back" href="../../../../sc_plot.html#cjf.cmap.plot.sc_plot.sc_plot_from_brew">[docs]</a><span class="k">def</span> <span class="nf">sc_plot_from_brew</span><span class="p">(</span><span class="n">brew_name</span><span class="p">,</span><span class="n">include</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">control</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    builds and sc plot from the given brew folder name.  This function will only work on</span>
+<span class="sd">    systems where /xchip/cogs/data/brew is a valid path</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c">#get the sigstats path from the specified brew folder</span>
+    <span class="n">sigstat_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;/xchip/cogs/data/brew&#39;</span><span class="p">,</span><span class="n">brew_name</span><span class="p">,</span><span class="s">&#39;sigstat&#39;</span><span class="p">,</span><span class="n">brew_name</span> <span class="o">+</span> <span class="s">&#39;_SIGSTATS.txt&#39;</span><span class="p">)</span>
+    
+    <span class="c">#create an SC object and populate it with data from the brew folder. Filter the data if</span>
+    <span class="c">#necessary</span>
+    <span class="n">SCObj</span> <span class="o">=</span> <span class="n">SC</span><span class="p">()</span>
+    <span class="n">SCObj</span><span class="o">.</span><span class="n">add_sc_from_sigstat</span><span class="p">(</span><span class="n">sigstat_path</span><span class="p">)</span>
+    <span class="n">SCObj</span><span class="o">.</span><span class="n">filter_sc</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="n">include</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">,</span> <span class="n">control</span><span class="o">=</span><span class="n">control</span><span class="p">)</span>
+    
+    <span class="c">#make the plot</span>
+    <span class="n">SCObj</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>    
+</div>
+<div class="viewcode-block" id="sc_plot_from_grp"><a class="viewcode-back" href="../../../../sc_plot.html#cjf.cmap.plot.sc_plot.sc_plot_from_grp">[docs]</a><span class="k">def</span> <span class="nf">sc_plot_from_grp</span><span class="p">(</span><span class="n">grp_path</span><span class="p">,</span><span class="n">include</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">control</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    builds and sc plot from the given grp file containing brew folder names.  This function</span>
+<span class="sd">    will only work on systems where /xchip/cogs/data/brew is a valid path</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c">#read in all of the lines of the grp file</span>
+    <span class="n">folder_names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">grp_path</span><span class="p">,</span><span class="s">&#39;rU&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">folder_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+    
+    <span class="c">#create an SC object and populate it with data from the brew folders. Filter the data if</span>
+    <span class="c">#necessary</span>
+    <span class="n">SCObj</span> <span class="o">=</span> <span class="n">SC</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">folder_names</span><span class="p">:</span>
+        <span class="c">#get the sigstats path from the specified brew folder</span>
+        <span class="n">sigstat_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;/xchip/cogs/data/brew&#39;</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="s">&#39;sigstat&#39;</span><span class="p">,</span><span class="n">name</span> <span class="o">+</span> <span class="s">&#39;_SIGSTATS.txt&#39;</span><span class="p">)</span>
+        <span class="n">SCObj</span><span class="o">.</span><span class="n">add_sc_from_sigstat</span><span class="p">(</span><span class="n">sigstat_path</span><span class="p">)</span>
+    <span class="n">SCObj</span><span class="o">.</span><span class="n">filter_sc</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="n">include</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">,</span> <span class="n">control</span><span class="o">=</span><span class="n">control</span><span class="p">)</span>
+    
+    <span class="c">#make the plot</span>
+    <span class="n">SCObj</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+    </div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">100</span><span class="p">))</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">100</span><span class="p">))</span><span class="o">*</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span>
+    
+</pre></div>
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Corey Flynn.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
