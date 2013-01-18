@@ -44,5 +44,5 @@ subprocess.call(['make','-C','/Users/cflynn/Broad/CMap/bptk_doc','html'])
 dir_list = [x[0] for x in os.walk('/Users/cflynn/Broad/CMap/bptk_doc/build/html')]
 for d in dir_list:
     transfer_directory(sftp, d, d.replace('/Users/cflynn/Broad/CMap/bptk_doc/build/html',
-                                          '/home/unix/cflynn/public_html/bptk_doc/'))
+                                          '/xchip/cogs/web/icmap/pestle_doc/'))
 sftp.close()

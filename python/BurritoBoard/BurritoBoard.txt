@@ -1,0 +1,1 @@
+name	program meeting	lab meeting	totalideal	2	2	4Roger	2	2	4Peyton	2	2	4Dave	1	1.5	2.5Ian	0	1	1Ted	1	2	3Larson	2	2	4
