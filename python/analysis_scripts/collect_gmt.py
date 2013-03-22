@@ -2,15 +2,28 @@
 '''
 collect_gmt.py
 
-scrapes a top level folder containing brew folders and collects all of the gmt files in
-those folders.  These files are copied to the output location and concatenated in a new
-gmt file
+scrapes a top level folder containing signature grp files and builds a gmt from them
 
-AUTHOR: Corey Flynn, Broad Institute, 2012
+AUTHOR: Corey Flynn, Broad Institute, 2013
 '''
 import os
 import shutil
 import glob
+
+def get_edb_files(input_dir,verbose=True):
+	'''
+    '''
+	edb_files = []
+	walk_result = [x for x in os.walk(input_dir)]
+	for wr in walk_result:
+	    for f in wr[2]:
+	    	root, ext = os.path.splitext(f)
+	    	if ext == '.edb':
+	            edb_files.append(os.path.join(wr[0],f))
+	num_files = len(edb_files)
+	if verbose:
+		print('found %i .edb files' %(num_files,))
+	return edb_files
 
 top_dir = '/xchip/obelix/pod/brew/vc/'
 brew_match_string = 'MUC.*' #the name stub to match. grab all brew folders containing this
