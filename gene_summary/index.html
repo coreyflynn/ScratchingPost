@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html lang="en">
+<head>
+    <title>Gene Summary</title>
+    <link href="http://cmap.github.com/cdn/css/main.all.min.css" rel="stylesheet">
+</head>
+<body data-spy="scroll" data-target=".navbar">
+	<!-- navbar -->
+	<div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <ul class="nav">
+          <li><a href="#search">Home</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- header  -->
+	<a id="home"></a>
+    <div class='hero-unit'>
+        <h1>Gene Summary</h1>
+        <small>Connectivity Map results by Gene Symbol</small>
+    </div>
+
+    <div class="row-fluid">
+    	<div class="offset1 span10">
+			<input class="span12" type="text" data-provide="typeahead" id="search">
+		</div>
+    </div>
+    
+    <div class="row-fluid">
+        <div class="offset1 span10" id="card"></div>
+    </div>
+
+    <div class="row-fluid">
+        <div class="offset1 span10" id="SI_table" style="height:300px"></div>
+    </div>
+
+    <div class="row-fluid">
+        <div class="offset1 span10" id="KDQ_table" style="height:300px"></div>
+    </div>
+    <div class="row-fluid">
+        <div class="offset1 span10" id="OEQ_table" style="height:300px"></div>
+    </div>
+
+</body>
+
+<script src="http://cmap.github.com/cdn/js/main.all.min.js"></script>
+<script src="gene_info.js"></script>
+<script src="sig_info_table.js"></script>
+<script src="query_info_table.js"></script>
+<script src="jQueryRotateCompressed.2.2.js"></script>
+<script type="text/javascript">
+
+    $("#search").change(function (evt) { symbol_update(evt) });
+    $(window).resize(function (evt) { redraw(evt) });
+	var siginfo = 'http://lincscloud.org/api/siginfo?callback=?';
+    var geneinfo = 'http://lincscloud.org/api/geneinfo?callback=?';
+	var auto_data = []
+	$.getJSON(siginfo,{q:'{"cell_id":"MCF7","pert_type":"trt_sh"}',
+						  f:'{"pert_desc":1}',
+						  l:1000},
+						  function(response){
+        
+        response.forEach(function(element,index,array){
+	        	auto_data.push(element.pert_desc)
+        });
+        auto_data = _.uniq(auto_data);
+        $('#search').typeahead({source: auto_data});
+      });
+	
+    var GI = new Gene_Info_Object("#card",$("#card").width(),250,10);
+    var SIT = new Sig_Info_Table_Object("#SI_table","Signature Detail",300);
+    var OEQT = new Query_Info_Table_Object("#OEQ_table","OE Connections",300);
+    var KDQT = new Query_Info_Table_Object("#KDQ_table","KD Connections",300);
+    SIT.hide();
+    OEQT.hide();
+    KDQT.hide();
+
+    if (window.location.hash != ""){
+        $("#search").val(window.location.hash.split('#')[1]);
+        symbol_update();
+    }
+	function symbol_update(event){
+            $.getJSON(geneinfo,{q:'{"pr_gene_symbol":"' + $("#search").val() + '"}'},
+                          function(response){
+                            if (response == 0){
+                                GI.clear();
+                                SIT.clear_data();
+                                SIT.hide();
+                                OEQT.clear_data();
+                                OEQT.hide();
+                                KDQT.clear_data();
+                                KDQT.hide();
+                            }else{
+                                GI.update_symbol($("#search").val(),$("#card").width())
+                                SIT.add_data_from_symbol($("#search").val())
+                                OEQT.add_data_from_queries()
+                                KDQT.add_data_from_queries()
+                            }
+                          }
+            );
+	}
+
+    function redraw(event){
+        GI.draw($("#card").width());
+    }
+</script>
+
+</html>
