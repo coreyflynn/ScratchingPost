@@ -14,7 +14,7 @@ function Sig_Info_Table_Object(div_id,title,show_height){
 
   header_html = '<div class="row-fluid" id="' + this.div_id.split("#")[1] + '_head" class="span12" style="background-color:#f0f0f0">' +
       '<h1 class="span11">' + title + '</h1>' +
-      '<span class="span1"><img id="'+ this.div_id.split("#")[1] + '_button" style="max-width:50px;max-height:50px;" src="http://coreyflynn.github.com/Bellhop/img/plus_round_small.png"></span>' +
+      '<span class="span1"><img id="'+ this.div_id.split("#")[1] + '_button" style="max-width:50px;max-height:50px;" src="http://coreyflynn.github.com/Bellhop/img/plus_round_small_blue.png"></span>' +
       '</div>';
 
   $(this.div_id).append(header_html);
