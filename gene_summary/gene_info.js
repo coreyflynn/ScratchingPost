@@ -59,27 +59,27 @@ function Gene_Info_Object(div_id,width,height,margin){
                             self.update_long_name(response[0].pr_gene_title);
 
 			$.getJSON(siginfo,{q:'{"pert_desc":"' + symbol +'"}',
-								f:'{"cell_id":1,"pert_type":1}',
+								f:'{"cell_id":1,"pert_type":1,"distil_nsample":1}',
 								l:1000},
 								function(response){
-									var oe_sigs = [];
-									var kd_sigs = [];
+									var oe_nsample = 0;
+									var kd_nsample = 0;
 									var kd_cells = [];
 									var oe_cells = [];
 									response.forEach(function(element,index,array){
 										if (element.pert_type == "trt_oe"){
-											oe_sigs.push(element);
+											oe_nsample += element.distil_nsample;
 											oe_cells.push(element.cell_id);
 										}
 										if (element.pert_type == "trt_sh"){
-											kd_sigs.push(element);
+											kd_nsample += element.distil_nsample;
 											kd_cells.push(element.cell_id);
 										}
 									});
 								oe_cells = _.uniq(oe_cells);
 								kd_cells = _.uniq(kd_cells);
-								self.update_oe(oe_sigs.length,oe_cells.length);
-								self.update_kd(kd_sigs.length,kd_cells.length);
+								self.update_oe(oe_nsample,oe_cells.length);
+								self.update_kd(kd_nsample.length,kd_cells.length);
 								self.draw(self.width);
 			});
         });
@@ -92,8 +92,8 @@ function Gene_Info_Object(div_id,width,height,margin){
 	function update_kd(kd_num,kd_num_lines){
 		this.kd_num = kd_num;
 		this.kd_num_lines = kd_num_lines;
-	}	
-	
+	}
+
 	function update_oe(oe_num,oe_num_lines){
 		this.oe_num = oe_num;
 		this.oe_num_lines = oe_num_lines;
@@ -137,8 +137,6 @@ function Gene_Info_Object(div_id,width,height,margin){
 			.attr("y",y(0.9))
 			.attr("font-size",40)
 			.text(function(d){ return d;});
-
-		
 	}
 
 	function draw_KD(x,y){
@@ -228,11 +226,11 @@ function Gene_Info_Object(div_id,width,height,margin){
 	}
 
 	function hide(){
-	    if (this.init){
-	    	$("svg.card").height(0);
-	    	$("svg.card").hide();
-	    }
-	    $("svg.card").animate({height:0});
+		if (this.init){
+			$("svg.card").height(0);
+			$("svg.card").hide();
+		}
+		$("svg.card").animate({height:0});
 	}
 
 	function show(){

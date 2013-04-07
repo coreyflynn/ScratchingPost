@@ -87,9 +87,10 @@ function Compound_Info_Object(div_id,width,height,margin){
 		this.svg.selectAll("text.name").data([this.compound])
 			.enter().append("text")
 			.attr("class","name")
-			.attr("x",x(0))
-			.attr("y",y(0.9))
+			.attr("x",x(0.5))
+			.attr("y",40)
 			.attr("font-size",40)
+			.attr("text-anchor","middle")
 			.text(function(d){ return d;});
 	}
 
@@ -98,9 +99,9 @@ function Compound_Info_Object(div_id,width,height,margin){
 		this.svg.selectAll("image.cp").data([this.nsample])
 			.enter().append("image")
 			.attr("xlink:href","http://coreyflynn.github.com/Bellhop/img/arrow_down_round_small.png")
-			.attr("class","down")
+			.attr("class","cp")
 			.attr("x",x(0.5) - 50)
-			.attr("y",y(0.6))
+			.attr("y",55)
 			.attr("height",100)
 			.attr("width",100);
 
@@ -109,7 +110,7 @@ function Compound_Info_Object(div_id,width,height,margin){
 			.enter().append("text")
 			.attr("class","cp_text")
 			.attr("x",x(0.5))
-			.attr("y",y(0.6) + 60)
+			.attr("y",55 + 60)
 			.attr("font-size",25)
 			.attr("text-anchor","middle")
 			.attr("fill","#f0f0f0")
@@ -120,7 +121,7 @@ function Compound_Info_Object(div_id,width,height,margin){
 			.enter().append("text")
 			.attr("class","cp_static")
 			.attr("x",x(0.5))
-			.attr("y",y(0.6) + 115)
+			.attr("y",55 + 115)
 			.attr("font-size",20)
 			.attr("text-anchor","middle")
 			.text("Experiments");
@@ -130,7 +131,7 @@ function Compound_Info_Object(div_id,width,height,margin){
 			.enter().append("text")
 			.attr("class","cell_lines_text")
 			.attr("x",x(0.5))
-			.attr("y",y(0.6) + 135)
+			.attr("y",55 + 135)
 			.attr("font-size",20)
 			.attr("text-anchor","middle")
 			.text("In " + this.num_lines + " Cell Lines");
