@@ -19,6 +19,8 @@ function Sig_Info_Table_Object(div_id,title,show_height){
       '</div>';
 
   $(this.div_id).append(header_html);
+  $(this.div_id).css("padding-bottom", "2px");
+
   var self = this;
   $(this.div_id + '_button').click(function (evt) { self.buttonCallback(evt); });
   $(this.div_id).append('<div id="' +
@@ -46,10 +48,10 @@ function Sig_Info_Table_Object(div_id,title,show_height){
   this.expand();
 
   function add_data_from_symbol(symbol){
-    var siginfo = 'http://lincscloud.org/api/siginfo?callback=?';
+    var siginfo = 'http://107.20.184.64:8080/api/v1.2/siginfo?callback=?';
     var sig_id_list = [];
     var self = this;
-    $.getJSON(siginfo,{q:'{"pert_desc":"' + symbol + '"}',
+    $.getJSON(siginfo,{q:'{"pert_iname":"' + symbol + '"}',
                 f:'{"sig_id":1,"cell_id":1,"pert_type":1}',
                 l:1000},
                 function(response){

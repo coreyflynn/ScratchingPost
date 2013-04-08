@@ -9,6 +9,8 @@ function Gene_Info_Object(div_id,width,height,margin){
 	this.kd_num_lines = 0;
 	this.oe_num_lines = 0;
 	this.init = false;
+	this.x = d3.scale.linear().domain([0,1]).range([this.margin,this.width-this.margin]);
+	this.y = d3.scale.linear().domain([0,1]).range([this.height-this.margin,this.margin]);
 
 	this.clear = clear;
 	this.draw = draw;
@@ -51,14 +53,15 @@ function Gene_Info_Object(div_id,width,height,margin){
 	function update_symbol(symbol,width){
 		this.symbol = symbol;
 		this.width = width;
+		this.draw_bg(this.x,this.y,width);
 		var self = this;
-		var geneinfo = 'http://lincscloud.org/api/geneinfo?callback=?';
-		var siginfo = 'http://lincscloud.org/api/siginfo?callback=?';
-		$.getJSON(geneinfo,{q:'{"pr_gene_symbol":"' + symbol + '"}'},
+		var pertinfo = 'http://107.20.184.64:8080/api/v1.2/pertinfo?callback=?'
+		var siginfo = 'http://107.20.184.64:8080/api/v1.2/siginfo?callback=?';
+		$.getJSON(pertinfo,{q:'{"pert_iname":"' + symbol + '"}'},
                           function(response){
-                            self.update_long_name(response[0].pr_gene_title);
+                            self.update_long_name(response[0].gene_title);
 
-			$.getJSON(siginfo,{q:'{"pert_desc":"' + symbol +'"}',
+			$.getJSON(siginfo,{q:'{"pert_iname":"' + symbol +'"}',
 								f:'{"cell_id":1,"pert_type":1,"distil_nsample":1}',
 								l:1000},
 								function(response){
@@ -100,6 +103,14 @@ function Gene_Info_Object(div_id,width,height,margin){
 	}
 
 	function draw_bg(x,y,width){
+		if (!this.init){
+			this.svg=d3.select(this.div_id).append("svg")
+						.attr("class","card")
+						.attr("width",width)
+						.attr("height",height);
+			this.init = true;
+		}
+
 		this.svg.selectAll("rect.bg").data([]).exit().remove();
 
 		this.svg.selectAll("rect.bg").data([1])
@@ -110,6 +121,29 @@ function Gene_Info_Object(div_id,width,height,margin){
 				.attr("height", height)
 				.attr("width", width)
 				.attr("fill", "#f0f0f0");
+
+		this.svg.selectAll("text.down").data([]).exit().remove();
+
+		this.svg.selectAll("text.down").data([1])
+			.enter().append("text")
+			.attr("class","down")
+			.attr("x",x(0.5))
+			.attr("y",y(0.5))
+			.attr("font-size",30)
+			.attr("text-anchor","middle")
+			.text("Finding Experiments...");
+
+		this.svg.selectAll("image.down").data([]).exit().remove();
+		this.svg.selectAll("image.down").data([1])
+			.enter().append("image")
+			.attr("xlink:href","http://coreyflynn.github.com/Bellhop/img/ajax-loader.gif")
+			.attr("class","down")
+			.attr("x",x(0.3))
+			.attr("y",y(0.5) - 25)
+			.attr("height",32)
+			.attr("width",32);
+
+
 	}
 
 	function draw_symbol(x,y){

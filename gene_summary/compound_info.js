@@ -7,6 +7,8 @@ function Compound_Info_Object(div_id,width,height,margin){
 	this.nsample = 0;
 	this.num_lines = 0;
 	this.init = false;
+	this.x = d3.scale.linear().domain([0,1]).range([this.margin,this.width-this.margin]);
+	this.y = d3.scale.linear().domain([0,1]).range([this.height-this.margin,this.margin]);
 
 	this.clear = clear;
 	this.draw = draw;
@@ -45,9 +47,11 @@ function Compound_Info_Object(div_id,width,height,margin){
 	function update_compound(compound,width){
 		this.compound = compound;
 		this.width = width;
+		this.draw_bg(this.x,this.y,width);
 		var self = this;
-		var siginfo = 'http://lincscloud.org/api/siginfo?callback=?';
-		$.getJSON(siginfo,{q:'{"pert_desc":"' + compound +'"}',
+		var siginfo = 'http://107.20.184.64:8080/api/v1.2/siginfo?callback=?';
+		
+		$.getJSON(siginfo,{q:'{"pert_iname":"' + compound +'"}',
 							f:'{"cell_id":1,"pert_type":1,"pert_desc":1,"distil_nsample":1}',
 							l:1000},
 							function(response){
@@ -69,6 +73,14 @@ function Compound_Info_Object(div_id,width,height,margin){
 	}
 
 	function draw_bg(x,y,width){
+		if (!this.init){
+			this.svg=d3.select(this.div_id).append("svg")
+						.attr("class","card")
+						.attr("width",width)
+						.attr("height",height);
+			this.init = true;
+		}
+
 		this.svg.selectAll("rect.bg").data([]).exit().remove();
 
 		this.svg.selectAll("rect.bg").data([1])
@@ -79,6 +91,27 @@ function Compound_Info_Object(div_id,width,height,margin){
 				.attr("height", height)
 				.attr("width", width)
 				.attr("fill", "#f0f0f0");
+
+		this.svg.selectAll("text.name").data([]).exit().remove();
+
+		this.svg.selectAll("text.name").data([this.compound])
+			.enter().append("text")
+			.attr("class","name")
+			.attr("x",x(0.5))
+			.attr("y",y(0.5))
+			.attr("font-size",30)
+			.attr("text-anchor","middle")
+			.text("Finding Experiments...");
+
+		this.svg.selectAll("image.cp").data([]).exit().remove();
+		this.svg.selectAll("image.cp").data([1])
+			.enter().append("image")
+			.attr("xlink:href","http://coreyflynn.github.com/Bellhop/img/ajax-loader.gif")
+			.attr("class","cp")
+			.attr("x",x(0.3))
+			.attr("y",y(0.5) - 25)
+			.attr("height",32)
+			.attr("width",32);
 	}
 
 	function draw_name(x,y){

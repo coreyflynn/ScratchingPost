@@ -17,13 +17,24 @@
     <!-- header  -->
 	<a id="home"></a>
     <div class='hero-unit'>
-        <h1>Gene Summary</h1>
+        <div class="row-fluid">
+            <h1 class="span9">Gene Summary</h1>
+            <span class="span3"><a href="http://www.broadinstitute.org/"><img style="max-height=100px;max-width:250px" src="http://coreyflynn.github.com/Bellhop/img/broad_logo.png"></a></span>
+        </div>
         <small>Connectivity Map results by Gene Symbol</small>
     </div>
 
-    <div class="row-fluid">
+    <div class="row-fluid" id="loading_container">
+        <div class="offset1 span10">
+            <img src="http://coreyflynn.github.com/Bellhop/img/ajax-loader.gif">
+            <p class="span11 lead">Loading Genes...</p>
+        </div>
+    </div>
+
+
+    <div class="row-fluid" id="search_container">
     	<div class="offset1 span10">
-			<input class="span12" type="text" data-provide="typeahead" id="search">
+			<input class="span12" type="text" placeholder="Search Genes" data-provide="typeahead" id="search">
 		</div>
     </div>
     
@@ -56,20 +67,25 @@
 
     $("#search").change(function (evt) { symbol_update(evt) });
     $(window).resize(function (evt) { redraw(evt) });
-	var siginfo = 'http://lincscloud.org/api/siginfo?callback=?';
-    var geneinfo = 'http://lincscloud.org/api/geneinfo?callback=?';
+    $("#search_container").hide();
+    $("#loading_container").show();
+	var siginfo = 'http://107.20.184.64:8080/api/v1.2/siginfo?callback=?';
+    var pertinfo = "http://107.20.184.64:8080/api/v1.2/pertinfo?callback=?"
 	var auto_data = []
-	$.getJSON(siginfo,{q:'{"cell_id":"MCF7","pert_type":"trt_sh"}',
-						  f:'{"pert_desc":1}',
-						  l:1000},
+	$.getJSON(pertinfo,{q:'{"pert_type":{"$in":["trt_sh","trt_oe"]}}',
+						  f:'{"pert_iname":1}',
+						  l:0},
 						  function(response){
         
         response.forEach(function(element,index,array){
-	        	auto_data.push(element.pert_desc)
+	        	auto_data.push(element.pert_iname)
         });
         auto_data = _.uniq(auto_data);
         $('#search').typeahead({source: auto_data});
+        $("#loading_container").hide();
+        $("#search_container").show();
       });
+    
 	
     var GI = new Gene_Info_Object("#card",$("#card").width(),250,10);
     var SIT = new Sig_Info_Table_Object("#SI_table",'<font color="#636363">Signature Detail</font>',300);
@@ -94,7 +110,7 @@
         symbol_update();
     }
 	function symbol_update(event){
-            $.getJSON(geneinfo,{q:'{"pr_gene_symbol":"' + $("#search").val() + '"}'},
+            $.getJSON(pertinfo,{q:'{"pert_iname":"' + $("#search").val() + '"}'},
                           function(response){
                             if (response == 0){
                                 GI.clear();
@@ -106,7 +122,7 @@
                                 KDQT.hide();
                             }else{
                                 GI.update_symbol($("#search").val(),$("#card").width())
-                                SIT.add_data_from_symbol($("#search").val())
+                                SIT.add_data_from_symbol($("#search").val());
                                 OEQT.add_data_from_queries()
                                 KDQT.add_data_from_queries()
                             }

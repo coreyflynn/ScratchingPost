@@ -66,6 +66,13 @@
       </div>
   </div>
 
+  <div class="row-fluid" id="loading_container">
+        <div class="offset1 span10">
+            <img src="http://coreyflynn.github.com/Bellhop/img/ajax-loader.gif">
+            <p class="span11 lead">Loading Reagents...</p>
+        </div>
+    </div>
+
   <div class="row-fluid">
       <div id="listing" class="offset1 span10">
       </div>
@@ -81,10 +88,10 @@
     text: '<b>16,425 </b><font color="#636363">Chemical Reagents</font>',
     image:"http://coreyflynn.github.com/Bellhop/img/CP_small.png",
     panels:[
-      new Split_Text_Panel({image:"",text1:'1,456',text2:'<font color="#636363">FDA Approved Drugs</font>',style:"background-color:#dbdbdb"}),
-      new Split_Text_Panel({image:"",text1:'4,212',text2:'<font color="#636363">Bioactive Tool Compounds</font>',style:"background-color:#dbdbdb"}),
-      new Split_Text_Panel({image:"",text1:'912',text2:'<font color="#636363">Novel NIH MLPCN Hits</font>',style:"background-color:#dbdbdb"}),
-      new Split_Text_Panel({image:"",text1:'9,845',text2:'<font color="#636363">Broad DOS Primary Screening Compounds</font>',style:"background-color:#dbdbdb"}),
+      new Graph_Split_Text_Panel({image:"",text1:'1,456',text2:'<font color="#636363">FDA Approved Drugs</font>',style:"background-color:#dbdbdb"}),
+      new Graph_Split_Text_Panel({image:"",text1:'4,212',text2:'<font color="#636363">Bioactive Tool Compounds</font>',style:"background-color:#dbdbdb"}),
+      new Graph_Split_Text_Panel({image:"",text1:'912',text2:'<font color="#636363">Novel NIH MLPCN Hits</font>',style:"background-color:#dbdbdb"}),
+      new Graph_Split_Text_Panel({image:"",text1:'9,845',text2:'<font color="#636363">Broad DOS Primary Screening Compounds</font>',style:"background-color:#dbdbdb"}),
     ]});
 
   genetics_cp = new Collapse_Panel({
@@ -122,80 +129,60 @@
   var reagents_grid_columns = [
       {id: "pert_iname", name: "Reagent Name", field: "pert_iname"},
       {id: "pert_type", name: "Reagent Type", field: "pert_type"},
-      {id: "cell_id", name: "Cell ID", field: "cell_id"},
+      {id: "num_cell", name: "Cell Lines", field: "num_cell"},
       {id: "num_inst", name: "Experiments", field: "num_inst"}
     ];
 
     // build the reagents listing data table
-    // var reagents_grid_data = [];
-    // var reagents_autocomplete_data = {};
-    // var pert_types = [];
-    // var cell_ids = [];
-    // var pertinfo = "http://107.20.184.64:8080/api/v1.2/pertinfo"
-    // $.getJSON(pertinfo,{q:'{"pert_iname":{"$regex":""}}',
-    //           f:'{"pert_iname":1,"pert_type":1,"num_inst":1}',
-    //           l:0},
-    //           function(response){
-        
-    //     response.forEach(function(element,index,array){
-    //         var unique_key = element.pert_iname + element.pert_type
-    //         if (reagents_grid_data.hasOwnProperty(unique_key)){
-    //           reagents_grid_data.unique_key.num_inst += element.num_inst;
-    //         }else{
-    //           reagents_grid_data.unique_key = {
-    //             pert_iname:element.pert_iname,
-    //             pert_desc:element.pert_desc,
-    //             cell_id:element.cell_id,
-    //             num_inst:element.num_inst,
-
-    //           };
-    //         }
-    //         pert_types = pert_types.push(element/pert_type);
-    //         cell_ids = cell_ids.push(element/cell_id);
-    //     });
-
-    //   reagents_grid_data = _.toArray(reagents_grid_data);
-    //   reagents_autocomplete_data = _.uniq(reagents_autocomplete_data);
-    //   pert_types = _.uniq(pert_types);
-    //   reagents_autocomplete_data.concat(pert_types);
-    //   cell_ids = _.uniq(cell_ids);
-    //   reagents_autocomplete_data.concat(cell_ids);
-    //   $('#search').typeahead({source: reagents_autocomplete_data});
-    // });
-
-    // build dummy data for the table
+    var reagents_grid_object = {};
     var reagents_grid_data = [];
     var reagents_autocomplete_data = [];
-    var pert_types = ["trt_sh","trt_oe","trt_oe"];
-    var cell_ids = ["MCF7","VCAP","PC3","A375","A549","HEPG2"];
-    for (var i =0; i < 45000; i++){
-      type_index = Math.floor(Math.random() * pert_types.length);
-      cell_index = Math.floor(Math.random() * pert_types.length);
-      reagent = "Reagent " + Math.floor(Math.random()*1000000000);
-      reagents_grid_data.push({
-        pert_iname: reagent,
-        pert_type: pert_types[type_index],
-        cell_id: cell_ids[cell_index],
-        num_inst: Math.floor(Math.random()*100)
-      });
-      reagents_autocomplete_data.push(reagent);
-    }
-    reagents_autocomplete_data = reagents_autocomplete_data.concat(pert_types,cell_ids);
+    var pert_types = [];
+    var pertinfo = "http://107.20.184.64:8080/api/v1.2/pertinfo?callback=?"
+    $.getJSON(pertinfo,{q:'{"pert_iname":{"$nin":["-666.0","-666"]}}',
+              f:'{"pert_iname":1,"pert_type":1,"num_inst":1,"cell_id":1}',
+              l:0,
+              s:'{"pert_iname":1}'},
+              function(response){
+        
+        response.forEach(function(element,index,array){
+            var unique_key = element.pert_iname + element.pert_type;
+            if (reagents_grid_object.hasOwnProperty(unique_key)){
+              reagents_grid_object[unique_key].num_inst += element.num_inst;
+              reagents_grid_object[unique_key].num_cell += element.cell_id.length;
+            }else{
+              reagents_grid_object[unique_key] = {
+                pert_iname:element.pert_iname,
+                pert_type:element.pert_type,
+                num_cell:element.cell_id.length,
+                num_inst:element.num_inst,
+
+              };
+            }
+            if (pert_types.indexOf(reagents_autocomplete_data.iname) == -1){
+              reagents_autocomplete_data.push(element.pert_iname);
+            }
+            if (pert_types.indexOf(element.pert_type) == -1){
+              pert_types.push(element.pert_type);
+              reagents_autocomplete_data.push(element.pert_type);
+            }
+        });
+
+      reagents_grid_data = _.toArray(reagents_grid_object);
+      reagents_autocomplete_data = _.uniq(reagents_autocomplete_data);
+      $('#search').typeahead({source: reagents_autocomplete_data});
 
     // typeahead options for reagents search table
-    reagents_grid_filter_columns = ["pert_iname","pert_type","cell_id"];
+    reagents_grid_filter_columns = ["pert_iname","pert_type"];
     reagents_typeahead_options = {source: reagents_autocomplete_data,
                                   highlighter: function(item){
                                     if (pert_types.indexOf(item) != -1){
                                       return '<div><span class="label label-important">Pert Type</span>  ' + item  +  '</div>';
                                     }
-                                    if (cell_ids.indexOf(item) != -1){
-                                      return '<div><span class="label label-warning">Cell ID</span>  ' + item  +  '</div>';
-                                    }
                                     return '<div><span class="label">Reagent Name</span>  ' + item  +  '</div>';
                                     }
                                   };
-  console.log(reagents_grid_data);
+
   listing_cp = new Collapse_Panel({
     div_target: "#listing",
     text: '<font color="#636363">List of Reagents</font>',
@@ -212,7 +199,9 @@
                              grid_filter_columns:reagents_grid_filter_columns
                            }),
     ]});
-  listing_cp.expand(0)
+  listing_cp.expand(0);
+  $("#loading_container").hide();
+  });
 
 </script>
 </html>

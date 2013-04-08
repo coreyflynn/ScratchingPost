@@ -18,6 +18,7 @@ function Collapse_Panel(options){
 
 	var self = this;
 	$(this.div_target).append(this.html);
+	$(this.div_target).css("padding-bottom", "2px");
 
 	$("#" + this.div_id + "_button").click(function (evt) { self.buttonCallback(evt); });
 
@@ -101,11 +102,18 @@ function Panel(options){
 	this.text = (options.text !== undefined) ? options.text : "Title";
 	this.div_id = (options.div_id !== undefined) ? options.div_id : "Panel" + Math.floor(Math.random()*1000000000);
 	this.style = (options.style !== undefined) ? options.style : "background-color:#f0f0f0";
-	this.html = ['<div class="row-fluid" id="' + this.div_id + '" class="span12" style=' + this.style + '>',
-				'<span class="span1"><img style="max-width:' + this.image_max + 'px;max-height:' + this.image_max + 'px;" src="' + this.image + '"/></span>',
-				'<p class="lead offset1 span10">' + this.text + '</p>',
+	if (this.image === ""){
+		this.html = ['<div class="row-fluid" id="' + this.div_id + '" class="span12" style=' + this.style + '>',
+				'<p class="lead offset2 span10">' + this.text + '</p>',
 				'</div>'
 				].join('\n');
+	}else{
+		this.html = ['<div class="row-fluid" id="' + this.div_id + '" class="span12" style=' + this.style + '>',
+					'<span class="span1"><img style="max-width:' + this.image_max + 'px;max-height:' + this.image_max + 'px;" src="' + this.image + '"/></span>',
+					'<p class="lead offset1 span10">' + this.text + '</p>',
+					'</div>'
+					].join('\n');
+	}
 
 	this.add_to_div = add_to_div;
 
@@ -122,12 +130,19 @@ function Split_Text_Panel(options){
 	this.text2 = (options.text2 !== undefined) ? options.text2 : "text";
 	this.div_id = (options.div_id !== undefined) ? options.div_id : "Split_Text_Panel" + Math.floor(Math.random()*1000000000);
 	this.style = (options.style !== undefined) ? options.style : "background-color:#f0f0f0";
-	this.html = ['<div class="row-fluid" id="' + this.div_id + '" class="span12" style=' + this.style + '>',
-				'<span class="span1"><img style="max-width:' + this.image_max + 'px;max-height:' + this.image_max + 'px;" src="' + this.image + '"/></span>',
-				'<p class="lead offset1 span1"><b>' + this.text1 + '</b></p>',
-				'<p class="lead span9">' + this.text2 + '</p>',
-				'</div>'
-				].join('\n');
+	if (this.image === ""){
+		this.html = ['<div class="row-fluid" id="' + this.div_id + '" class="span12" style=' + this.style + '>',
+					'<p class="lead offset2 span1"><b>' + this.text1 + '</b></p>',
+					'<p class="lead span9">' + this.text2 + '</p>',
+					'</div>'
+					].join('\n');
+	}else{
+		this.html = ['<div class="row-fluid" id="' + this.div_id + '" class="span12" style=' + this.style + '>',
+					'<p class="lead offset1 span1"><b>' + this.text1 + '</b></p>',
+					'<p class="lead span9">' + this.text2 + '</p>',
+					'</div>'
+					].join('\n');
+	}
 
 	this.add_to_div = add_to_div;
 
@@ -136,10 +151,44 @@ function Split_Text_Panel(options){
 	}
 }
 
-function List_Search_Panel(options){
+function Graph_Split_Text_Panel(options){
 	options = (options !== undefined) ? options : {};
 	this.image = (options.image !== undefined) ? options.image : "";
 	this.image_max = (options.image_max !== undefined) ? options.image_max : 60;
+	this.text1 = (options.text1 !== undefined) ? options.text1 : "Title";
+	this.text2 = (options.text2 !== undefined) ? options.text2 : "text";
+	this.div_id = (options.div_id !== undefined) ? options.div_id : "Split_Text_Panel" + Math.floor(Math.random()*1000000000);
+	this.style = (options.style !== undefined) ? options.style : "background-color:#f0f0f0";
+	this.html = ['<div class="row-fluid" id="' + this.div_id + '" class="span12" style=' + this.style + '>',
+				// '<div class="offset1 span1" id="' + this.div_id + '_graph" style:"height:' + ("#" + this.div_id +'></div>',
+				'<p class="lead span1"><b>' + this.text1 + '</b></p>',
+				'<p class="lead span8">' + this.text2 + '</p>',
+				'</div>'
+				].join('\n');
+
+	this.add_to_div = add_to_div;
+
+	function add_to_div(div_target){
+		$("#" + div_target).append(this.html);
+		graph = d3.selectAll("#" + this.div_id + "_graph")
+		width = $("#" + this.div_id + "_graph").outerWidth();
+		height = $("#" + this.div_id + "_graph").outerHeight();
+		graph.append("svg")
+			.attr("width",width)
+			.attr("height",height);
+		graph.selectAll("rect.bg").data([1])
+				.enter().append("rect")
+				.attr("x",0)
+				.attr("y",0)
+				.attr("class","bg")
+				.attr("height", height)
+				.attr("width", width);
+
+	}
+}
+
+function List_Search_Panel(options){
+	options = (options !== undefined) ? options : {};
 	this.text = (options.text !== undefined) ? options.text : "Title";
 	this.div_id = (options.div_id !== undefined) ? options.div_id : "List_Search_Panel" + Math.floor(Math.random()*1000000000);
 	this.style = (options.style !== undefined) ? options.style : "background-color:#f0f0f0";
@@ -151,8 +200,7 @@ function List_Search_Panel(options){
 	this.grid_filter_columns = (options.grid_filter_columns !== undefined) ? options.grid_filter_columns : ["data"];
 	this.placeholder_text = (options.placeholder_text !== undefined) ? options.placeholder_text : "Search";
 	this.html = ['<div class="row-fluid" id="' + this.div_id + '" class="span12" style=' + this.style + '>',
-				'<span class="span1"><img style="max-width:' + this.image_max + 'px;max-height:' + this.image_max + 'px;" src="' + this.image + '"/></span>',
-				'<input class="span10" type="text" placeholder="' + this.placeholder_text + '" data-provide="typeahead" id="' + this.div_id + '_search">',
+				'<input class="offset1 span10" type="text" placeholder="' + this.placeholder_text + '" data-provide="typeahead" id="' + this.div_id + '_search">',
 				'<div id="' + this.div_id + '_grid" style="height:' + this.grid_height + 'px">',
 				'</div>'
 				].join('\n');
@@ -166,6 +214,7 @@ function List_Search_Panel(options){
 		$("#" + div_target).append(this.html);
 		$("#" + this.div_id + "_search").typeahead(this.typeahead_options);
 		this.grid = new Slick.Grid("#" + this.div_id + "_grid", this.grid_data, this.grid_columns, this.grid_options);
+		this.grid.render();
 		var self = this;
 		$("#" + this.div_id + "_search").change(function (evt) { self.filter_grid_data($("#" + self.div_id + "_search").val(),self.grid_filter_columns); });
 
