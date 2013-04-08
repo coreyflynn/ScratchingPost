@@ -13,18 +13,19 @@ function Sig_Info_Table_Object(div_id,title,show_height){
   this.add_data_from_sig_id = add_data_from_sig_id;
 
   header_html = '<div class="row-fluid" id="' + this.div_id.split("#")[1] + '_head" class="span12" style="background-color:#f0f0f0">' +
-      '<h1 class="span11">' + title + '</h1>' +
-      '<span class="span1"><img id="'+ this.div_id.split("#")[1] + '_button" style="max-width:50px;max-height:50px;" src="http://coreyflynn.github.com/Bellhop/img/plus_round_small_blue.png"></span>' +
+      '<span class="span1"><img style="max-width:60px;max-height:60px;" src="http://coreyflynn.github.com/Bellhop/img/signature.png"></span>' +
+      '<h3 class="span10">' + title + '</h3>' +
+      '<span class="span1"><img id="'+ this.div_id.split("#")[1] + '_button" style="max-width:60px;max-height:60px;" src="http://coreyflynn.github.com/Bellhop/img/plus_round_small_blue.png"></span>' +
       '</div>';
 
   $(this.div_id).append(header_html);
   var self = this;
   $(this.div_id + '_button').click(function (evt) { self.buttonCallback(evt); });
-  $(this.div_id).append('<div id="' + 
-              this.div_id.split("#")[1] + 
+  $(this.div_id).append('<div id="' +
+              this.div_id.split("#")[1] +
               '_SIT" style="height:' +
               (this.show_height - $(this.div_id + "_head").outerHeight(true)) +
-              'px"></div>')
+              'px"></div>');
 
   this.columns = [
     {id: "sig_id", name: "Sig ID", field: "sig_id"},

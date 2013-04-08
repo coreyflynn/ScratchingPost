@@ -114,6 +114,47 @@
       new List_Panel({style:"background-color:#dbdbdb",grid_columns:cell_lines_columns,grid_data:primaries_data,grid_height:150}),
     ]});
 
+  // create the reagents listing collapse panel
+  var reagents_grid_columns = [
+      {id: "pert_iname", name: "Reagent Name", field: "pert_iname"},
+      {id: "pert_type", name: "Reagent Type", field: "pert_type"},
+      {id: "cell_id", name: "Cell ID", field: "cell_id"},
+      {id: "num_inst", name: "Experiments", field: "num_inst"}
+    ];
+    
+    // build dummy data for the table
+    var reagents_grid_data = [];
+    var reagents_autocomplete_data = [];
+    var pert_types = ["trt_sh","trt_oe","trt_oe"];
+    var cell_ids = ["MCF7","VCAP","PC3","A375","A549","HEPG2"];
+    for (var i =0; i < 45000; i++){
+      type_index = Math.floor(Math.random() * pert_types.length);
+      cell_index = Math.floor(Math.random() * pert_types.length);
+      reagent = "Reagent " + Math.floor(Math.random()*1000000000);
+      reagents_grid_data.push({
+        pert_iname: reagent,
+        pert_type: pert_types[type_index],
+        cell_id: cell_ids[cell_index],
+        num_inst: Math.floor(Math.random()*100)
+      });
+      reagents_autocomplete_data.push(reagent);
+    }
+    reagents_autocomplete_data = reagents_autocomplete_data.concat(pert_types,cell_ids);
+
+    // typeahead options for reagents search table
+    reagents_grid_filter_columns = ["pert_iname","pert_type","cell_id"];
+    reagents_typeahead_options = {source: reagents_autocomplete_data,
+                                  highlighter: function(item){
+                                    if (pert_types.indexOf(item) != -1){
+                                      return '<div><span class="label label-important">Pert Type</span>  ' + item  +  '</div>';
+                                    }
+                                    if (cell_ids.indexOf(item) != -1){
+                                      return '<div><span class="label label-warning">Cell ID</span>  ' + item  +  '</div>';
+                                    }
+                                    return '<div><span class="label">Reagent Name</span>  ' + item  +  '</div>';
+                                    }
+                                  };
+
   listing_cp = new Collapse_Panel({
     div_target: "#listing",
     text: '<font color="#636363">List of Reagents</font>',
@@ -122,7 +163,13 @@
       new List_Search_Panel({image:"",
                              text:"Place holder for reagent table",
                              placeholder_text:"Search Reagents",
-                             style:"background-color:#dbdbdb"}),
+                             style:"background-color:#dbdbdb",
+                             grid_columns:reagents_grid_columns,
+                             grid_data:reagents_grid_data,
+                             autocompete_data:reagents_autocomplete_data,
+                             typeahead_options:reagents_typeahead_options,
+                             grid_filter_columns:reagents_grid_filter_columns
+                           }),
     ]});
   listing_cp.expand(0)
 

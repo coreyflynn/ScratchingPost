@@ -35,6 +35,8 @@ function Collapse_Panel(options){
 	this.buttonCallback = buttonCallback;
 	this.collapse = collapse;
 	this.expand = expand;
+	this.hide = hide;
+	this.show = show;
 
 	this.open = false;
 	this.collapse(0);
@@ -80,6 +82,14 @@ function Collapse_Panel(options){
 		$('.' + this.div_id + "_sub_panel").fadeIn(duration);
 		$("#" + this.div_id).animate({height:this.open_height},duration);
 		$("#" + this.div_id + "_button").rotate({animateTo:45,duration:duration});
+	}
+
+	function hide(){
+		$("#" + this.div_id).hide();
+	}
+
+	function show(){
+		$("#" + this.div_id).show();
 	}
 
 }
@@ -134,6 +144,11 @@ function List_Search_Panel(options){
 	this.div_id = (options.div_id !== undefined) ? options.div_id : "List_Search_Panel" + Math.floor(Math.random()*1000000000);
 	this.style = (options.style !== undefined) ? options.style : "background-color:#f0f0f0";
 	this.grid_height = (options.grid_height !== undefined) ? options.grid_height : 300;
+	this.grid_columns = (options.grid_columns !== undefined) ? options.grid_columns : [{id: "data", name: "Data", field: "data"}];
+	this.grid_options = (options.grid_options !== undefined) ? options.grid_options : {enableCellNavigation: true,enableColumnReorder: false,fullWidthRows: true,forceFitColumns: true};
+	this.grid_data = (options.grid_data !== undefined) ? options.grid_data : ["DataPoint1","DataPoint2","DataPoint3"];
+	this.typeahead_options = (options.typeahead_options !== undefined) ? options.typeahead_options : {source:["DataPoint1","DataPoint2","DataPoint3"]};
+	this.grid_filter_columns = (options.grid_filter_columns !== undefined) ? options.grid_filter_columns : ["data"];
 	this.placeholder_text = (options.placeholder_text !== undefined) ? options.placeholder_text : "Search";
 	this.html = ['<div class="row-fluid" id="' + this.div_id + '" class="span12" style=' + this.style + '>',
 				'<span class="span1"><img style="max-width:' + this.image_max + 'px;max-height:' + this.image_max + 'px;" src="' + this.image + '"/></span>',
@@ -143,56 +158,40 @@ function List_Search_Panel(options){
 				].join('\n');
 
 	this.add_to_div = add_to_div;
+	this.filter_grid_data = filter_grid_data;
 
 	function add_to_div(div_target){
+		// adds the hmtl for this panel into the div at the given div target.  The search and slick grid components
+		// are configured according to the passed arguments in the contructor
 		$("#" + div_target).append(this.html);
-
-		this.grid_columns = [
-			{id: "pert_iname", name: "Reagent Name", field: "pert_iname"},
-			{id: "pert_type", name: "Reagent Type", field: "pert_type"},
-			{id: "cell_id", name: "Cell ID", field: "cell_id"},
-			{id: "num_inst", name: "Experiments", field: "num_inst"}
-		];
-
-		this.grid_options = {
-			enableCellNavigation: true,
-			enableColumnReorder: false,
-			fullWidthRows: true,
-			forceFitColumns: true
-		};
-
-		// build dummy data for the table
-		var fake_data = [];
-		var auto_data = [];
-		var pert_types = ["trt_sh","trt_oe","trt_oe"];
-		var cell_ids = ["MCF7","VCAP","PC3","A375","A549","HEPG2"];
-		for (var i =0; i < 45000; i++){
-			type_index = Math.floor(Math.random() * pert_types.length);
-			cell_index = Math.floor(Math.random() * pert_types.length);
-			reagent = "Reagent " + Math.floor(Math.random()*1000000000);
-			fake_data.push({
-				pert_iname: reagent,
-				pert_type: pert_types[type_index],
-				cell_id: cell_ids[cell_index],
-				num_inst: Math.floor(Math.random()*100)
-			});
-			auto_data.push(reagent);
-		}
-		auto_data = auto_data.concat(pert_types,cell_ids);
-		this.grid_data = fake_data;
-		$("#" + this.div_id + "_search").typeahead({source: auto_data,
-													highlighter: function(item){
-														if (pert_types.indexOf(item) != -1){
-															return '<div><span class="label label-important">Pert Type</span>  ' + item  +  '</div>';
-														}
-														if (cell_ids.indexOf(item) != -1){
-															return '<div><span class="label label-warning">Cell ID</span>  ' + item  +  '</div>';
-														}
-														return '<div><span class="label">Reagent Name</span>  ' + item  +  '</div>';
-													}});
-
+		$("#" + this.div_id + "_search").typeahead(this.typeahead_options);
 		this.grid = new Slick.Grid("#" + this.div_id + "_grid", this.grid_data, this.grid_columns, this.grid_options);
+		var self = this;
+		$("#" + this.div_id + "_search").change(function (evt) { self.filter_grid_data($("#" + self.div_id + "_search").val(),self.grid_filter_columns); });
 
+	}
+
+	function filter_grid_data(search_string,columns_list){
+		// filters the content of the grid data for the search_string matching any of the entries in the columns listed in
+		// columns_list
+		if (search_string === ""){
+			this.grid.setData(this.grid_data);
+			this.grid.render();
+		}else{
+			data = this.grid_data;
+			filtered_data = [];
+			data.forEach(function(data_element,data_index,data_array){
+				var vals = [];
+				columns_list.forEach(function(col_element,col_index,col_array){
+					vals.push(data_element[col_element]);
+				});
+				if ($.inArray(search_string,vals) != -1){
+					filtered_data.push(data_element);
+				}
+			});
+			this.grid.setData(filtered_data);
+			this.grid.render();
+		}
 	}
 }
 

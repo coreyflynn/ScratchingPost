@@ -98,7 +98,7 @@ function Compound_Info_Object(div_id,width,height,margin){
 		this.svg.selectAll("image.cp").data([]).exit().remove();
 		this.svg.selectAll("image.cp").data([this.nsample])
 			.enter().append("image")
-			.attr("xlink:href","http://coreyflynn.github.com/Bellhop/img/arrow_down_round_small.png")
+			.attr("xlink:href","http://coreyflynn.github.com/Bellhop/img/two_circles.png")
 			.attr("class","cp")
 			.attr("x",x(0.5) - 50)
 			.attr("y",55)
@@ -121,7 +121,7 @@ function Compound_Info_Object(div_id,width,height,margin){
 			.enter().append("text")
 			.attr("class","cp_static")
 			.attr("x",x(0.5))
-			.attr("y",55 + 115)
+			.attr("y",55 + 117)
 			.attr("font-size",20)
 			.attr("text-anchor","middle")
 			.text("Experiments");
@@ -131,7 +131,7 @@ function Compound_Info_Object(div_id,width,height,margin){
 			.enter().append("text")
 			.attr("class","cell_lines_text")
 			.attr("x",x(0.5))
-			.attr("y",55 + 135)
+			.attr("y",55 + 137)
 			.attr("font-size",20)
 			.attr("text-anchor","middle")
 			.text("In " + this.num_lines + " Cell Lines");

@@ -79,7 +79,7 @@ function Gene_Info_Object(div_id,width,height,margin){
 								oe_cells = _.uniq(oe_cells);
 								kd_cells = _.uniq(kd_cells);
 								self.update_oe(oe_nsample,oe_cells.length);
-								self.update_kd(kd_nsample.length,kd_cells.length);
+								self.update_kd(kd_nsample,kd_cells.length);
 								self.draw(self.width);
 			});
         });
