@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html lang="en">
+<head>
+    <title>CMap Summary</title>
+    <link href="http://cmap.github.com/cdn/css/main.all.min.css" rel="stylesheet">
+</head>
+<body data-spy="scroll" data-target=".navbar">
+  <!-- navbar -->
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <ul class="nav">
+        <li><a href="#home">Home</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- header  -->
+  <a id="home"></a>
+  <div class='hero-unit'>
+      <h1>Broad Institute LINCS Data Summary</h1>
+  </div>
+
+  <div class="row-fluid">
+      <div id="top" class="offset1 span10">
+        <h2><font color="#636363">Gene-expression signatures of</font> <b>22,412</b> <font color="#636363">reagents profiled in </font><b>1,142,024</b><font color="#636363"> experiments</font></h2>
+      </div>
+  </div>
+
+  <div class="row-fluid">
+      <div id="cp_summary" class="offset1 span10">
+      </div>
+  </div>
+
+  <div class="row-fluid">
+      <div id="genetic_summary" class="offset1 span10">
+      </div>
+  </div>
+
+  <div class="row-fluid">
+      <div class="offset1 span10">
+      </div>
+  </div>
+
+  <div class="row-fluid">
+      <div id="top" class="offset1 span10">
+        <h2><font color="#636363">Experiments have been performed in </font> <b>15</b> <font color="#636363"> cellular contexts</font></h2>
+      </div>
+  </div>
+
+  <div class="row-fluid">
+      <div id="cell_lines" class="offset1 span10">
+      </div>
+  </div>
+
+  <div class="row-fluid">
+      <div id="primaries" class="offset1 span10">
+      </div>
+  </div>
+
+  <div class="row-fluid">
+      <div class="offset1 span10">
+      </div>
+  </div>
+
+  <div class="row-fluid">
+      <div id="listing" class="offset1 span10">
+      </div>
+  </div>
+</body>
+
+<script src="http://cmap.github.com/cdn/js/main.all.min.js"></script>
+<script src="collapse_panel.js"></script>
+<script src="jQueryRotateCompressed.2.2.js"></script>
+<script type="text/javascript">
+  drugs_cp = new Collapse_Panel({
+    div_target: "#cp_summary",
+    text: '<b>16,425 </b><font color="#636363">Chemical Reagents</font>',
+    image:"http://coreyflynn.github.com/Bellhop/img/CP_small.png",
+    panels:[
+      new Split_Text_Panel({image:"",text1:'1,456',text2:'<font color="#636363">FDA Approved Drugs</font>',style:"background-color:#dbdbdb"}),
+      new Split_Text_Panel({image:"",text1:'4,212',text2:'<font color="#636363">Bioactive Tool Compounds</font>',style:"background-color:#dbdbdb"}),
+      new Split_Text_Panel({image:"",text1:'912',text2:'<font color="#636363">Novel NIH MLPCN Hits</font>',style:"background-color:#dbdbdb"}),
+      new Split_Text_Panel({image:"",text1:'9,845',text2:'<font color="#636363">Broad DOS Primary Screening Compounds</font>',style:"background-color:#dbdbdb"}),
+    ]});
+
+  genetics_cp = new Collapse_Panel({
+    div_target: "#genetic_summary",
+    text: '<b>5,806 </b><font color="#636363">Genetic Reagents</font>',
+    image:"http://coreyflynn.github.com/Bellhop/img/variant.png",
+    image_max: 80,
+    panels:[
+      new Split_Text_Panel({image:"",text1:'3,566',text2:'<font color="#636363">Loss of Function Reagents</font>',style:"background-color:#dbdbdb"}),
+      new Split_Text_Panel({image:"",text1:'2,112',text2:'<font color="#636363">Gain of Function Reagents</font>',style:"background-color:#dbdbdb"}),
+      new Split_Text_Panel({image:"",text1:'128',text2:'<font color="#636363">Genetic Variants of 35 Genes</font>',style:"background-color:#dbdbdb"}),
+    ]});
+
+  
+  var cell_lines_columns = [{id: "cell_id", name: "Cell Line", field: "cell_id"},{id: "lineage", name: "Lineage", field: "lineage"}];
+  var cell_line_data = [{cell_id:"MCF7",lineage:"breast"},{cell_id:"PC3",lineage:"prostate"},{cell_id:"A549",lineage:"lung"},{cell_id:"A375",lineage:"melanoma"},{cell_id:"HepG2",lineage:"liver carcinoma"},{cell_id:"VCaP",lineage:"prostae"},{cell_id:"HCC515",lineage:"lung"},{cell_id:"HT29",lineage:"colon"},{cell_id:"HA1E",lineage:"kidney epithelial"},{cell_id:"HEK293T",lineage:"embrionic kidney"}];
+  cell_lines_cp = new Collapse_Panel({
+    div_target: "#cell_lines",
+    text: '10 <font color="#636363">Cancer Cell Lines</font>',
+    image:"http://coreyflynn.github.com/Bellhop/img/cell_line.png",
+    panels:[
+      new List_Panel({style:"background-color:#dbdbdb",grid_columns:cell_lines_columns,grid_data:cell_line_data,grid_height:273}),
+    ]});
+
+  var primaries_data = [{cell_id:"ASC",lineage:"adipocyte"},{cell_id:"SKL",lineage:"skeletal myocyte"},{cell_id:"PHH",lineage:"hepatocyte"},{cell_id:"NPC",lineage:"iPS derived neural progenitor"},{cell_id:"NEU",lineage:"terminally differentiated neuron"}];
+  primaries_cp = new Collapse_Panel({
+    div_target: "#primaries",
+    text: '5 <font color="#636363">Primary Cell Types</font>',
+    image:"http://coreyflynn.github.com/Bellhop/img/brain.png",
+    panels:[
+      new List_Panel({style:"background-color:#dbdbdb",grid_columns:cell_lines_columns,grid_data:primaries_data,grid_height:150}),
+    ]});
+
+  // create the reagents listing collapse panel
+  var reagents_grid_columns = [
+      {id: "pert_iname", name: "Reagent Name", field: "pert_iname"},
+      {id: "pert_type", name: "Reagent Type", field: "pert_type"},
+      {id: "cell_id", name: "Cell ID", field: "cell_id"},
+      {id: "num_inst", name: "Experiments", field: "num_inst"}
+    ];
+    
+    // build dummy data for the table
+    var reagents_grid_data = [];
+    var reagents_autocomplete_data = [];
+    var pert_types = ["trt_sh","trt_oe","trt_oe"];
+    var cell_ids = ["MCF7","VCAP","PC3","A375","A549","HEPG2"];
+    for (var i =0; i < 45000; i++){
+      type_index = Math.floor(Math.random() * pert_types.length);
+      cell_index = Math.floor(Math.random() * pert_types.length);
+      reagent = "Reagent " + Math.floor(Math.random()*1000000000);
+      reagents_grid_data.push({
+        pert_iname: reagent,
+        pert_type: pert_types[type_index],
+        cell_id: cell_ids[cell_index],
+        num_inst: Math.floor(Math.random()*100)
+      });
+      reagents_autocomplete_data.push(reagent);
+    }
+    reagents_autocomplete_data = reagents_autocomplete_data.concat(pert_types,cell_ids);
+
+    // typeahead options for reagents search table
+    reagents_grid_filter_columns = ["pert_iname","pert_type","cell_id"];
+    reagents_typeahead_options = {source: reagents_autocomplete_data,
+                                  highlighter: function(item){
+                                    if (pert_types.indexOf(item) != -1){
+                                      return '<div><span class="label label-important">Pert Type</span>  ' + item  +  '</div>';
+                                    }
+                                    if (cell_ids.indexOf(item) != -1){
+                                      return '<div><span class="label label-warning">Cell ID</span>  ' + item  +  '</div>';
+                                    }
+                                    return '<div><span class="label">Reagent Name</span>  ' + item  +  '</div>';
+                                    }
+                                  };
+
+  listing_cp = new Collapse_Panel({
+    div_target: "#listing",
+    text: '<font color="#636363">List of Reagents</font>',
+    image:"http://coreyflynn.github.com/Bellhop/img/list.png",
+    panels:[
+      new List_Search_Panel({image:"",
+                             text:"Place holder for reagent table",
+                             placeholder_text:"Search Reagents",
+                             style:"background-color:#dbdbdb",
+                             grid_columns:reagents_grid_columns,
+                             grid_data:reagents_grid_data,
+                             autocompete_data:reagents_autocomplete_data,
+                             typeahead_options:reagents_typeahead_options,
+                             grid_filter_columns:reagents_grid_filter_columns
+                           }),
+    ]});
+  listing_cp.expand(0)
+
+</script>
+</html>

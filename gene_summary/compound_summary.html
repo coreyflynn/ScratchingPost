@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html lang="en">
+<head>
+    <title>Compound Summary</title>
+    <link href="http://cmap.github.com/cdn/css/main.all.min.css" rel="stylesheet">
+</head>
+<body data-spy="scroll" data-target=".navbar">
+	<!-- navbar -->
+	<div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <ul class="nav">
+          <li><a href="#search">Home</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- header  -->
+	<a id="home"></a>
+    <div class='hero-unit'>
+        <h1>Compound Summary</h1>
+        <small>Connectivity Map results by Compound Name</small>
+    </div>
+
+    <div class="row-fluid">
+    	<div class="offset1 span10">
+			<input class="span12" type="text" data-provide="typeahead" id="search">
+		</div>
+    </div>
+    
+    <div class="row-fluid">
+        <div class="offset1 span10" id="card"></div>
+    </div>
+
+    <div class="row-fluid">
+        <div class="offset1 span10" id="SI_table" style="height:300px"></div>
+    </div>
+
+    <div class="row-fluid">
+        <div class="offset1 span10" id="CPQ_table" style="height:300px"></div>
+    </div>
+
+</body>
+
+<script src="http://cmap.github.com/cdn/js/main.all.min.js"></script>
+<script src="gene_info.js"></script>
+<script src="compound_info.js"></script>
+<script src="sig_info_table.js"></script>
+<script src="collapse_panel.js"></script>
+<script src="jQueryRotateCompressed.2.2.js"></script>
+<script src="query_info_table.js"></script>
+<script type="text/javascript">
+
+    $("#search").change(function (evt) { compound_update(evt) });
+    $(window).resize(function (evt) { redraw(evt) });
+	var siginfo = 'http://lincscloud.org/api/siginfo?callback=?';
+	var auto_data = []
+	$.getJSON(siginfo,{q:'{"pert_type":"trt_cp"}',
+						  f:'{"pert_desc":1}',
+						  l:1000},
+						  function(response){
+        
+        response.forEach(function(element,index,array){
+	        	auto_data.push(element.pert_desc)
+        });
+        auto_data = _.uniq(auto_data);
+        $('#search').typeahead({source: auto_data});
+      });
+	
+    var CI = new Compound_Info_Object("#card",$("#card").width(),205,10);
+    var SIT = new Sig_Info_Table_Object("#SI_table",'<font color="#636363">Signature Detail</font>',300);
+    // var CPQT = new Query_Info_Table_Object("#CPQ_table","Connections",300);
+    var CPQT = new Query_Info_Table_Object2({div_target: "#CPQ_table",
+                                            text: '<font color="#636363">Connections</font>',
+                                            image:"http://coreyflynn.github.com/Bellhop/img/two_circles.png"}
+    );
+    SIT.hide();
+    CPQT.hide();
+    CPQT.expand();
+
+    if (window.location.hash != ""){
+        $("#search").val(window.location.hash.split('#')[1]);
+        compound_update();
+    }
+	function compound_update(event){
+            $.getJSON(siginfo,{q:'{"pert_desc":"' + $("#search").val() + '"}'},
+                          function(response){
+                            if (response == 0){
+                                CI.clear();
+                                SIT.clear_data();
+                                SIT.hide();
+                                CPQT.hide();
+                            }else{
+                                CI.update_compound($("#search").val(),$("#card").width())
+                                SIT.add_data_from_symbol($("#search").val())
+                                CPQT.add_data_from_queries()
+                            }
+                          }
+            );
+	}
+
+    function redraw(event){
+        CI.draw($("#card").width());
+    }
+</script>
+
+</html>
