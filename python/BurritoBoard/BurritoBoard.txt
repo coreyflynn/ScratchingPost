@@ -1,1 +1,0 @@
-name	program meeting	lab meeting	totalmonth_ideal	1	2	3all_ideal	9	9	18#month			Roger	1	1	2Peyton	0	1	1Dave	0	1	1Ian	1	2	3Ted	0	2	2Larson	1	2	3#all			Roger	6	7	13Peyton	7	6	13Dave	2	4.5	6.5Ian	3	6.5	9.5Ted	3	9	12Larson	8	8	16

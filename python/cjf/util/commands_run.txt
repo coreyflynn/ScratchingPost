@@ -1,2 +1,0 @@
-/xchip/cogs/bin/sig_info
-/xchip/cogs/bin/sig_info
