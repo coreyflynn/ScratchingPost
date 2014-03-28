@@ -1,7 +1,7 @@
 //get all of the libraries we need to run the app
 var express = require('express');
 var app = express();
-var port = 8080;
+var port = 3000;
 var mongoose = require('mongoose');
 var passport = require('passport');
 var flash = require('connect-flash');

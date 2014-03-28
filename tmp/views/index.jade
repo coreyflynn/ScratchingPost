@@ -6,11 +6,12 @@ html
         link(rel="stylesheet" href="css/custom.css")
     body
         div.container
-            div.jumbotron.text-center
-                h1 <span class="fa fa-lock"> Authentication
-                p Login or Register with:
-                a(href='/login').btn.btn-default <span class="fa fa-user"> Local Login
-                a(href='/signup').btn.btn-default <span class="fa fa-user"> Local Signup
-                a(href='/auth/facebook').btn.btn-primary <span class="fa fa-facebook"> Facebook
-                    
-                    
+            div.text-center
+                img(src="http://coreyflynn.github.io/Bellhop/img/cmap_logo_small.png")
+                div(style="min-height: 20px")
+                a(href='/login' style="margin: 10px").btn.btn-default <span class="fa fa-user"> Sign In
+                a(href='/signup' style="margin: 10px").btn.btn-default <span class="fa fa-plus"> Register
+                h3 Or Sign In With
+                a(href='/auth/facebook' style="margin: 10px").btn.btn-primary <span class="fa fa-facebook"> Facebook
+                a(href='/auth/twitter' style="margin: 10px").btn.btn-info <span class="fa fa-twitter"> Twitter
+                a(href='/auth/google' style="margin: 10px").btn.btn-danger <span class="fa fa-google-plus"> Google

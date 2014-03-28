@@ -51,6 +51,32 @@ module.exports = function(app, passport){
                 failureRedirect: '/'
             })
     );
+  
+    // twitter routes
+    // route for twitter authentication and login
+    app.get('/auth/twitter', passport.authenticate('twitter'));
+  
+    // handle the callback after twitter has authenticated the user
+    app.get('/auth/twitter/callback',
+      passport.authenticate('twitter', {
+        successRedirect : '/profile',
+        failureRedirect : '/'
+      })
+     );
+  
+    // google routes
+    // send to google to do the authentication
+    // profile gets us their basic information including their name
+    // email gets their emails
+    app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
+
+    // the callback after google has authenticated the user
+    app.get('/auth/google/callback',
+            passport.authenticate('google', {
+                    successRedirect : '/profile',
+                    failureRedirect : '/'
+            })
+     );
     
     // example of a protected route
 	app.get('/profile', isLoggedIn, function(req, res) {
