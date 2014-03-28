@@ -1,0 +1,16 @@
+html
+    head
+        title Passport Example
+        link(rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css")
+        link(rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css")
+        link(rel="stylesheet" href="css/custom.css")
+    body
+        div.container
+            div.jumbotron.text-center
+                h1 <span class="fa fa-lock"> Authentication
+                p Login or Register with:
+                a(href='/login').btn.btn-default <span class="fa fa-user"> Local Login
+                a(href='/signup').btn.btn-default <span class="fa fa-user"> Local Signup
+                a(href='/auth/facebook').btn.btn-primary <span class="fa fa-facebook"> Facebook
+                    
+                    
