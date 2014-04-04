@@ -1,0 +1,13 @@
+{
+    "name": "ToolRunner",
+    "version": "0.0.0",
+    "description": "Example C3 tool runner",
+    "dependencies": {
+        "express": "latest",
+        "jade": "latest",
+        "ssh2": "latest",
+        "scp2": "latest",
+        "aws-sdk": "latest"
+    },
+    "author": "developer"
+}
