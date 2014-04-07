@@ -23,7 +23,7 @@ exports.default = function(req, res) {
     var files_array = [];
     var file_keys = Object.keys(files_object);
     async.map(file_keys,function(key,callback){
-        callback(null,files_array[key]);
+        callback(null,files_object[key]);
     },function(err,result){
         if (err) throw err;
         async.map(result,save_tmp_file,function(err,result){
