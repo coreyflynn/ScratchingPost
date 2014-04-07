@@ -3,6 +3,7 @@ var express = require('express');
 var routes = require('./routes');
 var post = require('./routes/post');
 var user = require('./routes/user');
+var email_notifier = require('./util/email_notifier').email_notifier;
 var http = require('http');
 var path = require('path');
 
@@ -20,6 +21,7 @@ app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(app.router);
+//app.use(email_notifier);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // development only

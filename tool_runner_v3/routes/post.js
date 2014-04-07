@@ -4,6 +4,7 @@ var async = require('async');
 var mongoose = require('mongoose');
 var tool_collections = require('../models/tool_collections');
 var mongo_config = require('../config/mongo');
+var save_tmp_file = require('../util/save_tmp_file');
 
 //configure mongoose
 mongoose.connect(mongo_config.url);
@@ -22,7 +23,7 @@ exports.default = function(req, res) {
     var files_array = [];
     var file_keys = Object.keys(files_object);
     async.map(file_keys,function(key,callback){
-        callback(null,files_object[key]);
+        callback(null,files_array[key]);
     },function(err,result){
         if (err) throw err;
         async.map(result,save_tmp_file,function(err,result){
@@ -46,27 +47,12 @@ exports.default = function(req, res) {
                     new_log_item.job_id = new_queue_item.job_id
                     new_log_item.save(function(err){
                         if (err) throw err;
-                        params.staus = 'pending';
-                        params.job_id = new_log_item.job_id
+                        params.status = 'pending';
+                        params.job_id = new_log_item.job_id;
                         res.jsonp(params);
                     });
                 });
             });
-        });
-    });
-}
-
-// utility function to save the input file object to a local temp file
-// in file_uploads
-var save_tmp_file = function(file_object,callback) {
-    fs.readFile(file_object.path, function(err,data) {
-        if (err) throw callback(err);
-        var newPath = 'file_uploads/' + new Date().getTime() + file_object.name;
-        fs.writeFile(newPath, data, function(err, data) {
-            if (err) throw callback(err);
-            var obj = {}
-            obj[file_object.fieldName] = newPath
-            callback(null,obj);
         });
     });
 }
