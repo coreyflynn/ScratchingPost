@@ -34,8 +34,8 @@ db.on('open', function(){
         .then(function(doc){
             return Q.nfcall(submit_job,doc);
         })
-        .then(function(doc){
-            return Q.nfcall(poll_job,doc);
+        .then(function(job_object){
+            return Q.nfcall(poll_job,job_object);
         })
         .catch(function(err){throw err});
         });
@@ -78,21 +78,21 @@ var submit_job = function(doc,callback){
         q_submit.stderr.on('data',function(data){
             console.log(data);
         });
-        var job_object = {};
+        var job_object = doc.toObject();
 		var chunk_number = 0;
         q_submit.stdout.on('data',function(data){
             chunk_number ++;
 			if (chunk_number === 2){
-				doc.c3_job_number = data.toString().split(' ')[2];
-                callback(null,doc);
+				job_object.c3_job_number = data.toString().split(' ')[2];
+                callback(null,job_object);
 			}
         });
     }
 }
 
-var poll_job = function(doc,callback){
-    console.log(doc);
-    callback(null,doc);
+var poll_job = function(job_object,callback){
+    console.log(job_object);
+    callback(null,job_object);
 }
 
 var update_log = function(doc,status,callback){
