@@ -37,6 +37,9 @@ db.on('open', function(){
         .then(function(job_object){
             return Q.nfcall(poll_job,job_object);
         })
+        .then(function(job_object){
+            return Q.nfcall(update_log,job_object,'submitted');
+        })
         .catch(function(err){throw err});
         });
     });
@@ -95,12 +98,12 @@ var poll_job = function(job_object,callback){
     callback(null,job_object);
 }
 
-var update_log = function(doc,status,callback){
-    log.update({job_id: doc.job_id},{status: status},function(err){
+var update_log = function(job_object,status,callback){
+    log.update({job_id: job_object.job_id},{status: status},function(err){
         if (err) callback(err);   
-        console.log('updated job status: ' + doc.job_id + ':' + status);
-        loggly_client.log(doc, ['ComputeAPIDaemon','UpdateStatus',status]);
-        callback(null,doc);
+        console.log('updated job status: ' + job_object.job_id + ':' + status);
+        loggly_client.log(job_object, ['ComputeAPIDaemon','UpdateStatus',status]);
+        callback(null,job_object);
     });
 }
 
