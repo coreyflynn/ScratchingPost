@@ -10,6 +10,8 @@
     "jade": "*",
     "async": "~0.6.2",
     "mongoose": "~3.8.8",
-    "nodemailer": "^0.6.1"
+    "nodemailer": "^0.6.1",
+    "aws-sdk": "~2.0.0-rc13",
+    "loggly": "~1.0.4"
   }
 }

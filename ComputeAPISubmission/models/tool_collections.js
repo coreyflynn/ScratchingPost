@@ -3,7 +3,6 @@ var mongoose = require('mongoose');
 //define the schema for our queue model
 var queueSchema = mongoose.Schema({
     job_id: String,
-    status: String
 },{
     collection: 'queue',
 });
@@ -11,7 +10,8 @@ var queueSchema = mongoose.Schema({
 //define the schema for our log model
 var logSchema = mongoose.Schema({
     job_id: String,
-    status: String
+    status: String,
+    params: {},
 },{
     collection: 'log',
     strict: false

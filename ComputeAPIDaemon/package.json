@@ -1,7 +1,7 @@
 {
-  "name": "ToolRunner",
+  "name": "ComputeAPIDaemon",
   "version": "0.0.0",
-  "description": "Example C3 tool runner",
+  "description": "Daemon process from C3 job submission and monitoring",
   "dependencies": {
     "express": "latest",
     "jade": "latest",
@@ -9,7 +9,9 @@
     "scp2": "latest",
     "aws-sdk": "latest",
     "mongoose": "~3.8.8",
-    "loggly": "~1.0.4"
+    "loggly": "~1.0.4",
+    "async": "~0.7.0",
+    "q": "~1.0.1"
   },
   "author": "developer"
 }

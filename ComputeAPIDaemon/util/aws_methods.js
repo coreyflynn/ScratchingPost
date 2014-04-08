@@ -1,11 +1,15 @@
 var fs = require("fs"),
 path = require('path'),
-AWS = require('aws-sdk');
+AWS = require('aws-sdk'),
+loggly_client = require('../config/loggly').client;
+
+// configure AWS 
+AWS.config.loadFromPath('./config/aws_config.json');
 
 // upload the specified file to the specified AWS bucket
 var upload_file_to_bucket = function (file_path,bucket_name,callback){
 	// load AWS configuration and create a new S3 object to work with
-	AWS.config.loadFromPath('./aws_config.json');
+	
 	var s3 = new AWS.S3();
 
 	// attempt to read the given file_path and upload it. Report back the error
@@ -38,10 +42,24 @@ var upload_file_to_bucket = function (file_path,bucket_name,callback){
 				callback(err);
 			}
 			console.log('successully uploaded to ' + bucket_name + '/' + file_base);
-			console.log('file url: https://s3.amazonaws.com/' + bucket_name + '/' + file_base);
-			callback(null,'https://s3.amazonaws.com/' + bucket_name + '/' + file_base);
+			var url = 'https://s3.amazonaws.com/' + bucket_name + '/' + file_base;
+            var s3_locations = {url: url, key: file_base}
+            console.log('file url: ' + s3_locations.url);
+            loggly_client.log(s3_locations,['ComputeAPISubmission','S3_upload']);
+			callback(null,s3_locations);
 		});
 	});
 }
 
-module.exports = {upload_file_to_bucket: upload_file_to_bucket};
+//download the specified bucket/key to the specified file locally
+var download_file_from_bucket = function(bucket,key,file_path, callback){
+    var s3 = new AWS.S3();
+    var params = {Bucket: bucket, Key: key};
+    var file = fs.createWriteStream(file_path);
+    s3.getObject(params).createReadStream().pipe(file);
+    callback(null,file_path);
+};
+
+module.exports = {upload_file_to_bucket: upload_file_to_bucket,
+                  download_file_from_bucket: download_file_from_bucket
+                 };

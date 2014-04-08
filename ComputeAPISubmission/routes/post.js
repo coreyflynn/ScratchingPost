@@ -5,6 +5,7 @@ var mongoose = require('mongoose');
 var tool_collections = require('../models/tool_collections');
 var mongo_config = require('../config/mongo');
 var save_tmp_file = require('../util/save_tmp_file');
+var loggly_client = require('../config/loggly').client;
 
 //configure mongoose
 mongoose.connect(mongo_config.url);
@@ -29,8 +30,9 @@ exports.default = function(req, res) {
         async.map(result,save_tmp_file,function(err,result){
             if (err) throw err;
             async.each(result,function(res,callback){
-                var res_key = Object.keys(res)[0]
-                params[res_key] = res[res_key];
+                var key = Object.keys(res)[0]
+                console.log(key);
+                params[key] = res[key];
                 callback(null);
             },function(err){
                 if (err) throw err;
@@ -38,17 +40,18 @@ exports.default = function(req, res) {
                 // job queue and the job log as well as return a 
                 // response to the client
                 new_queue_item = new tool_collections.queue();
-                new_queue_item.status = 'pending';
                 new_queue_item.job_id = 'job' + new Date().getTime();
                 new_queue_item.save(function(err){
                     if (err) throw err;
-                    new_log_item = new tool_collections.log(params);
+                    new_log_item = new tool_collections.log();
+                    new_log_item.params = params;
                     new_log_item.status = 'pending';
                     new_log_item.job_id = new_queue_item.job_id
                     new_log_item.save(function(err){
                         if (err) throw err;
                         params.status = 'pending';
                         params.job_id = new_log_item.job_id;
+                        loggly_client.log(params, ['ComputeAPISubmission','NewJob']);
                         res.json(params);
                     });
                 });
