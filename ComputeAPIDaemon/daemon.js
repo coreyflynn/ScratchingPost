@@ -80,12 +80,16 @@ var submit_job = function(doc,callback){
         q_submit.stdout.on('data',function(data){
             chunk_number ++;
 			if (chunk_number === 2){
-				job_object.job_number = data.toString().split(' ')[2];
-                console.log(job_object);
+				doc.c3_job_number = data.toString().split(' ')[2];
 			}
         });
         callback(null,doc);
     }
+}
+
+var poll_job = function(doc,callback){
+    console.log(doc);
+    callback(null,doc);
 }
 
 var update_log = function(doc,status,callback){
