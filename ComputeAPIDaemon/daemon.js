@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var async = require('async');
 var Q = require('q');
 var path = require('path');
-var exec = require('child_process').exec;
+var spawn = require('child_process').spawn;
 var mongo_config = require('./config/mongo');
 var queue = require('./models/tool_collections').queue;
 var log = require('./models/tool_collections').log;
@@ -68,13 +68,20 @@ var submit_job = function(doc,callback){
         console.log('submitting: ' + doc.job_id);
         
         var tmp_folder = 'sig_tool_result' + new Date().getTime();
-        fs.mkdirSync('tmp');
-        var q_submit = exec('q sig_query_tool',function(err,stdout,stderr){
-            if (err !== null){
-                console.log(err);
-            }
-            console.log(stdout);
+//        fs.mkdirSync('tmp');
+        var q_submit = spawn('qstat');
+        q_submit.stderr.setEncoding('utf8');
+        q_submit.stderr.on('data',function(data){
+            console.log(data);
         });
+        q_submit.stdout.setEncoding('utf8');
+        q_submit.stdout.on('data',function(data){
+            console.log(data);
+        });
+        q_submit.on('close',function(){
+            console.log('close');
+        });
+        callback(null,doc);
     }
 }
 
