@@ -34,6 +34,9 @@ db.on('open', function(){
         .then(function(doc){
             return Q.nfcall(submit_job,doc);
         })
+        .then(function(doc){
+            return Q.nfcall(poll_job,doc);
+        })
         .catch(function(err){throw err});
         });
     });
