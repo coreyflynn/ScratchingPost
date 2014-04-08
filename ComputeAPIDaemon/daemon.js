@@ -77,11 +77,10 @@ var submit_job = function(doc,callback){
         });
         var job_object = {};
 		var chunk_number = 0;
-        q_submit.stdout.setEncoding('utf8');
         q_submit.stdout.on('data',function(data){
             chunk_number ++;
 			if (chunk_number === 2){
-				job_object.job_number = chunk.toString().split(' ')[2];
+				job_object.job_number = data.toString().split(' ')[2];
                 console.log(job_object);
 			}
         });
