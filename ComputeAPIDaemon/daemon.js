@@ -3,6 +3,7 @@ var async = require('async');
 var Q = require('q');
 var path = require('path');
 var spawn = require('child_process').spawn;
+var execSync = require('execSync');
 var mongo_config = require('./config/mongo');
 var queue = require('./models/tool_collections').queue;
 var log = require('./models/tool_collections').log;
@@ -68,8 +69,8 @@ var submit_job = function(doc,callback){
         console.log('submitting: ' + doc.job_id);
         
         var tmp_folder = 'sig_tool_result' + new Date().getTime();
-//        fs.mkdirSync('tmp');
-        var q_submit = spawn('qstat');
+        execSync.run('source /etc/profile');
+        var q_submit = spawn('q');
         q_submit.stderr.setEncoding('utf8');
         q_submit.stderr.on('data',function(data){
             console.log(data);

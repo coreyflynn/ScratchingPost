@@ -11,7 +11,8 @@
     "mongoose": "~3.8.8",
     "loggly": "~1.0.4",
     "async": "~0.7.0",
-    "q": "~1.0.1"
+    "q": "~1.0.1",
+    "execSync": "~1.0.1-pre"
   },
   "author": "developer"
 }
