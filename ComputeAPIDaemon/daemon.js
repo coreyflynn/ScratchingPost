@@ -81,14 +81,13 @@ var build_arguments = function(doc,callback){
         if (tool === undefined){
             tool = 'foo';
         }
-        console.log('tool:' + tool);
         arguments.push(tool);
+        console.log(arguments);
 
         // get the parameters
         var param_keys = Object.keys(doc.params);
         console.log(param_keys);
         param_keys.forEach(function(key){
-            console.log(key);
             if (key.length === 1){
                 arguments.push('-' + key);
             }else{
