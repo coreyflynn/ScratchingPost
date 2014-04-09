@@ -113,7 +113,7 @@ var submit_job = function(doc,arguments,callback){
         
         var tmp_folder = 'sig_tool_result' + new Date().getTime();
         execSync.run('source /etc/profile');
-        var q_submit = spawn('q',['sig_query_tool']);
+        var q_submit = spawn('q',arguments);
         q_submit.stderr.setEncoding('utf8');
         q_submit.stderr.on('data',function(data){
             console.log(data);
