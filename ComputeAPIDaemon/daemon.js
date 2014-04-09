@@ -93,6 +93,7 @@ var build_arguments = function(doc,callback){
             }else{
                 arguments.push('--' + key);
             }
+            console.log(arguments);
             if (typeof(doc.params[key]) === 'object'){
                 arguments.push('file_downloads/' + doc.params[key].aws_key); 
             }else{
