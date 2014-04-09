@@ -60,18 +60,17 @@ var get_log_doc = function(job_id,callback){
 
 var save_local_files = function(doc,callback){
     if (doc.status === 'pending' && doc.params !== undefined){
-        update_log(doc,'claimed',function(doc){
-            loggly_client.log(doc, ['ComputeAPIDaemon','SaveLocalFiles']);
-            console.log('saving local files: ' + doc.job_id);
-            var keys = Object.keys(doc.params);
-            keys.forEach(function(key){
-                var aws_key = doc.params[key].aws_key;
-                if (aws_key !== undefined){
-                   aws_methods.download_file_from_bucket('ComputeAPITempFiles',aws_key,'file_downloads/' + aws_key,function(err,file_path){
-                       if (err) callback(err);
-                   });
-                }
-            });
+        update_log(doc,'claimed');
+        loggly_client.log(doc, ['ComputeAPIDaemon','SaveLocalFiles']);
+        console.log('saving local files: ' + doc.job_id);
+        var keys = Object.keys(doc.params);
+        keys.forEach(function(key){
+            var aws_key = doc.params[key].aws_key;
+            if (aws_key !== undefined){
+               aws_methods.download_file_from_bucket('ComputeAPITempFiles',aws_key,'file_downloads/' + aws_key,function(err,file_path){
+                   if (err) callback(err);
+               });
+            }
         });
     }
     callback(null,doc);
