@@ -143,7 +143,7 @@ var poll_job = function(job_object,callback){
         var qstat = spawn('qstat', ['-j', job_object.c3_job_number]);
         var grep = spawn('grep',['job number']);
         
-        qsat.stdout.setEncoding('utf8');
+        qstat.stdout.setEncoding('utf8');
         qstat.stdout.on('data',function(data){
             if (/job number/.test(data)){
                 is_running = true
