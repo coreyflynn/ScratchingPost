@@ -44,7 +44,7 @@ db.on('open', function(){
         .then(function(job_object){
             return Q.nfcall(update_log,job_object,'submitted');
         })
-        .fail(function(err){throw err});
+        .catch(function(err){console.log('error: '+ err.stack)});
         });
     });
 
