@@ -89,7 +89,7 @@ var build_arguments = function(doc,callback){
             tool = 'tool_foo';
         }
         arguments.push(tool);
-        var output_folder = 'sig_tool_result' + new Date().getTime();
+        var output_folder = __dirname + '/sig_tool_result' + new Date().getTime();
         doc.output_folder = output_folder;
         arguments = arguments.concat(['--out',output_folder,'--mkdir','0']);
 
