@@ -137,7 +137,7 @@ var submit_job = function(doc,arguments,callback){
             chunk_number ++;
 			if (chunk_number === 2){
 				job_object.c3_job_number = data.toString().split(' ')[2];
-                callback(null,job_object);
+                callback(null,doc);
 			}
         });
     }
