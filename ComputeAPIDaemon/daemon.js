@@ -82,7 +82,7 @@ var build_arguments = function(doc,callback){
             tool = 'tool_foo';
         }
         arguments.push(tool);
-        console.log(arguments);
+        console.log(typeof(arguments));
 
         // get the parameters
         var param_keys = Object.keys(doc.params);
@@ -90,7 +90,7 @@ var build_arguments = function(doc,callback){
             if (key.length === 1){
                 arguments.push('-' + key);
             }else{
-                arguments.push('--');
+                arguments.push('--' + key);
             }
             console.log(arguments);
             if (typeof(doc.params[key]) === 'object'){
