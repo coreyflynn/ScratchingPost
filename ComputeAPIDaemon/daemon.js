@@ -28,20 +28,32 @@ db.on('open', function(){
     var stream = queue.find({}).tailable().stream();
     stream.on("data", function(doc){
         Q.nfcall(get_log_doc,doc.job_id)
+        .then(function(job_object){
+            return Q.nfcall(update_log,job_object,'claimed');
+        })
         .then(function(doc){
             return Q.nfcall(save_local_files,doc);
         })
+        .then(function(job_object){
+            return Q.nfcall(update_log,job_object,'files saved');
+        })
         .then(function(doc){
             return Q.nfcall(build_arguments,doc);
+        })
+        .then(function(job_object){
+            return Q.nfcall(update_log,job_object,'arguments built');
         })
         .then(function(obj){
             return Q.nfcall(submit_job,obj.doc,obj.arguments);
         })
         .then(function(job_object){
+            return Q.nfcall(update_log,job_object,'submitted');
+        })
+        .then(function(job_object){
             return Q.nfcall(poll_job,job_object);
         })
         .then(function(job_object){
-            return Q.nfcall(update_log,job_object,'submitted');
+            return Q.nfcall(update_log,job_object,'completed');
         })
         .catch(function(err){console.log('error: '+ err.stack)});
         });
@@ -133,6 +145,7 @@ var submit_job = function(doc,arguments,callback){
 }
 
 var poll_job = function(job_object,callback){
+    console.log('polling: ' + doc.job_id);
     // make sure our environment is set up correctly
     execSync.run('source /etc/profile');
     var poll_timer = setInterval(function (){
@@ -153,17 +166,12 @@ var poll_job = function(job_object,callback){
                 clearTimeout(poll_timer);
             }
             if (!is_running){
-                console.log('finished');
                 clearTimeout(poll_timer);
                 job_object.status = 'completed';
                 callback(null,job_object);
-            }else{
-                console.log('polling');
             }
             
         });
-        
-        
 	}, 1000);
 }
 
@@ -174,40 +182,4 @@ var update_log = function(job_object,status,callback){
         loggly_client.log(job_object, ['ComputeAPIDaemon','UpdateStatus',status]);
         callback(null,job_object);
     });
-}
-
-// given a ssh2 connection and a command to run, submit it using 
-// a system call to 'q' after seting up the environment in the cluster.
-var submit = function (ssh2_connection, command, callback){
-	var tmp_folder = 'sig_tool_result' + new Date().getTime();
-	ssh2_connection.exec('source /etc/profile; mkdir -p $HOME/public_html/' + tmp_folder + '; q '  + command + ' --out ' + tmp_folder + ' --mkdir 0 ', function (err, stream){
-		// if we error out, bubble the error through the callback
-		if (err) callback(err);
-
-		// grab the second line of the output from the stream as it provides
-		// the job number that the cluster is going to use for the submitted
-		// process
-		var job_object = {};
-		var chunk_number = 0;
-		stream.on('data', function (chunk){
-			chunk_number ++;
-			if (chunk_number === 2){
-				job_object.job_number = chunk.toString().split(' ')[2];
-				job_object.status = 'submitted';
-				job_object.output_folder = '$HOME/public_html/' + tmp_folder;
-
-			}
-		});
-
-		// if the stream ends normally, call the callback and provide
-		// the job number to the callback
-		stream.on('end', function (){
-			callback(null, job_object);
-		});
-	})
-};
-
-// hack to only pass parameters that tools expect
-var allowed_params = {
-    'sig_slice_tool': ['sig_id']
 }
