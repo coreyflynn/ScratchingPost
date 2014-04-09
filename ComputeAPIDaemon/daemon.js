@@ -81,6 +81,7 @@ var build_arguments = function(doc,callback){
         if (tool === undefined){
             tool = 'tool_foo';
         }
+        console.log(typeof(arguments));
         arguments.push(tool);
         console.log(typeof(arguments));
 
