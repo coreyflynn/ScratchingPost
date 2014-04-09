@@ -74,12 +74,11 @@ var save_local_files = function(doc,callback){
 
 var build_arguments = function(doc,callback){
     var arguments = [];
-    
+    console.log('building arguments');
     // get the tool name
     var tool = doc.tool;
     if (tool === undefined){
-        tool = 'foo';
-        // callback(new Error('the tool parameter must be set'));
+        throw new Error('the tool parameter must be set');
     }else{
         arguments.push(tool);
     }
