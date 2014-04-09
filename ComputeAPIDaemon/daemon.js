@@ -133,9 +133,11 @@ var submit_job = function(doc,arguments,callback){
 }
 
 var poll_job = function(job_object,callback){
+    // make sure our environment is set up correctly
+    execSync.run('source /etc/profile');
+    var is_running = true;
     var poll_timer = setInterval(function (){
-		// make sure our environment is set up correctly
-        execSync.run('source /etc/profile');
+		
         
         // spawn qstat and grep processes to work together
         var qstat = spawn('qstat', ['-j', job_object.c3_job_number]);
