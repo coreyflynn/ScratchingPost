@@ -86,8 +86,8 @@ var build_arguments = function(doc,callback){
 
         // get the parameters
         var param_keys = Object.keys(doc.params);
-        var arguments = [];
-        param_keys.forEach(function(key){
+        for(var i = 0; i < param_keys.length(); i++){
+            var key = param_keys[i];
             if (key.length === 1){
                 arguments.push('-' + key);
             }else{
