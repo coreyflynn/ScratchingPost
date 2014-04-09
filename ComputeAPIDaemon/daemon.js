@@ -125,7 +125,7 @@ var submit_job = function(doc,arguments,callback){
         console.log('submitting: ' + doc.job_id);
         
         var tmp_folder = 'sig_tool_result' + new Date().getTime();
-        execSync.run('mkdir -p ' + __dirname + '/' + doc.output_folder);
+        execSync.run('mkdir -p ' + doc.output_folder);
         var q_submit = spawn('q',arguments);
         q_submit.stderr.setEncoding('utf8');
         q_submit.stderr.on('data',function(data){
