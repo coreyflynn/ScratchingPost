@@ -157,10 +157,14 @@ var poll_job = function(job_object,callback){
                 callback(new Error('qstat exited with code: ' + code));
             }
             if (!is_running){
+                console.log('finished');
                 clearTimeout(poll_timer);
                 job_object.status = 'completed';
                 callback(null,job_object);
+            }else{
+                console.log('polling');
             }
+            
         });
         
         
