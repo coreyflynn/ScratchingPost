@@ -94,7 +94,7 @@ var build_arguments = function(doc,callback){
                     arguments.push('--' + key);
                 }
                 if (typeof(doc.params[key]) === 'object'){
-                    arguments.push(__dirname + 'file_downloads/' + doc.params[key].aws_key); 
+                    arguments.push(__dirname + '/file_downloads/' + doc.params[key].aws_key); 
                 }else{
                     arguments.push(doc.params[key]);
                 }
