@@ -144,7 +144,6 @@ var poll_job = function(job_object,callback){
         
         qstat.stdout.setEncoding('utf8');
         qstat.stdout.on('data',function(data){
-            console.log(data);
             if (/job_number/.test(data)){
                 is_running = true;
             }
@@ -152,7 +151,6 @@ var poll_job = function(job_object,callback){
         qstat.on('close',function(code){
             if (code !== 0){
                 clearTimeout(poll_timer);
-                callback(new Error('qstat exited with code: ' + code));
             }
             if (!is_running){
                 console.log('finished');
