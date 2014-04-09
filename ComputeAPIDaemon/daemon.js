@@ -97,7 +97,7 @@ var build_arguments = function(doc,callback){
             if (typeof(doc.params[key]) === 'object'){
                 arguments.push('file_downloads/' + doc.params[key].aws_key); 
             }else{
-                arguments.push(doc_object.params[key]);
+                arguments.push(doc.params[key]);
             }
             console.log(arguments);
         };
