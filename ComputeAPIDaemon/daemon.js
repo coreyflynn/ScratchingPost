@@ -73,34 +73,39 @@ var save_local_files = function(doc,callback){
 }
 
 var build_arguments = function(doc,callback){
-    var arguments = [];
-    console.log('building arguments');
-    // get the tool name
-    var tool = doc.params.tool;
-    if (tool === undefined){
-        tool = 'foo';
-        // throw new Error('the tool parameter must be set');
-    }else{
-        arguments.push(tool);
+    if (doc.status === 'pending'){
+        var arguments = [];
+        console.log('building arguments');
+        // get the tool name
+        var tool = doc.params.tool;
+        if (tool === undefined){
+            tool = 'foo';
+            // throw new Error('the tool parameter must be set');
+        }else{
+            arguments.push(tool);
+        }
+
+        // get the parameters
+        var param_keys = Object.keys(doc_object.params);
+        param_keys.forEach(function(key){
+            if (key.length === 1){
+                arguments.push('-' + key);
+            }else{
+                arguments.push('--' + key);
+            }
+            if (typeof(doc_object[key]) === 'object'){
+                arguments.push('file_downloads/' + doc.params[key].aws_key); 
+            }else{
+                arguments.push(doc_object.params[key]);
+            }
+        });
+        // return the built array and the original mongo document
+        callback(null,doc,arguments);
     }
-    
-    // get the parameters
-    var param_keys = Object.keys(doc_object.params);
-    param_keys.forEach(function(key){
-        if (key.length === 1){
-            arguments.push('-' + key);
-        }else{
-            arguments.push('--' + key);
-        }
-        if (typeof(doc_object[key]) === 'object'){
-            arguments.push('file_downloads/' + doc.params[key].aws_key); 
-        }else{
-            arguments.push(doc_object.params[key]);
-        }
-    });
-    
     // return the built array and the original mongo document
-    callback(null,doc,arguments);
+    callback(null,doc,null);
+    
+    
 }
 
 var submit_job = function(doc,arguments,callback){
