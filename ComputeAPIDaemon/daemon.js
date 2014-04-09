@@ -145,8 +145,8 @@ var poll_job = function(job_object,callback){
         qstat.stdout.setEncoding('utf8');
         qstat.stdout.on('data',function(data){
             console.log(data);
-            if (/job number/.test(data)){
-                is_running = true
+            if (/job_number/.test(data)){
+                is_running = true;
             }
         });
         qstat.on('close',function(code){
