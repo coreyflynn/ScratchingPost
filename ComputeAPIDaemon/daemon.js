@@ -82,7 +82,6 @@ var build_arguments = function(doc,callback){
             tool = 'tool_foo';
         }
         arguments.push(tool);
-        console.log(typeof(arguments));
 
         // get the parameters
         var param_keys = Object.keys(doc.params);
@@ -93,13 +92,11 @@ var build_arguments = function(doc,callback){
             }else{
                 arguments.push('--' + key);
             }
-            console.log(arguments);
             if (typeof(doc.params[key]) === 'object'){
                 arguments.push('file_downloads/' + doc.params[key].aws_key); 
             }else{
                 arguments.push(doc.params[key]);
             }
-            console.log(arguments);
         };
         // return the built array and the original mongo document
         callback(null,doc,arguments);
