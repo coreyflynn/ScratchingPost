@@ -76,26 +76,26 @@ var build_arguments = function(doc,callback){
     var arguments = [];
     console.log('building arguments');
     // get the tool name
-    var tool = doc.tool;
+    var tool = doc.params.tool;
     if (tool === undefined){
-        throw new Error('the tool parameter must be set');
+        tool = 'foo';
+        // throw new Error('the tool parameter must be set');
     }else{
         arguments.push(tool);
     }
     
     // get the parameters
-    var doc_object = doc.toObject();
-    var doc_keys = Object.keys(doc_object);
-    doc_keys.forEach(function(key){
+    var param_keys = Object.keys(doc_object.params);
+    param_keys.forEach(function(key){
         if (key.length === 1){
             arguments.push('-' + key);
         }else{
             arguments.push('--' + key);
         }
         if (typeof(doc_object[key]) === 'object'){
-            arguments.push('file_downloads/' + doc_object[key].aws_key); 
+            arguments.push('file_downloads/' + doc.params[key].aws_key); 
         }else{
-            arguments.push(doc_object[key]);
+            arguments.push(doc_object.params[key]);
         }
     });
     
