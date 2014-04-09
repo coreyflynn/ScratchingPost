@@ -51,6 +51,7 @@ db.on('open', function(){
 var get_log_doc = function(job_id,callback){
     log.findOne({job_id: job_id},function(err, doc){
         if (err) callback(err);
+        console.log(doc);
         callback(null,doc);
     });
 }
