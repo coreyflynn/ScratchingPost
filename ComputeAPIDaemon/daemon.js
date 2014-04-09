@@ -136,7 +136,7 @@ var submit_job = function(doc,arguments,callback){
         q_submit.stdout.on('data',function(data){
             chunk_number ++;
 			if (chunk_number === 2){
-				job_object.c3_job_number = data.toString().split(' ')[2];
+				doc.c3_job_number = data.toString().split(' ')[2];
                 callback(null,doc);
 			}
         });
