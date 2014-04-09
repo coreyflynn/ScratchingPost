@@ -99,15 +99,15 @@ var build_arguments = function(doc,callback){
             }
         };
         // return the built array and the original mongo document
-        callback(null,doc,arguments);
+        callback(null,doc);
     }
     // return the built array and the original mongo document
-    callback(null,doc,null);
+    callback(null,doc);
 }
 
-var submit_job = function(doc,arguments,callback){
+var submit_job = function(doc,callback){
     if (doc.status === 'pending'){
-        console.log(arguments);
+//        console.log(arguments);
         loggly_client.log(doc, ['ComputeAPIDaemon','SubmitJob']);
         console.log('submitting: ' + doc.job_id);
         
