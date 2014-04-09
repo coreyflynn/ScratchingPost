@@ -93,7 +93,7 @@ var build_arguments = function(doc,callback){
         arguments.push(tool);
         var output_folder = 'sig_tool_result' + new Date().getTime();
         doc.output_folder = output_folder;
-        arguments.concat(['--out',output_folder,'--mkdir','0']);
+        arguments = arguments.concat(['--out',output_folder,'--mkdir','0']);
 
         // get the parameters
         var param_keys = Object.keys(doc.params);
