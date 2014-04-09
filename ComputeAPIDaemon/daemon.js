@@ -75,13 +75,15 @@ var save_local_files = function(doc,callback){
 var build_arguments = function(doc,callback){
     if (doc.status === 'pending'){
         var arguments = [];
-        console.log('building arguments');
+        console.log('building arguments: ' + doc.job_id);
         // get the tool name
         var tool = doc.params.tool;
         if (tool === undefined){
+            console.log('no tool');
             tool = 'foo';
             // throw new Error('the tool parameter must be set');
         }else{
+            console.log('tool:' + tool);
             arguments.push(tool);
         }
 
@@ -104,8 +106,6 @@ var build_arguments = function(doc,callback){
     }
     // return the built array and the original mongo document
     callback(null,doc,null);
-    
-    
 }
 
 var submit_job = function(doc,arguments,callback){
