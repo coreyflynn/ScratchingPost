@@ -51,7 +51,6 @@ db.on('open', function(){
 var get_log_doc = function(job_id,callback){
     log.findOne({job_id: job_id},function(err, doc){
         if (err) callback(err);
-        console.log(doc);
         callback(null,doc);
     });
 }
@@ -88,15 +87,17 @@ var build_arguments = function(doc,callback){
         var param_keys = Object.keys(doc.params);
         for(var i = 0; i < param_keys.length; i++){
             var key = param_keys[i];
-            if (key.length === 1){
-                arguments.push('-' + key);
-            }else{
-                arguments.push('--' + key);
-            }
-            if (typeof(doc.params[key]) === 'object'){
-                arguments.push('file_downloads/' + doc.params[key].aws_key); 
-            }else{
-                arguments.push(doc.params[key]);
+            if (key !== 'tool'){
+                if (key.length === 1){
+                    arguments.push('-' + key);
+                }else{
+                    arguments.push('--' + key);
+                }
+                if (typeof(doc.params[key]) === 'object'){
+                    arguments.push('file_downloads/' + doc.params[key].aws_key); 
+                }else{
+                    arguments.push(doc.params[key]);
+                }
             }
         };
         // return the built array and the original mongo document
@@ -175,3 +176,8 @@ var submit = function (ssh2_connection, command, callback){
 		});
 	})
 };
+
+// hack to only pass parameters that tools expect
+var allowed_params = {
+    'sig_slice_tool': ['sig_id']
+}
