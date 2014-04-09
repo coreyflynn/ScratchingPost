@@ -162,10 +162,14 @@ var poll_job = function(job_object,callback){
             }
         });
         
+        grep.stderr.on('data', function (data) {
+          console.log('grep stderr: ' + data);
+        });
+        
         grep.on('close',function(code){
             if (code !== 0){
                 clearTimeout(poll_timer);
-                callback(new Error('qstat exited with code: ' + code));
+                callback(new Error('grep exited with code: ' + code));
             }
             if (!is_running){
                 clearTimeout(poll_timer);
