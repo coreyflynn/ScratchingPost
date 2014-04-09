@@ -79,13 +79,10 @@ var build_arguments = function(doc,callback){
         // get the tool name
         var tool = doc.params.tool;
         if (tool === undefined){
-            console.log('no tool');
             tool = 'foo';
-            // throw new Error('the tool parameter must be set');
-        }else{
-            console.log('tool:' + tool);
-            arguments.push(tool);
         }
+        console.log('tool:' + tool);
+        arguments.push(tool);
 
         // get the parameters
         var param_keys = Object.keys(doc_object.params);
@@ -95,11 +92,12 @@ var build_arguments = function(doc,callback){
             }else{
                 arguments.push('--' + key);
             }
-            if (typeof(doc_object[key]) === 'object'){
+            if (typeof(doc.params[key]) === 'object'){
                 arguments.push('file_downloads/' + doc.params[key].aws_key); 
             }else{
                 arguments.push(doc_object.params[key]);
             }
+            console.log(arguments);
         });
         // return the built array and the original mongo document
         callback(null,doc,arguments);
