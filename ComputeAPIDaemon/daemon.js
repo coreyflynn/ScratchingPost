@@ -191,6 +191,9 @@ var tar = function (ssh2_connection,job_object, callback){
 };
 
 var update_log = function(job_object,status,callback){
+    if (callback === undefined){
+        callback = function(){};
+    };
     log.update({job_id: job_object.job_id},{status: status},function(err){
         if (err) callback(err);   
         console.log('updated job status: ' + job_object.job_id + ':' + status);
