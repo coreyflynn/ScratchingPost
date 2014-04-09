@@ -79,6 +79,8 @@ var save_local_files = function(doc,callback){
 
 var build_arguments = function(doc,callback){
     if (doc.status === 'pending'){
+        
+        
         var arguments = new Array();
         console.log('building arguments: ' + doc.job_id);
         // get the tool name
@@ -87,6 +89,9 @@ var build_arguments = function(doc,callback){
             tool = 'tool_foo';
         }
         arguments.push(tool);
+        var output_folder = 'sig_tool_result' + new Date().getTime();
+        doc.output_folder = output_folder;
+        arguments.concat(['--out',output_folder,'--mkdir','0']);
 
         // get the parameters
         var param_keys = Object.keys(doc.params);
@@ -119,7 +124,7 @@ var submit_job = function(doc,arguments,callback){
         console.log('submitting: ' + doc.job_id);
         
         var tmp_folder = 'sig_tool_result' + new Date().getTime();
-        execSync.run('source /etc/profile');
+        execSync.run('mkdir -p ' --dirname + '/' + doc.output_folder);
         var q_submit = spawn('q',arguments);
         q_submit.stderr.setEncoding('utf8');
         q_submit.stderr.on('data',function(data){
@@ -167,6 +172,24 @@ var poll_job = function(job_object,callback){
         });
 	}, 1000);
 }
+
+var tar = function (ssh2_connection,job_object, callback){
+	var tar_path = path.basename(job_object.output_folder) + '.tgz';
+	var tar_command = 'tar -czf ' + tar_path + ' -C $HOME/public_html ' + path.basename(job_object.output_folder);
+	console.log(tar_command);
+	ssh2_connection.exec(tar_command, function (err,stream){
+		// if we error out, bubble the error through the callback
+		if (err) callback(err);
+
+		// if the stream ends normally, return the job object with the tar_path
+		// attribute added
+		stream.on('end', function (){
+			job_object.tar_path = tar_path;
+			job_object.status = 'compressed';
+			callback(null,job_object);
+		});
+	});
+};
 
 var update_log = function(job_object,status,callback){
     log.update({job_id: job_object.job_id},{status: status},function(err){
