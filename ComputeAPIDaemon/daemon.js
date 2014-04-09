@@ -100,7 +100,7 @@ var build_arguments = function(doc,callback){
                 arguments.push(doc_object.params[key]);
             }
             console.log(arguments);
-        });
+        };
         // return the built array and the original mongo document
         callback(null,doc,arguments);
     }
