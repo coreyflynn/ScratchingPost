@@ -175,7 +175,7 @@ var poll_job = function(job_object,callback){
 
 var tar = function (job_object, callback){
 	var tar_path = job_object.output_folder + '.tgz';
-    var tar = spawn('tar', ['-czf', tar_path, job_object.output_folder]);
+    var tar = spawn('tar', ['-czf', tar_path, '-C', __dirname, job_object.output_folder]);
     tar.on('close',function(code){
         callback(null,job_object);
     });
