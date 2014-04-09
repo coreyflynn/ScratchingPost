@@ -75,6 +75,7 @@ var save_local_files = function(doc,callback){
 var build_arguments = function(doc,callback){
     if (doc.status === 'pending'){
         var arguments = [];
+        console.log(typeof(arguments));
         console.log('building arguments: ' + doc.job_id);
         // get the tool name
         var tool = doc.params.tool;
