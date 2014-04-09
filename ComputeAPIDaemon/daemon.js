@@ -32,7 +32,10 @@ db.on('open', function(){
             return Q.nfcall(save_local_files,doc);
         })
         .then(function(doc){
-            return Q.nfcall(submit_job,doc);
+            return Q.nfcall(build_arguments,doc);
+        })
+        .then(function(doc,arguments){
+            return Q.nfcall(submit_job,doc,arguments);
         })
         .then(function(job_object){
             return Q.nfcall(poll_job,job_object);
@@ -69,8 +72,40 @@ var save_local_files = function(doc,callback){
     callback(null,doc);
 }
 
-var submit_job = function(doc,callback){
+var build_arguments = function(doc,callback){
+    var arguments = [];
+    
+    // get the tool name
+    var tool = doc.tool;
+    if (tool === undefined){
+        callback(new Error('the tool parameter must be set'));
+    }else{
+        arguments.push(tool);
+    }
+    
+    // get the parameters
+    var doc_object = doc.toObject();
+    var doc_keys = Object.keys(doc_object);
+    doc_keys.forEach(function(key){
+        if (key.length === 1){
+            arguments.push('-' + key);
+        }else{
+            arguments.push('--' + key);
+        }
+        if (typeof(doc_object[key]) === 'object'){
+            arguments.push('file_downloads/' + doc_object[key].aws_key); 
+        }else{
+            arguments.push(doc_object[key]);
+        }
+    });
+    
+    // return the built array and the original mongo document
+    callback(null,doc,arguments);
+}
+
+var submit_job = function(doc,arguments,callback){
     if (doc.status === 'pending'){
+        console.log(arguments);
         loggly_client.log(doc, ['ComputeAPIDaemon','SubmitJob']);
         console.log('submitting: ' + doc.job_id);
         
