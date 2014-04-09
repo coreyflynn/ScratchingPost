@@ -34,14 +34,8 @@ db.on('open', function(){
         .then(function(doc){
             return Q.nfcall(save_local_files,doc);
         })
-        .then(function(job_object){
-            return Q.nfcall(update_log,job_object,'files saved');
-        })
         .then(function(doc){
             return Q.nfcall(build_arguments,doc);
-        })
-        .then(function(job_object){
-            return Q.nfcall(update_log,job_object,'arguments built');
         })
         .then(function(obj){
             return Q.nfcall(submit_job,obj.doc,obj.arguments);
