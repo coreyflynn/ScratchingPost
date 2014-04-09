@@ -78,7 +78,8 @@ var build_arguments = function(doc,callback){
     // get the tool name
     var tool = doc.tool;
     if (tool === undefined){
-        callback(new Error('the tool parameter must be set'));
+        tool = 'foo';
+        // callback(new Error('the tool parameter must be set'));
     }else{
         arguments.push(tool);
     }
