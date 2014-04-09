@@ -46,6 +46,9 @@ db.on('open', function(){
         .then(function(job_object){
             return Q.nfcall(update_log,job_object,'completed');
         })
+        .then(function(job_object){
+            return Q.nfcall(tar,job_object);
+        })
         .catch(function(err){console.log('error: '+ err.stack)});
         });
     });
@@ -150,7 +153,6 @@ var poll_job = function(job_object,callback){
         
         // spawn qstat and grep processes to work together
         var qstat = spawn('qstat', ['-j', job_object.c3_job_number]);
-        var grep = spawn('grep',['job number']);
         
         qstat.stdout.setEncoding('utf8');
         qstat.stdout.on('data',function(data){
@@ -172,23 +174,20 @@ var poll_job = function(job_object,callback){
 	}, 1000);
 }
 
-var tar = function (ssh2_connection,job_object, callback){
-	var tar_path = path.basename(job_object.output_folder) + '.tgz';
-	var tar_command = 'tar -czf ' + tar_path + ' -C $HOME/public_html ' + path.basename(job_object.output_folder);
-	console.log(tar_command);
-	ssh2_connection.exec(tar_command, function (err,stream){
-		// if we error out, bubble the error through the callback
-		if (err) callback(err);
+var tar = function (job_object, callback){
+	var tar_path = job_object.output_folder + '.tgz';
+    var tar = spawn('tar', ['-czf', tar_path, job_object.output_folder]);
+    tar.on('close',function(code){
+        callback(null,job_object);
+    });
+}
 
-		// if the stream ends normally, return the job object with the tar_path
-		// attribute added
-		stream.on('end', function (){
-			job_object.tar_path = tar_path;
-			job_object.status = 'compressed';
-			callback(null,job_object);
-		});
-	});
-};
+var cleanup = function (job_object,callback){
+	var rm = spawn('rm', ['-r', job_object.output_folder]);
+    rm.on('close',function(code){
+        callback(null,job_object);
+    });
+}
 
 var update_log = function(job_object,status,callback){
     if (callback === undefined){
