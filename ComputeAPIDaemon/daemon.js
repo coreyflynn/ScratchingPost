@@ -35,7 +35,6 @@ db.on('open', function(){
             return Q.nfcall(build_arguments,doc);
         })
         .then(function(doc,arguments){
-            if (err) throw err;
             return Q.nfcall(submit_job,doc,arguments);
         })
         .then(function(job_object){
