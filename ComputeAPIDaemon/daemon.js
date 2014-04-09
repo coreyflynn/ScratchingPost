@@ -143,33 +143,18 @@ var poll_job = function(job_object,callback){
         var qstat = spawn('qstat', ['-j', job_object.c3_job_number]);
         var grep = spawn('grep',['job number']);
         
+        qsat.stdout.setEncoding('utf8');
         qstat.stdout.on('data',function(data){
-            grep.stdin.write(data);
+            if (/job number/.test(data)){
+                is_running = true
+            }else{
+                is_running = false;
+            }
         });
         qstat.on('close',function(code){
             if (code !== 0){
                 clearTimeout(poll_timer);
                 callback(new Error('qstat exited with code: ' + code));
-            }
-            grep.stdin.end();
-        });
-        
-        grep.stdout.on('data', function(data){
-            if (data.toString().indexOf('job_number:') === -1){
-                is_running = false
-            }else{
-                is_running = true;
-            }
-        });
-        
-        grep.stderr.on('data', function (data) {
-          console.log('grep stderr: ' + data);
-        });
-        
-        grep.on('close',function(code){
-            if (code !== 0){
-                clearTimeout(poll_timer);
-                callback(new Error('grep exited with code: ' + code));
             }
             if (!is_running){
                 clearTimeout(poll_timer);
@@ -177,6 +162,8 @@ var poll_job = function(job_object,callback){
                 callback(null,job_object);
             }
         });
+        
+        
 	}, 1000);
 }
 
