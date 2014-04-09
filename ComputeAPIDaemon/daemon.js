@@ -34,8 +34,8 @@ db.on('open', function(){
         .then(function(doc){
             return Q.nfcall(build_arguments,doc);
         })
-        .then(function(doc,arguments){
-            return Q.nfcall(submit_job,doc,arguments);
+        .then(function(obj){
+            return Q.nfcall(submit_job,obj.doc,obj.arguments);
         })
         .then(function(job_object){
             return Q.nfcall(poll_job,job_object);
@@ -99,15 +99,15 @@ var build_arguments = function(doc,callback){
             }
         };
         // return the built array and the original mongo document
-        callback(null,doc);
+        callback(null,{doc: doc, arguments: arguments},arguments);
     }
     // return the built array and the original mongo document
-    callback(null,doc);
+    callback(null,{doc:doc, arguments: []});
 }
 
-var submit_job = function(doc,callback){
+var submit_job = function(doc,arguments,callback){
     if (doc.status === 'pending'){
-//        console.log(arguments);
+        console.log(arguments);
         loggly_client.log(doc, ['ComputeAPIDaemon','SubmitJob']);
         console.log('submitting: ' + doc.job_id);
         
