@@ -142,7 +142,7 @@ var submit_job = function(doc,arguments,callback){
 }
 
 var poll_job = function(job_object,callback){
-    console.log('polling: ' + doc.job_id);
+    console.log('polling: ' + job_object.job_id);
     // make sure our environment is set up correctly
     execSync.run('source /etc/profile');
     var poll_timer = setInterval(function (){
