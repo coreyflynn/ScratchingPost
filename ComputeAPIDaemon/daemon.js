@@ -99,7 +99,7 @@ var build_arguments = function(doc,callback){
             }
         };
         // return the built array and the original mongo document
-        callback(null,{doc: doc, arguments: arguments},arguments);
+        callback(null,{doc: doc, arguments: arguments});
     }
     // return the built array and the original mongo document
     callback(null,{doc:doc, arguments: []});
