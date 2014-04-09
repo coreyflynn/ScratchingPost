@@ -135,9 +135,8 @@ var submit_job = function(doc,arguments,callback){
 var poll_job = function(job_object,callback){
     // make sure our environment is set up correctly
     execSync.run('source /etc/profile');
-    var is_running = true;
     var poll_timer = setInterval(function (){
-		
+        var is_running = false;
         
         // spawn qstat and grep processes to work together
         var qstat = spawn('qstat', ['-j', job_object.c3_job_number]);
@@ -148,8 +147,6 @@ var poll_job = function(job_object,callback){
             console.log(data);
             if (/job number/.test(data)){
                 is_running = true
-            }else{
-                is_running = false;
             }
         });
         qstat.on('close',function(code){
