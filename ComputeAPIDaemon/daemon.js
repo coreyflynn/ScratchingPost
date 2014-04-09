@@ -133,8 +133,45 @@ var submit_job = function(doc,arguments,callback){
 }
 
 var poll_job = function(job_object,callback){
-    console.log(job_object);
-    callback(null,job_object);
+    var poll_timer = setInterval(function (){
+		// make sure our environment is set up correctly
+        execSync.run('source /etc/profile');
+        
+        // spawn qstat and grep processes to work together
+        var qstat = spawn('qstat', ['-j', job_object.c3_job_number]);
+        var grep = spawn('grep',['job number']);
+        
+        qstat.stdout.on('data',function(data){
+            grep.stdin.write(data);
+        });
+        qstat.on('close',function(code){
+            if (code !== 0){
+                clearTimeout(poll_timer);
+                callback(new Error('qstat exited with code: ' + code));
+            }
+            grep.stdin.end();
+        });
+        
+        grep.stdout.on('data', function(data){
+            if (data.toString().indexOf('job_number:') === -1){
+                is_running = false
+            }else{
+                is_running = true;
+            }
+        });
+        
+        grep.on('close',function(code){
+            if (code !== 0){
+                clearTimeout(poll_timer);
+                callback(new Error('qstat exited with code: ' + code));
+            }
+            if (!is_running){
+                clearTimeout(poll_timer);
+                job_object.status = 'completed';
+                callback(null,job_object);
+            }
+        });
+	}, 1000);
 }
 
 var update_log = function(job_object,status,callback){
