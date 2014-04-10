@@ -49,6 +49,9 @@ db.on('open', function(){
         .then(function(job_object){
             return Q.nfcall(tar,job_object);
         })
+        .then(function(job_object){
+            return Q.nfcall(cleanup,job_object);
+        })
         .catch(function(err){console.log('error: '+ err.stack)});
         });
     });
@@ -175,7 +178,7 @@ var poll_job = function(job_object,callback){
 
 var tar = function (job_object, callback){
 	var tar_base = path.basename(job_object.output_folder);
-    var tar = spawn('tar', ['-czf', tar_base + '.tgz', '-C', __dirname, job_object.output_folder + '/' + tar_base]);
+    var tar = spawn('tar', ['-czf', tar_base + '.tgz', '-C', __dirname, tar_base]);
     tar.on('close',function(code){
         callback(null,job_object);
     });
