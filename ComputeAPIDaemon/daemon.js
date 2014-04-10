@@ -200,7 +200,7 @@ var s3_upload = function(job_object,callback){
     });
 }
 var cleanup = function (job_object,callback){
-	fs.rmdirSync(job_object.output_folder);
+	deleteFolderRecursive(job_object.output_folder);
     fs.unlinkSync(job_object.tar_path);
     loggly_client.log(job_object, ['ComputeAPIDaemon','Cleanup']);
 }
@@ -216,3 +216,18 @@ var update_log = function(job_object,status,callback){
         callback(null,job_object);
     });
 }
+
+// taken from www.geedew.com/2012/10/24/remove-a-directory-that-is-not-empty-in-nodejs/
+var deleteFolderRecursive = function(path) {
+    if( fs.existsSync(path) ) {
+        fs.readdirSync(path).forEach(function(file,index){
+        var curPath = path + "/" + file;
+        if(fs.lstatSync(curPath).isDirectory()) { // recurse
+            deleteFolderRecursive(curPath);
+        } else { // delete file
+            fs.unlinkSync(curPath);
+        }
+        });
+        fs.rmdirSync(path);
+    }
+};
