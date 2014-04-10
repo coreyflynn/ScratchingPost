@@ -64,6 +64,7 @@ db.on('open', function(){
 var get_log_doc = function(job_id,callback){
     log.findOne({job_id: job_id},function(err, doc){
         if (err) callback(err);
+        loggly_client.log(doc.toObject(), ['ComputeAPIDaemon','GetLogDoc']);
         callback(null,doc);
     });
 }
@@ -118,6 +119,7 @@ var build_arguments = function(doc,callback){
             }
         };
         // return the built array and the original mongo document
+        loggly_client.log(doc, ['ComputeAPIDaemon','BuildArguments']);
         callback(null,{doc: doc, arguments: arguments});
     }
     // return the built array and the original mongo document
@@ -149,6 +151,7 @@ var submit_job = function(doc,arguments,callback){
 }
 
 var poll_job = function(job_object,callback){
+    loggly_client.log(job_object, ['ComputeAPIDaemon','BuildArguments']);
     console.log('polling: ' + job_object.job_id);
     // make sure our environment is set up correctly
     execSync.run('source /etc/profile');
@@ -183,6 +186,7 @@ var tar = function (job_object, callback){
     job_object.tar_path = tar_base + '.tgz';
     var tar = spawn('tar', ['-czf', job_object.tar_path, '-C', __dirname, tar_base]);
     tar.on('close',function(code){
+        loggly_client.log(job_object, ['ComputeAPIDaemon','Tar']);
         callback(null,job_object);
     });
 }
@@ -191,12 +195,14 @@ var s3_upload = function(job_object,callback){
     aws_methods.upload_file_to_bucket(job_object.tar_path,'ComputeAPITempFiles',function(err,s3_locations){
         if (err) callback(err);
         job_object.aws_tar_path = s3_locations.url;
+        loggly_client.log(job_object, ['ComputeAPIDaemon','S3Upload']);
         callback(null,job_object);
     });
 }
 var cleanup = function (job_object,callback){
 	fs.rmdirSync(job_object.output_folder);
     fs.unlinkSync(job_object.tar_path);
+    loggly_client.log(job_object, ['ComputeAPIDaemon','Cleanup']);
 }
 
 var update_log = function(job_object,status,callback){
