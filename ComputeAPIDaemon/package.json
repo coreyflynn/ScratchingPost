@@ -12,7 +12,8 @@
     "loggly": "~1.0.4",
     "async": "~0.7.0",
     "q": "~1.0.1",
-    "execSync": "~1.0.1-pre"
+    "execSync": "~1.0.1-pre",
+    "node-logentries": "^0.1.4"
   },
   "author": "developer"
 }

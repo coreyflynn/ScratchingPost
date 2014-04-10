@@ -9,6 +9,7 @@ var mongo_config = require('./config/mongo');
 var queue = require('./models/tool_collections').queue;
 var log = require('./models/tool_collections').log;
 var loggly_client = require('./config/loggly').client;
+var logentries_log = require('./config/logentries').log;
 var aws_methods = require('./util/aws_methods');
 
 //configure mongoose and get a connection reference
@@ -16,6 +17,7 @@ mongoose.connect(mongo_config.url);
 var db = mongoose.connection;
 
 //log the start of the Daemon
+logentries_log.log("ComputeAPIDaemon:Start", {});
 loggly_client.log({}, ['ComputeAPIDaemon','DaemonStart']);
 
 //handle connection errors
