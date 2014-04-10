@@ -50,6 +50,9 @@ db.on('open', function(){
             return Q.nfcall(tar,job_object);
         })
         .then(function(job_object){
+            return Q.nfcall(s3_upload,job_object);
+        })
+        .then(function(job_object){
             return Q.nfcall(cleanup,job_object);
         })
         .catch(function(err){console.log('error: '+ err.stack)});
@@ -113,7 +116,6 @@ var build_arguments = function(doc,callback){
                 }
             }
         };
-        console.log(doc);
         // return the built array and the original mongo document
         callback(null,{doc: doc, arguments: arguments});
     }
@@ -123,7 +125,6 @@ var build_arguments = function(doc,callback){
 
 var submit_job = function(doc,arguments,callback){
     if (doc.status === 'pending'){
-        console.log(arguments);
         loggly_client.log(doc, ['ComputeAPIDaemon','SubmitJob']);
         console.log('submitting: ' + doc.job_id);
         
@@ -178,12 +179,20 @@ var poll_job = function(job_object,callback){
 
 var tar = function (job_object, callback){
 	var tar_base = path.basename(job_object.output_folder);
-    var tar = spawn('tar', ['-czf', tar_base + '.tgz', '-C', __dirname, tar_base]);
+    job_object.tar_path = tar_base + '.tgz';
+    var tar = spawn('tar', ['-czf', job_object.tar_path, '-C', __dirname, tar_base]);
     tar.on('close',function(code){
         callback(null,job_object);
     });
 }
 
+var s3_upload = function(job_object,callback){
+    aws_methods.upload_file_to_bucket(job_object.tar_path,'ComputeAPITempFiles',function(err,s3_locations){
+        if (err) callback(err);
+        job_object.aws_tar_path = s3_locations.url;
+        callback(null,job_object);
+    });
+}
 var cleanup = function (job_object,callback){
 	var rm = spawn('rm', ['-r', job_object.output_folder]);
     rm.on('close',function(code){
