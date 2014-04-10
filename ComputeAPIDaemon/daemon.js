@@ -66,6 +66,7 @@ db.on('open', function(){
 var get_log_doc = function(job_id,callback){
     log.findOne({job_id: job_id},function(err, doc){
         if (err) callback(err);
+        logentries_log.log("debug", {tags: ['ComputeAPIDaemon','GetLogDoc'], doc: doc.toObject()});
         loggly_client.log(doc.toObject(), ['ComputeAPIDaemon','GetLogDoc']);
         callback(null,doc);
     });
@@ -74,6 +75,7 @@ var get_log_doc = function(job_id,callback){
 var save_local_files = function(doc,callback){
     if (doc.status === 'pending' && doc.params !== undefined){
         update_log(doc,'claimed');
+        logentries_log.log("debug", {tags: ['ComputeAPIDaemon','SaveLocalFiles'], doc: doc});
         loggly_client.log(doc, ['ComputeAPIDaemon','SaveLocalFiles']);
         console.log('saving local files: ' + doc.job_id);
         var keys = Object.keys(doc.params);
@@ -91,6 +93,8 @@ var save_local_files = function(doc,callback){
 
 var build_arguments = function(doc,callback){
     if (doc.status === 'pending'){
+        logentries_log.log("debug", {tags: ['ComputeAPIDaemon','BuildArguments'], doc: doc});
+        loggly_client.log(doc, ['ComputeAPIDaemon','BuildArguments']);
         var arguments = new Array();
         console.log('building arguments: ' + doc.job_id);
         // get the tool name
@@ -121,7 +125,6 @@ var build_arguments = function(doc,callback){
             }
         };
         // return the built array and the original mongo document
-        loggly_client.log(doc, ['ComputeAPIDaemon','BuildArguments']);
         callback(null,{doc: doc, arguments: arguments});
     }
     // return the built array and the original mongo document
@@ -130,6 +133,7 @@ var build_arguments = function(doc,callback){
 
 var submit_job = function(doc,arguments,callback){
     if (doc.status === 'pending'){
+        logentries_log.log("debug", {tags: ['ComputeAPIDaemon','SubmitJob'], doc: doc});
         loggly_client.log(doc, ['ComputeAPIDaemon','SubmitJob']);
         console.log('submitting: ' + doc.job_id);
         
@@ -153,7 +157,8 @@ var submit_job = function(doc,arguments,callback){
 }
 
 var poll_job = function(job_object,callback){
-    loggly_client.log(job_object, ['ComputeAPIDaemon','BuildArguments']);
+    logentries_log.log("debug", {tags: ['ComputeAPIDaemon','PollJob'], doc: job_object});
+    loggly_client.log(job_object, ['ComputeAPIDaemon','PollJob']);
     console.log('polling: ' + job_object.job_id);
     // make sure our environment is set up correctly
     execSync.run('source /etc/profile');
@@ -184,26 +189,29 @@ var poll_job = function(job_object,callback){
 }
 
 var tar = function (job_object, callback){
-	var tar_base = path.basename(job_object.output_folder);
+	logentries_log.log("debug", {tags: ['ComputeAPIDaemon','Tar'], doc: job_object});
+    loggly_client.log(job_object, ['ComputeAPIDaemon','Tar']);
+    var tar_base = path.basename(job_object.output_folder);
     job_object.tar_path = tar_base + '.tgz';
     var tar = spawn('tar', ['-czf', job_object.tar_path, '-C', __dirname, tar_base]);
     tar.on('close',function(code){
-        loggly_client.log(job_object, ['ComputeAPIDaemon','Tar']);
         callback(null,job_object);
     });
 }
 
 var s3_upload = function(job_object,callback){
+    logentries_log.log("debug", {tags: ['ComputeAPIDaemon','S3upload'], doc: job_object});
+    loggly_client.log(job_object, ['ComputeAPIDaemon','S3Upload']);
     aws_methods.upload_file_to_bucket(job_object.tar_path,'ComputeAPITempFiles',function(err,s3_locations){
         if (err) callback(err);
         job_object.aws_tar_path = s3_locations.url;
-        loggly_client.log(job_object, ['ComputeAPIDaemon','S3Upload']);
         callback(null,job_object);
     });
 }
 var cleanup = function (job_object,callback){
 	deleteFolderRecursive(job_object.output_folder);
     fs.unlinkSync(job_object.tar_path);
+    logentries_log.log("debug", {tags: ['ComputeAPIDaemon','Cleanup'], doc: job_object});
     loggly_client.log(job_object, ['ComputeAPIDaemon','Cleanup']);
 }
 
@@ -214,6 +222,7 @@ var update_log = function(job_object,status,callback){
     log.update({job_id: job_object.job_id},{status: status},function(err){
         if (err) callback(err);   
         console.log('updated job status: ' + job_object.job_id + ':' + status);
+        logentries_log.log("debug", {tags: ['ComputeAPIDaemon','UpdateStatus'], status:status, doc: job_object});
         loggly_client.log(job_object, ['ComputeAPIDaemon','UpdateStatus',status]);
         callback(null,job_object);
     });
