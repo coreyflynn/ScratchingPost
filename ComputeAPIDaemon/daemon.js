@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var async = require('async');
+var fs = require('fs');
 var Q = require('q');
 var path = require('path');
 var spawn = require('child_process').spawn;
@@ -194,13 +195,8 @@ var s3_upload = function(job_object,callback){
     });
 }
 var cleanup = function (job_object,callback){
-	var rm_folder = spawn('rm', ['-r', job_object.output_folder]);
-    rm_folder.on('close',function(code){
-        var rm_tar = spawn('rm', [job_object.tar_path]);
-        rm_tar.on('close'),function(code){
-            callback(null,job_object);
-        }
-    });
+	fs.rmdirSync(job_object.output_folder);
+    fs.unlinkSync(job_object.tar_path);
 }
 
 var update_log = function(job_object,status,callback){
