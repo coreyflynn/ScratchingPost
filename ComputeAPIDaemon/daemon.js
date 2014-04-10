@@ -17,7 +17,7 @@ mongoose.connect(mongo_config.url);
 var db = mongoose.connection;
 
 //log the start of the Daemon
-logentries_log.log("ComputeAPIDaemon:Start", {});
+logentries_log.log("debug", {tags: ['ComputeAPIDaemon','DaemonStart']});
 loggly_client.log({}, ['ComputeAPIDaemon','DaemonStart']);
 
 //handle connection errors
