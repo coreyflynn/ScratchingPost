@@ -20,6 +20,12 @@ var db = mongoose.connection;
 logentries_log.log("info", {tags: ['ComputeAPIDaemon','DaemonStart']});
 loggly_client.log({}, ['ComputeAPIDaemon','DaemonStart']);
 
+//start a heartbeat
+var heartbeat = setInterval(function(){
+    logentries_log.log("info", {tags: ['ComputeAPIDaemon','Heartbeat']});
+},60000);
+
+
 //handle connection errors
 db.on('error', console.error.bind(console, 'connection error:'));
 
