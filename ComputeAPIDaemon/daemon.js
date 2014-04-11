@@ -17,7 +17,7 @@ mongoose.connect(mongo_config.url);
 var db = mongoose.connection;
 
 //log the start of the Daemon
-logentries_log.log("debug", {tags: ['ComputeAPIDaemon','DaemonStart']});
+logentries_log.log("info", {tags: ['ComputeAPIDaemon','DaemonStart']});
 loggly_client.log({}, ['ComputeAPIDaemon','DaemonStart']);
 
 //handle connection errors
@@ -66,7 +66,7 @@ db.on('open', function(){
 var get_log_doc = function(job_id,callback){
     log.findOne({job_id: job_id},function(err, doc){
         if (err) callback(err);
-        logentries_log.log("debug", {tags: ['ComputeAPIDaemon','GetLogDoc'], doc: doc.toObject()});
+        logentries_log.log("info", {tags: ['ComputeAPIDaemon','GetLogDoc'], job_id: job_id});
         loggly_client.log(doc.toObject(), ['ComputeAPIDaemon','GetLogDoc']);
         callback(null,doc);
     });
@@ -75,7 +75,7 @@ var get_log_doc = function(job_id,callback){
 var save_local_files = function(doc,callback){
     if (doc.status === 'pending' && doc.params !== undefined){
         update_log(doc,'claimed');
-        logentries_log.log("debug", {tags: ['ComputeAPIDaemon','SaveLocalFiles'], doc: doc});
+        logentries_log.log("info", {tags: ['ComputeAPIDaemon','SaveLocalFiles'], job_id: doc.job_id});
         loggly_client.log(doc, ['ComputeAPIDaemon','SaveLocalFiles']);
         console.log('saving local files: ' + doc.job_id);
         var keys = Object.keys(doc.params);
@@ -93,7 +93,7 @@ var save_local_files = function(doc,callback){
 
 var build_arguments = function(doc,callback){
     if (doc.status === 'pending'){
-        logentries_log.log("debug", {tags: ['ComputeAPIDaemon','BuildArguments'], doc: doc});
+        logentries_log.log("info", {tags: ['ComputeAPIDaemon','BuildArguments'], job_id: doc.job_id});
         loggly_client.log(doc, ['ComputeAPIDaemon','BuildArguments']);
         var arguments = new Array();
         console.log('building arguments: ' + doc.job_id);
@@ -118,7 +118,7 @@ var build_arguments = function(doc,callback){
                     arguments.push('--' + key);
                 }
                 if (typeof(doc.params[key]) === 'object'){
-                    arguments.push(__dirname + '/file_downloads/' + doc.params[key].aws_key); 
+                    arguments.push(__dirname + '/file_downloads/' + doc.params[key].aws_key);
                 }else{
                     arguments.push(doc.params[key]);
                 }
@@ -133,10 +133,10 @@ var build_arguments = function(doc,callback){
 
 var submit_job = function(doc,arguments,callback){
     if (doc.status === 'pending'){
-        logentries_log.log("debug", {tags: ['ComputeAPIDaemon','SubmitJob'], doc: doc});
+        logentries_log.log("info", {tags: ['ComputeAPIDaemon','SubmitJob'], job_id: doc.job_id});
         loggly_client.log(doc, ['ComputeAPIDaemon','SubmitJob']);
         console.log('submitting: ' + doc.job_id);
-        
+
         var tmp_folder = 'sig_tool_result' + new Date().getTime();
         execSync.run('mkdir -p ' + doc.output_folder);
         var q_submit = spawn('q',arguments);
@@ -157,17 +157,17 @@ var submit_job = function(doc,arguments,callback){
 }
 
 var poll_job = function(job_object,callback){
-    logentries_log.log("debug", {tags: ['ComputeAPIDaemon','PollJob'], doc: job_object});
+    logentries_log.log("info", {tags: ['ComputeAPIDaemon','PollJob'], job_id: job_object.job_id});
     loggly_client.log(job_object, ['ComputeAPIDaemon','PollJob']);
     console.log('polling: ' + job_object.job_id);
     // make sure our environment is set up correctly
     execSync.run('source /etc/profile');
     var poll_timer = setInterval(function (){
         var is_running = false;
-        
+
         // spawn qstat and grep processes to work together
         var qstat = spawn('qstat', ['-j', job_object.c3_job_number]);
-        
+
         qstat.stdout.setEncoding('utf8');
         qstat.stdout.on('data',function(data){
             if (/job_number/.test(data)){
@@ -183,13 +183,13 @@ var poll_job = function(job_object,callback){
                 job_object.status = 'completed';
                 callback(null,job_object);
             }
-            
+
         });
 	}, 1000);
 }
 
 var tar = function (job_object, callback){
-	logentries_log.log("debug", {tags: ['ComputeAPIDaemon','Tar'], doc: job_object});
+	logentries_log.log("info", {tags: ['ComputeAPIDaemon','Tar'], job_id: job_object,job_id});
     loggly_client.log(job_object, ['ComputeAPIDaemon','Tar']);
     var tar_base = path.basename(job_object.output_folder);
     job_object.tar_path = tar_base + '.tgz';
@@ -200,7 +200,7 @@ var tar = function (job_object, callback){
 }
 
 var s3_upload = function(job_object,callback){
-    logentries_log.log("debug", {tags: ['ComputeAPIDaemon','S3upload'], doc: job_object});
+    logentries_log.log("info", {tags: ['ComputeAPIDaemon','S3upload'], job_id: job_object.job_id});
     loggly_client.log(job_object, ['ComputeAPIDaemon','S3Upload']);
     aws_methods.upload_file_to_bucket(job_object.tar_path,'ComputeAPITempFiles',function(err,s3_locations){
         if (err) callback(err);
@@ -211,7 +211,7 @@ var s3_upload = function(job_object,callback){
 var cleanup = function (job_object,callback){
 	deleteFolderRecursive(job_object.output_folder);
     fs.unlinkSync(job_object.tar_path);
-    logentries_log.log("debug", {tags: ['ComputeAPIDaemon','Cleanup'], doc: job_object});
+    logentries_log.log("info", {tags: ['ComputeAPIDaemon','Cleanup'], job_id: job_object.job_id});
     loggly_client.log(job_object, ['ComputeAPIDaemon','Cleanup']);
 }
 
@@ -220,9 +220,9 @@ var update_log = function(job_object,status,callback){
         callback = function(){};
     };
     log.update({job_id: job_object.job_id},{status: status},function(err){
-        if (err) callback(err);   
+        if (err) callback(err);
         console.log('updated job status: ' + job_object.job_id + ':' + status);
-        logentries_log.log("debug", {tags: ['ComputeAPIDaemon','UpdateStatus'], status:status, doc: job_object});
+        logentries_log.log("info", {tags: ['ComputeAPIDaemon','UpdateStatus'], status:status, job_id: job_object.job_id});
         loggly_client.log(job_object, ['ComputeAPIDaemon','UpdateStatus',status]);
         callback(null,job_object);
     });
