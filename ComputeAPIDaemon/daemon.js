@@ -189,7 +189,7 @@ var poll_job = function(job_object,callback){
 }
 
 var tar = function (job_object, callback){
-	logentries_log.log("info", {tags: ['ComputeAPIDaemon','Tar'], job_id: job_object,job_id});
+	logentries_log.log("info", {tags: ['ComputeAPIDaemon','Tar'], job_id: job_object.job_id});
     loggly_client.log(job_object, ['ComputeAPIDaemon','Tar']);
     var tar_base = path.basename(job_object.output_folder);
     job_object.tar_path = tar_base + '.tgz';
