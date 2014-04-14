@@ -11,6 +11,7 @@ var queueSchema = mongoose.Schema({
 var logSchema = mongoose.Schema({
     job_id: String,
     status: String,
+    config: String,
     params: {},
 },{
     collection: 'log',
