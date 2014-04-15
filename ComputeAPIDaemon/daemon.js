@@ -179,6 +179,7 @@ var cleanup = function (job_object,callback){
     fs.unlinkSync(job_object.tar_path);
     logentries_log.log("info", {tags: ['ComputeAPIDaemon','Cleanup'], job_id: job_object.job_id});
     loggly_client.log(job_object, ['ComputeAPIDaemon','Cleanup']);
+    callback(null,job_object);
 }
 
 var update_log = function(job_object,status,callback){
