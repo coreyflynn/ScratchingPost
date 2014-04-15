@@ -3,13 +3,10 @@ path = require('path'),
 AWS = require('aws-sdk'),
 loggly_client = require('../config/loggly').client;
 
-// configure AWS 
-AWS.config.loadFromPath('./config/aws_config.json');
-
 // upload the specified file to the specified AWS bucket
 var upload_file_to_bucket = function (file_path,bucket_name,callback){
 	// load AWS configuration and create a new S3 object to work with
-	
+
 	var s3 = new AWS.S3();
 
 	// attempt to read the given file_path and upload it. Report back the error
@@ -24,7 +21,7 @@ var upload_file_to_bucket = function (file_path,bucket_name,callback){
 
 		// create a new buffer from the file_path given
 		var file_buffer = new Buffer(data,'binary');
-		
+
 		// set up the parameters for the object to be placed on amazon.
 		// we're going to pass the buffer from above to AWS and make the file
 		// public read only
@@ -35,7 +32,7 @@ var upload_file_to_bucket = function (file_path,bucket_name,callback){
 			Body: file_buffer
 		};
 
-		// upload the object to AWS and return the file_url to the callback 
+		// upload the object to AWS and return the file_url to the callback
 		// on success
 		s3.putObject(params, function (err,data){
 			if (err) {
