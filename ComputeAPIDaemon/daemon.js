@@ -134,7 +134,7 @@ var poll_job = function(job_object,callback){
     loggly_client.log(job_object, ['ComputeAPIDaemon','PollJob']);
     console.log('polling: ' + job_object.job_id);
     // make sure our environment is set up correctly
-    execSync.run('source /etc/profile');
+    // execSync.run('source /etc/profile');
     var poll_timer = setInterval(function (){
         var is_running = false;
 
