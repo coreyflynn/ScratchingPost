@@ -38,9 +38,6 @@ db.on('open', function(){
     stream.on("data", function(doc){
         Q.nfcall(get_log_doc,doc.job_id)
         .then(function(doc){
-            return Q.nfcall(save_local_files,doc);
-        })
-        .then(function(doc){
             return Q.nfcall(build_arguments,doc);
         })
         .then(function(obj){
@@ -53,9 +50,6 @@ db.on('open', function(){
             return Q.nfcall(poll_job,job_object);
         })
         .then(function(job_object){
-            return Q.nfcall(update_log,job_object,'completed');
-        })
-        .then(function(job_object){
             return Q.nfcall(tar,job_object);
         })
         .then(function(job_object){
@@ -64,37 +58,23 @@ db.on('open', function(){
         .then(function(job_object){
             return Q.nfcall(cleanup,job_object);
         })
+        .then(function(job_object){
+            return Q.nfcall(update_log,job_object,'completed');
+        })
         .catch(function(err){console.log('error: '+ err.stack)});
         });
     });
 
 
 var get_log_doc = function(job_id,callback){
-    log.findOne({job_id: job_id},function(err, doc){
-        if (err) callback(err);
-        logentries_log.log("info", {tags: ['ComputeAPIDaemon','GetLogDoc'], job_id: job_id});
-        loggly_client.log(doc.toObject(), ['ComputeAPIDaemon','GetLogDoc']);
-        callback(null,doc);
-    });
-}
-
-var save_local_files = function(doc,callback){
-    if (doc.status === 'pending' && doc.params !== undefined){
-        update_log(doc,'claimed');
-        logentries_log.log("info", {tags: ['ComputeAPIDaemon','SaveLocalFiles'], job_id: doc.job_id});
-        loggly_client.log(doc, ['ComputeAPIDaemon','SaveLocalFiles']);
-        console.log('saving local files: ' + doc.job_id);
-        var keys = Object.keys(doc.params);
-        keys.forEach(function(key){
-            var aws_key = doc.params[key].aws_key;
-            if (aws_key !== undefined){
-               aws_methods.download_file_from_bucket('ComputeAPITempFiles',aws_key,'file_downloads/' + aws_key,function(err,file_path){
-                   if (err) callback(err);
-               });
-            }
+    setTimeout(function(){
+        log.findOne({job_id: job_id},function(err, doc){
+            if (err) callback(err);
+            logentries_log.log("info", {tags: ['ComputeAPIDaemon','GetLogDoc'], job_id: job_id});
+            loggly_client.log({job_id: job_id}, ['ComputeAPIDaemon','GetLogDoc']);
+            callback(null,doc);
         });
-    }
-    callback(null,doc);
+    },2000);
 }
 
 var build_arguments = function(doc,callback){
@@ -113,24 +93,6 @@ var build_arguments = function(doc,callback){
         doc.output_folder = output_folder;
         arguments = arguments.concat(['--config', doc.config, '--out',output_folder,'--mkdir','0']);
 
-        // get the parameters
-        var param_keys = Object.keys(doc.params);
-        for(var i = 0; i < param_keys.length; i++){
-            var key = param_keys[i];
-            if (key !== 'tool'){
-                if (key.length === 1){
-                    arguments.push('-' + key);
-                }else{
-                    arguments.push('--' + key);
-                }
-                if (typeof(doc.params[key]) === 'object'){
-                    arguments.push(__dirname + '/file_downloads/' + doc.params[key].aws_key);
-                }else{
-                    arguments.push(doc.params[key]);
-                }
-            }
-        };
-        // return the built array and the original mongo document
         callback(null,{doc: doc, arguments: arguments});
     }
     // return the built array and the original mongo document
@@ -167,7 +129,7 @@ var poll_job = function(job_object,callback){
     loggly_client.log(job_object, ['ComputeAPIDaemon','PollJob']);
     console.log('polling: ' + job_object.job_id);
     // make sure our environment is set up correctly
-    execSync.run('source /etc/profile');
+    // execSync.run('source /etc/profile');
     var poll_timer = setInterval(function (){
         var is_running = false;
 
@@ -219,6 +181,7 @@ var cleanup = function (job_object,callback){
     fs.unlinkSync(job_object.tar_path);
     logentries_log.log("info", {tags: ['ComputeAPIDaemon','Cleanup'], job_id: job_object.job_id});
     loggly_client.log(job_object, ['ComputeAPIDaemon','Cleanup']);
+    callback(null,job_object);
 }
 
 var update_log = function(job_object,status,callback){
