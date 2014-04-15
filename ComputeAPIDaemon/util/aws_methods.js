@@ -3,6 +3,9 @@ path = require('path'),
 AWS = require('aws-sdk'),
 loggly_client = require('../config/loggly').client;
 
+// configure AWS 
+AWS.config.loadFromPath('./config/aws_config.json');
+
 // upload the specified file to the specified AWS bucket
 var upload_file_to_bucket = function (file_path,bucket_name,callback){
 	// load AWS configuration and create a new S3 object to work with
