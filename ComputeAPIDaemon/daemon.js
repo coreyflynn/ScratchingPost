@@ -68,9 +68,10 @@ db.on('open', function(){
 
 var get_log_doc = function(job_id,callback){
     log.findOne({job_id: job_id},function(err, doc){
-        if (err){
+        if (err) if (err) callback(err);
+        if (!doc){
             setTimeout(log.findOne({job_id: job_id},function(err, doc){
-                if (err) callback(err);
+                if (err) if (err) callback(err);
                 logentries_log.log("info", {tags: ['ComputeAPIDaemon','GetLogDoc'], job_id: job_id});
                 loggly_client.log({job_id: job_id}, ['ComputeAPIDaemon','GetLogDoc']);
                 callback(null,doc);
@@ -133,8 +134,6 @@ var poll_job = function(job_object,callback){
     logentries_log.log("info", {tags: ['ComputeAPIDaemon','PollJob'], job_id: job_object.job_id});
     loggly_client.log(job_object, ['ComputeAPIDaemon','PollJob']);
     console.log('polling: ' + job_object.job_id);
-    // make sure our environment is set up correctly
-    // execSync.run('source /etc/profile');
     var poll_timer = setInterval(function (){
         var is_running = false;
 
