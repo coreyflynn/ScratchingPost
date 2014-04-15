@@ -76,10 +76,11 @@ var get_log_doc = function(job_id,callback){
                 loggly_client.log({job_id: job_id}, ['ComputeAPIDaemon','GetLogDoc']);
                 callback(null,doc);
             }),5000);
+        }else{
+            logentries_log.log("info", {tags: ['ComputeAPIDaemon','GetLogDoc'], job_id: job_id});
+            loggly_client.log({job_id: job_id}, ['ComputeAPIDaemon','GetLogDoc']);
+            callback(null,doc);
         }
-        logentries_log.log("info", {tags: ['ComputeAPIDaemon','GetLogDoc'], job_id: job_id});
-        loggly_client.log({job_id: job_id}, ['ComputeAPIDaemon','GetLogDoc']);
-        callback(null,doc);
     });
 }
 
