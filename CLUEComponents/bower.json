@@ -1,0 +1,7 @@
+{
+  "name": "tmp",
+  "version": "0.0.1",
+  "dependencies": {
+      "paper-elements": "Polymer/paper-elements#~0.3.3"
+  }
+}

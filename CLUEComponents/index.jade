@@ -1,0 +1,30 @@
+doctype html
+html(lang="en")
+    head
+        title= LincsApp
+        link(rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css")
+        link(rel='stylesheet', href='http://cmap.github.io/barista/barista.main.min.css')
+        script(src='http://localhost:35729/livereload.js')
+    body
+        <!-- header view target -->
+        .cmap-shadow
+            #header(data-barista-view="CMapHeaderView",data-title="LincsApp",data-subtitle="The New Hotness")
+
+        <!-- put your content here -->
+        .cmap-spacer-large
+        .row
+            .col-lg-offset-1.col-lg-10.col-md-offset-1.col-md-10
+                #L1000Platform(data-barista-view="PlatformSummaryView",data-span_class="col-lg-12 col-md-12")
+
+        <!-- put your content here -->
+        hr
+        .row
+            .col-lg-offset-1.col-lg-10.col-md-offset-1.col-md-10
+                h2.cmap-center-text Your app content goes here
+                p.lead.col-lg-offset-1.col-lg-10.col-md-offset-1.col-md-10 Use the above as an example, wipe it out completely, or re-mix it. It's up to you. LINCS apps are built with <a href="http://cmap.github.io/barista">Barista.js</a>, head over there to get up to speed if you have not seen the library before.
+
+        <!-- footer view target -->
+        .row
+            #footer(data-barista-view="CMapFooterView")
+
+        script(src='http://cmap.github.io/barista/barista.main.min.js')

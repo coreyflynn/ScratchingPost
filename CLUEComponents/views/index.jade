@@ -1,0 +1,43 @@
+doctype html
+html(lang="en")
+    head
+        title= LincsApp
+        link(rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css")
+        link(rel='stylesheet', href='http://cmap.github.io/barista/barista.main.min.css')
+        link(rel='stylesheet', href='css/mains.css')
+        script(src='http://localhost:35729/livereload.js')
+        script(src='bower_components/platform/platform.js')
+        link(rel='import' href='bower_components/paper-ripple/paper-ripple.html')
+        link(rel='import' href='bower_components/paper-shadow/paper-shadow.html')
+        link(rel='import' href='bower_components/paper-button/paper-button.html')
+        link(rel='import' href='bower_components/core-input/core-input.html')
+        link(rel='import' href='bower_components/core-item/core-item.html')
+        link(rel='import' href='bower_components/core-collapse/core-collapse.html')
+    body(unresolved touch-action="auto")
+        <!-- header view target -->
+        .cmap-shadow
+            #header(data-barista-view="CMapHeaderView",
+                data-title="CLUE launcher",
+                data-subtitle="manage your CLUE instances")
+
+        .row
+            .cmap-spacer-large
+            #top.col-xs-offset-1.col-xs-10
+                paper-ripple(fit style="cursor:pointer")
+                core-input.col-xs-2(placeholder="BOX NAME" style="top:8px")
+                paper-button#start.pull-right(label="start")
+                paper-shadow.paper-shadow-animated(z="1")
+            #bottom.col-xs-offset-1.col-xs-10.pull-down
+                .cmap-spacer-small
+                core-item.col-xs-2(label="IP address")
+                core-item.col-xs-10 XX.XXX.XXX.XXX
+                core-item.col-xs-2(label="SSH login")
+                core-item.col-xs-6 ssh ubuntu@XX.XXX.XXX.XXX
+
+
+        <!-- footer view target -->
+        .row
+            #footer(data-barista-view="CMapFooterView")
+
+        script(src='http://cmap.github.io/barista/barista.main.min.js')
+        script(src='js/main.js')
