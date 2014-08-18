@@ -1,0 +1,21 @@
+{
+  "name": "slice-api",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app"
+  },
+  "dependencies": {
+    "express": "~3.4.8",
+    "jade": "~1.1.5",
+    "execSync": "^1.0.1-pre"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-develop": "~0.3.0",
+    "grunt-contrib-watch": "~0.5.3",
+    "request": "~2.33.0",
+    "time-grunt": "~0.2.9",
+    "load-grunt-tasks": "~0.3.0"
+  }
+}
