@@ -4,19 +4,6 @@ include orientation_base
         .cmap-spacer-large
         .col-xs-offset-1.col-xs-10.col-md-offset-2.col-md-8
             h1.col-xs-12.text-center CLUE Private Workspace
-
-
-    // - Quickstart
-    .row
-        .cmap-spacer-large
-        a.col-xs-offset-1.col-xs-10.col-md-offset-2.col-md-8.card.plain_link(href="/orientation?module=cpwQuickstart")
-            .cmap-spacer-large
-            .col-xs-12
-                object(data="img/quickstart.svg" type="image/svg+xml" class="svg-img-small")
-            h2.col-xs-12.text-center Quick Start
-            p Your CPW is already set up with standard Connectivity Map tools and data so that you can start your analyses right away. Follow this quick start guide to get flavor of what CLUE can do.
-
-
     // - Login
     .row
         a.col-xs-offset-1.col-xs-10.col-md-offset-2.col-md-8.card.plain_link(href="/orientation?module=cpwLogin")
@@ -25,27 +12,14 @@ include orientation_base
                 object(data="img/login.svg" type="image/svg+xml" class="svg-img-small")
             h2.col-xs-12.text-center Logging In
             p Get set up with your CPW account. Log in for the first time and take a look around.
-
-
-    // - Tools
+    // - Quickstart
     .row
-        a.col-xs-offset-1.col-xs-10.col-md-offset-2.col-md-8.card.plain_link(href="/orientation?module=cpwTools")
+        a.col-xs-offset-1.col-xs-10.col-md-offset-2.col-md-8.card.plain_link(href="/orientation?module=cpwQuickstart")
             .cmap-spacer-large
             .col-xs-12
-                object(data="img/tools.svg" type="image/svg+xml" class="svg-img-small")
-            h2.col-xs-12.text-center Tools
-            p The standard Connectivity Map tools built into your CPW cover common use cases of Connectivity Map data.  They provide mechanisms to slice, query, and identify the data in a variety of different ways.
-
-    // - Data
-    .row
-        a.col-xs-offset-1.col-xs-10.col-md-offset-2.col-md-8.card.plain_link(href="/orientation?module=cpwTools")
-            .cmap-spacer-large
-            .col-xs-12
-                object(data="img/data.svg" type="image/svg+xml" class="svg-img-small")
-            h2.col-xs-12.text-center Data
-            p Connectivity Map data is provided on your CPW 
-
-
+                object(data="img/quickstart.svg" type="image/svg+xml" class="svg-img-small")
+            h2.col-xs-12.text-center Quick Start
+            p Your CPW is already set up with standard Connectivity Map tools and data so that you can start your analyses right away. Follow this quick start guide to get flavor of what CLUE can do.
     // - Share
     .row
         a.col-xs-offset-1.col-xs-10.col-md-offset-2.col-md-8.card.plain_link(href="/orientation?module=cpwShare")
@@ -54,3 +28,27 @@ include orientation_base
                 object(data="img/share.svg" type="image/svg+xml" class="svg-img-small")
             h2.col-xs-12.text-center Share
             p Once you have run a few analyses on your CPW, you'll want to share your work with others. Your CPW comes set up to share results over web.
+    // - Tools
+    .row
+        a.col-xs-offset-1.col-xs-10.col-md-offset-2.col-md-8.card.plain_link(href="/orientation?module=cpwTools")
+            .cmap-spacer-large
+            .col-xs-12
+                object(data="img/tools.svg" type="image/svg+xml" class="svg-img-small")
+            h2.col-xs-12.text-center Tools
+            p The standard Connectivity Map tools built into your CPW cover common use cases of Connectivity Map data.  They provide mechanisms to slice, query, and identify the data in a variety of different ways.
+    // - Data
+    .row
+        a.col-xs-offset-1.col-xs-10.col-md-offset-2.col-md-8.card.plain_link(href="/orientation?module=cpwData")
+            .cmap-spacer-large
+            .col-xs-12
+                object(data="img/data.svg" type="image/svg+xml" class="svg-img-small")
+            h2.col-xs-12.text-center Data
+            p Connectivity Map data is provided on your CPW as matrix data files. Learn where the data is stored and about the format in which the data is stored.
+    // - Code
+    .row
+        a.col-xs-offset-1.col-xs-10.col-md-offset-2.col-md-8.card.plain_link(href="/orientation?module=cpwCode")
+            .cmap-spacer-large
+            .col-xs-12
+                object(data="img/code.svg" type="image/svg+xml" class="svg-img-small")
+            h2.col-xs-12.text-center Code
+            p Beyond the built in tools, your CPW provides code libraries for digging into the data yourself. Learn about the provided code libraries. Dive in to the data yourself using built in python libraries and learn by example.
