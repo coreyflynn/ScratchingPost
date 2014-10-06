@@ -1,0 +1,23 @@
+/*
+***********
+links
+***********
+*/
+@import 'base_type.scss';
+
+.plain_link, .plain_link:hover{
+    text-decoration: none;
+    color: $body-copy-color;
+}
+
+.header_link{
+    @extend p;
+    position: relative;
+    top: 0.25em;
+    padding-right: 1em;
+    color: $CMapBlue;
+    &:hover{
+        color: darken($CMapBlue, 10% );
+        text-decoration: none;
+    }
+}

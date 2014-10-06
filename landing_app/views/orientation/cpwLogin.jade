@@ -1,0 +1,81 @@
+include orientation_base
+.container
+    .row
+        .cmap-spacer-large
+        .col-xs-offset-1.col-xs-10.col-md-offset-3.col-md-6
+            .col-xs-12
+                object(data="img/login.svg" type="image/svg+xml" class="svg-img-small")
+            h2.col-xs-12.text-center Logging In
+            p Get set up with your CLUE Private Workspace (CPW) account. Log in for the first time and take a look around.
+
+    // logging in
+    .row
+        .col-xs-offset-1.col-xs-10.col-md-offset-3.col-md-6
+            h3 Logging in for the first time
+            p  From a terminal application of your choice, log into your CPW instance with the following command
+            p.console >> ssh USERNAME@CPW_ADDRESS
+            p where <kbd>USERNAME</kbd> is the username that has been assigned to you and <kbd>CPW_ADDRESS</kbd> is the IP address of your CPW instance. You should have received both of these from your CPW administrator.
+            p On your first login, you will be prompted to type in the password that your CPW administrator provided to you with your username and to choose a new password.
+            p.console WARNING: Your password has expired. <br> You must change your password now and login again! <br> Changing password for username.
+            br
+            p Type in the password that your CPW administrator supplied
+            p.console >> (current) UNIX password:
+            br
+            p and then choose a new password. Confirm it once you have typed it in the first time
+            p.console >> Enter new UNIX password: <br> >> Retype new UNIX password:
+            br
+            p Your CPW will then log you out so you can sign in with your updated password
+            p.console passwd: password updated successfully <br> Connection to CPW_ADDRESS closed
+
+    // taking a look around
+    .row
+        .col-xs-offset-1.col-xs-10.col-md-offset-3.col-md-6
+            h3 Taking a look around
+            p Once logged in, you can explore the CPW file system as you would any other linux system.  Take a look at the contents of your home directory
+            p.console >> ls <br> public_html/
+            br
+            p The only thing in your home directory is your <kbd>public_html</kbd> directory. Anything you place in this directory will be publically available at the IP address of your CPW instance under a subfolder named <kbd>~USERNAME</kbd>.
+            .browser
+                .top
+                    span.red
+                    span.orange
+                    span.green
+                .bar
+                    .url
+                        a CPW_ADDRESS/~USERNAME
+
+    // next steps
+    .row
+        .col-xs-offset-1.col-xs-10.col-md-offset-3.col-md-6
+            h3 Next Steps
+            p Now that you are logged into your CPW instance.  Take a shot at running a tool by clicking on the Quickstart card below.  Or maybe you want to learn more about the different tools provided on your CPW.  Click on the tools card below to get an in-depth explanation of all CPW tools. Care to Share? Click the share card below to learn how you can share tour results with others.
+
+    // - Quickstart
+    .row
+        .cmap-spacer-large
+        a.col-xs-offset-1.col-xs-10.col-md-offset-3.col-md-6.card.plain_link(href="/orientation?module=cpwQuickstart")
+            .cmap-spacer-large
+            .col-xs-12
+                object(data="img/quickstart.svg" type="image/svg+xml" class="svg-img-small")
+            h2.col-xs-12.text-center Quick Start
+            p Your CPW is already set up with standard Connectivity Map tools and data so that you can start your analyses right away. Follow this quick start guide to get flavor of what CLUE can do.
+
+
+    // - Tools
+    .row
+        a.col-xs-offset-1.col-xs-10.col-md-offset-3.col-md-6.card.plain_link(href="/orientation?module=cpwTools")
+            .cmap-spacer-large
+            .col-xs-12
+                object(data="img/tools.svg" type="image/svg+xml" class="svg-img-small")
+            h2.col-xs-12.text-center Tools
+            p The standard Connectivity Map tools built into your CPW cover common use cases of Connectivity Map data.  They provide mechanisms to slice, query, and identify the data in a variety of different ways.
+
+
+    // - Share
+    .row
+        a.col-xs-offset-1.col-xs-10.col-md-offset-3.col-md-6.card.plain_link(href="/orientation?module=cpwShare")
+            .cmap-spacer-large
+            .col-xs-12
+                object(data="img/share.svg" type="image/svg+xml" class="svg-img-small")
+            h2.col-xs-12.text-center Share
+            p Once you have run a few analyses on your CPW, you'll want to share your work with others. Your CPW comes set up to share results over web.

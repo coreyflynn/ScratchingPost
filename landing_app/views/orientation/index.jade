@@ -1,0 +1,27 @@
+doctype html
+html(lang="en")
+    head
+        title CLUE Orientation
+        link(rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css")
+        link(rel='stylesheet', href='http://cmap.github.io/barista/barista.main.min.css')
+        link(rel='stylesheet', href='css/CLUE.css')
+
+        script(src='http://localhost:35729/livereload.js')
+    body.container
+        // - Quickstart
+        .row
+            .cmap-spacer-large
+            a.col-xs-offset-1.col-xs-10.col-md-offset-2.col-md-8.card.plain_link(href="/orientation?module=apps")
+                .cmap-spacer-large
+                .col-xs-12
+                    object(data="img/apps.svg" type="image/svg+xml" class="svg-img-small")
+                h2.col-xs-12.text-center Apps
+                p.text-center Clue.io hosts a suite of web apps that allow you to explore the contents of the Connectivity Map database, find connections already stored in the Connectivity Map database and run custom queries against the Connectivity Map database. Click here to learn how.
+        // - Share
+        .row
+            a.col-xs-offset-1.col-xs-10.col-md-offset-2.col-md-8.card.plain_link(href="/orientation?module=cpw")
+                .cmap-spacer-large
+                .col-xs-12
+                    object(data="img/c3.svg" type="image/svg+xml" class="svg-img-small")
+                h2.col-xs-12.text-center CLUE Private Workspace
+                p Once you have run a few analyses on your CPW, you'll want to share your work with others. Your CPW comes is set up to share results over web.

@@ -1,0 +1,16 @@
+doctype html
+html(lang="en")
+    head
+        title #{title}
+        link(rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css")
+        link(rel='stylesheet', href='http://cmap.github.io/barista/barista.main.min.css')
+        link(rel='stylesheet', href='css/CLUE.css')
+
+        script(src='http://localhost:35729/livereload.js')
+    body
+        //- header
+        .hero.row
+            a.col-xs-1(href="/orientation")
+                object.col-xs-12(data="img/learn.svg" type="image/svg+xml" class="svg-img-tiny")
+            a.header_link.pull-left(href="/orientation?module=apps") Apps
+            a.header_link.pull-left(href="/orientation?module=cpw") CPW

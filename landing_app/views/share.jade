@@ -1,0 +1,32 @@
+include doc_base
+.container
+    .row
+        .cmap-spacer-large
+        .col-xs-offset-1.col-xs-10.col-md-offset-2.col-md-8
+            .col-xs-12
+                object(data="img/share.svg" type="image/svg+xml" class="svg-img-small")
+            h2.col-xs-12.text-center Share
+
+        //- view and sharing
+        .col-xs-offset-1.col-xs-10.col-md-offset-2.col-md-8
+            p CLUE instances support viewing and sharing of results via a web browser. By default all files in your home folder are visible at the following link:
+            .browser
+                .top
+                    span.red
+                    span.orange
+                    span.green
+                .bar
+                    .url
+                        a CLUE_IP_ADDRESS/~USERNAME
+
+            p If you have run any tools on your CPW, you will see that there are result folders in your user folder organized by date. Inside of the each date's folder are results that you generated on that date.
+            p Feel free to poke around there to get a feel for what results look like.  If you have questions or just want to read a more complete description of the output that is generated, check out the full documentation in the tools section.
+            p If you would like to share your results, it is as easy as sending the lik to the result folder to a friend. Just simply copy and paste what you see in the browser url when you are looking at a result and send it.
+            .browser
+                .top
+                    span.red
+                    span.orange
+                    span.green
+                .bar
+                    .url
+                        a CLUE_IP_ADDRESS/~USERNAME/DATE/RESULT_FOLDER

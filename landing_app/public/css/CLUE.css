@@ -1,0 +1,372 @@
+@import url(http://fonts.googleapis.com/css?family=Roboto+Slab:300);
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:300,700);
+/*
+**********
+typography base fonts and scaling
+**********
+*/
+body {
+  font-family: 'Open Sans', Arial, sans-serif;
+  font-weight: 300;
+  line-height: 1.65;
+}
+
+h1 {
+  font-family: 'Open Sans', Arial, sans-serif;
+  font-weight: 300;
+  font-size: 3.27241em;
+  padding: 15px;
+}
+
+h2 {
+  font-family: 'Open Sans', Arial, sans-serif;
+  font-weight: 300;
+  font-size: 2.0225em;
+  margin: 0;
+  padding-bottom: 0.1em;
+}
+
+h3 {
+  font-family: 'Open Sans', Arial, sans-serif;
+  font-size: 1.25em;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  margin-bottom: 0;
+}
+
+p, .header_link {
+  font-family: 'Roboto Slab', Cambria, serif;
+  font-size: 1.25em;
+  margin-top: 0;
+  max-width: 50em;
+}
+
+p.intro, .intro.header_link {
+  font-family: 'Open Sans', Arial, sans-serif;
+  font-weight: 300;
+  font-size: 3.27241em;
+  line-height: 1;
+}
+
+/*
+**********
+typography colors
+**********
+*/
+body {
+  color: #444;
+}
+
+h1 {
+  color: #00B9F2;
+}
+
+h2 {
+  color: #00B9F2;
+}
+
+h3,
+h4,
+h5,
+h6 {
+  color: #222;
+}
+
+p.header, .header.header_link {
+  color: #00B9F2;
+}
+
+/*
+***********
+browser cartoon styling
+***********
+adapted from http://codepen.io/jonicious/pen/inHtj
+*/
+.browser {
+  width: 100%;
+  /*max-width: 920px;*/
+  margin: 30px auto;
+}
+
+.browser .top {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  width: 100%;
+  background: #eaeaea;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.browser .top span {
+  height: 13px;
+  width: 13px;
+  display: inline-block;
+  border-radius: 100%;
+}
+
+.browser .top span:first-child {
+  margin-left: 10px;
+}
+
+.browser .top .red {
+  background: #ec4641;
+}
+
+.browser .top .orange {
+  background: #efb96a;
+}
+
+.browser .top .green {
+  background: #9ecc7c;
+}
+
+.browser .bar {
+  width: 100%;
+  background: #f6f6f6;
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+
+.browser .bar .url {
+  width: 95%;
+  background: white;
+  margin: 0 auto;
+  border-radius: 4px;
+  padding-left: 1em;
+}
+
+.browser a {
+  color: #373737;
+  text-decoration: none;
+}
+
+/*
+***********
+card styles
+***********
+*/
+.card {
+  margin-bottom: 1.25em;
+  box-shadow: 0 1px 1.5px 0 rgba(0, 0, 0, 0.12), 0 1px 1px 0 rgba(0, 0, 0, 0.24);
+  -webkit-transition: all 0.2s;
+  transition: all 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 0.19), 0 6px 3px 0 rgba(0, 0, 0, 0.23);
+  -webkit-transition: all 0.2s;
+  transition: all 0.2s;
+}
+
+/*
+***********
+console styling
+***********
+*/
+.console {
+  font-family: courier, monospace;
+  background-color: #000;
+  border-radius: 10px;
+  padding: 10px;
+  color: #fff;
+  width: 100%;
+  font-size: 14px;
+  max-width: none;
+}
+
+/*
+***********
+custom button
+***********
+*/
+.btn-custom {
+  background-color: #00B9F2;
+  border-color: #fff;
+  color: #fff;
+  font-family: 'Open Sans', Arial, sans-serif;
+  font-weight: 300;
+  font-size: 4.236em;
+}
+
+.btn-custom:hover,
+.btn-custom:focus,
+.btn-custom:active,
+.btn-custom.active {
+  background-color: #9ae4f3;
+  border-color: #ffffff;
+  color: #fff;
+}
+
+.btn-custom.disabled:hover,
+.btn-custom.disabled:focus,
+.btn-custom.disabled:active,
+.btn-custom.disabled.active,
+.btn-custom[disabled]:hover,
+.btn-custom[disabled]:focus,
+.btn-custom[disabled]:active,
+.btn-custom[disabled].active,
+fieldset[disabled] .btn-custom:hover,
+fieldset[disabled] .btn-custom:focus,
+fieldset[disabled] .btn-custom:active,
+fieldset[disabled] .btn-custom.active {
+  background-color: #00B9F2;
+  border-color: #00B9F2;
+}
+
+/*
+***********
+custom div styles
+***********
+*/
+.hero {
+  background-color: #f0f0f0;
+  background-clip: content-box;
+}
+
+/*
+***********
+images
+***********
+*/
+.svg-img-large {
+  width: 100%;
+  max-height: 250px;
+  pointer-events: none;
+}
+
+.svg-img-small {
+  width: 100%;
+  max-height: 100px;
+  pointer-events: none;
+}
+
+.svg-img-tiny {
+  min-height: 40px;
+  max-height: 40px;
+  pointer-events: none;
+}
+
+/*
+***********
+custom kdb styling
+***********
+*/
+kbd {
+  -moz-border-radius: 3px;
+  /*-moz-box-shadow:0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+  -webkit-border-radius:3px;
+  -webkit-box-shadow:0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;*/
+  background-color: #f7f7f7;
+  /*border:1px solid #ccc;*/
+  border-radius: 3px;
+  /*box-shadow:0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;*/
+  color: #333;
+  display: inline-block;
+  font-family: Arial,Helvetica,sans-serif;
+  /*font-size:11px;*/
+  line-height: 1.0;
+  margin: .1em .1em;
+  padding: .1em .6em;
+  text-shadow: 0 1px 0 #fff;
+}
+
+/*
+***********
+links
+***********
+*/
+/*
+**********
+typography base fonts and scaling
+**********
+*/
+body {
+  font-family: 'Open Sans', Arial, sans-serif;
+  font-weight: 300;
+  line-height: 1.65;
+}
+
+h1 {
+  font-family: 'Open Sans', Arial, sans-serif;
+  font-weight: 300;
+  font-size: 3.27241em;
+  padding: 15px;
+}
+
+h2 {
+  font-family: 'Open Sans', Arial, sans-serif;
+  font-weight: 300;
+  font-size: 2.0225em;
+  margin: 0;
+  padding-bottom: 0.1em;
+}
+
+h3 {
+  font-family: 'Open Sans', Arial, sans-serif;
+  font-size: 1.25em;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  margin-bottom: 0;
+}
+
+p, .header_link {
+  font-family: 'Roboto Slab', Cambria, serif;
+  font-size: 1.25em;
+  margin-top: 0;
+  max-width: 50em;
+}
+
+p.intro, .intro.header_link {
+  font-family: 'Open Sans', Arial, sans-serif;
+  font-weight: 300;
+  font-size: 3.27241em;
+  line-height: 1;
+}
+
+/*
+**********
+typography colors
+**********
+*/
+body {
+  color: #444;
+}
+
+h1 {
+  color: #00B9F2;
+}
+
+h2 {
+  color: #00B9F2;
+}
+
+h3,
+h4,
+h5,
+h6 {
+  color: #222;
+}
+
+p.header, .header.header_link {
+  color: #00B9F2;
+}
+
+.plain_link, .plain_link:hover {
+  text-decoration: none;
+  color: #444;
+}
+
+.header_link {
+  position: relative;
+  top: 0.25em;
+  padding-right: 1em;
+  color: #00B9F2;
+}
+.header_link:hover {
+  color: #0092bf;
+  text-decoration: none;
+}
+
+/*# sourceMappingURL=CLUE.css.map */

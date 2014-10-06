@@ -1,0 +1,93 @@
+include orientation_base
+.container
+    .row
+        .cmap-spacer-large
+        .col-xs-offset-1.col-xs-10.col-md-offset-3.col-md-6
+            .col-xs-12
+                object(data="img/quickstart.svg" type="image/svg+xml" class="svg-img-small")
+            h2.col-xs-12.text-center Quick Start
+            p Your CLUE instance is already set up with standard Connectivity Map tools and data so that you can start your analyses right away. Follow this quick start guide to get flavor of what CLUE can do. We will start by logging in to your CLUE instance. Once you are logged in, we will run a standard Connectivity Map tool and inspect its results.
+
+        //- logging in
+        .col-xs-offset-1.col-xs-10.col-md-offset-3.col-md-6
+            h3 Logging In
+            p  From a terminal application of your choice, log into your CLUE instance with the following command
+            p.console >> ssh USERNAME@CLUE_IP_ADDRESS
+            p where <kbd>USERNAME</kbd> is the username that has been assigned to and <kbd>CLUE_IP_ADDRESS</kbd> is the IP address of your CLUE instance. You should have received both of these from your CLUE administrator.
+            p Once logged in, you can explore the CLUE file system as you would any other linux system.  Take a look at the contents of your home directory
+            p.console >> ls <br> public_html/
+            .cmap-spacer-large
+            p The only thing in your home directory is your <kbd>public_html</kbd> directory. Anything you place in this directory will be publically available at the IP address of your CLUE instance under a subfolder named <kbd>~USERNAME</kbd>.
+            .browser
+                .top
+                    span.red
+                    span.orange
+                    span.green
+                .bar
+                    .url
+                        a CLUE_IP_ADDRESS/~USERNAME
+
+        //- running a query
+        .col-xs-offset-1.col-xs-10.col-md-offset-3.col-md-6
+            h3 Running A Query
+            p We are going to run a Connectivity Map query to get to know your CLUE instance.  There are a number of standard tools included in your CLUE instance. A tool to run standard Connectivity Map queries is one of them. Let's run a query with the following command
+            p.console  q sig_quest_tool --uptag /workshop/hsf1_kd_up.gmt --dntag /workshop/hsf1_kd_dn.gmt  --metric wtcs --row_space full
+            .cmap-spacer-large
+            p OK, that seems like a lot, so let's unpack what is going on here. The first thing you need to know is that CLUE instances come with a full featured compute cluster engine based on <a href="http://star.mit.edu/cluster/">StarCluster</a>. CLUE instances make it easy to submit jobs to the compute cluster by using the <kbd>q</kbd> command.
+            p What we are doing here is using the <kbd>q</kbd> command to run a tool called <kbd>sig_quest_tool</kbd>. This tool is in charge of taking a list of genes that are up-modulated and a list of genes down-modulated in a state of interest and searching the Connectivity Map database for matches to that state. In this case, we are supplying a file called <kbd>/workshop/hsf1_kd_up.gmt</kbd> as the up modulated genes using the <kbd>--uptag</kbd> flag.  Similarly, we are supplying down-modulated genes in the file <kbd>/workshop/hsf1_kd_dn.gmt</kbd>.
+            p Two additional flags are used in the call above,<kbd>--metric</kbd> and <kbd>--row_space</kbd>. For more information on these options, check out the full documentation under the tools section.
+
+        //- checking the progress of a query
+        .col-xs-offset-1.col-xs-10.col-md-offset-3.col-md-6
+            h3 checking the progress of a query
+            p In order to check the progress your query, we will use the command <kbd>qstat</kbd>. <kbd>qstat</kbd> displays all of a users jobs currently in the queue as well as their status. A simplified view of the <kbd>qstat</kbd> console output looks like the following
+            p.console job-ID user state <br> ------------------ <br> 63 username r
+            p these are the most important fields to pay attention to when you check the status of your query. the meaning of the fields are:
+            ol
+                li <b>job-ID</b>: the job identifier used in the starCluster queuing system.
+                li <b>username</b>: the username of the user that submitted the job. In normal usage, you will only see your jobs.
+                li <b>state</b>: the current state of the job.
+            p In particular, pay attention to the state of the job. A few states of interest are
+            ol
+                li <b>qw</b>: the job is queued, but not yet running
+                li <b>r</b>: the job is running
+            p If you use <kbd>qstat</kbd> to look for your job, but can't find it displayed there, it has most likely already completed. Let's confirm this by checking the log files that tools on CLUE instances generate.
+
+        //- log files
+        .col-xs-offset-1.col-xs-10.col-md-offset-3.col-md-6
+            h3 Log Files
+            p The cluster creates two files in your public_html folder when you run <kbd>q</kbd> by default. These files are <kbd>output.log</kbd> and <kbd>error.log</kbd>. <kbd>output.log</kbd> captures any standard output that a tool generates and <kbd>error.log</kbd> captures any standard error logs that tool generates.  You can inspect the contents of either of these files with standard linux tools.  For example, you could use <kbd>tail</kbd> to look at the latest outputs generated by the sig_quest_tool run you kicked off above.
+            p.console >> tail ~/public_html/ouput.log
+
+        //- view and sharing
+        .col-xs-offset-1.col-xs-10.col-md-offset-3.col-md-6
+            h3 Viewing and sharing results
+            p CLUE instances support viewing and sharing of results via a web browser. By default all files in your home folder are visible at the following link:
+            .browser
+                .top
+                    span.red
+                    span.orange
+                    span.green
+                .bar
+                    .url
+                        a CLUE_IP_ADDRESS/~USERNAME
+            p Now that you have run a query to populate your user folder with some data, try checking out your output.log file
+            .browser
+                .top
+                    span.red
+                    span.orange
+                    span.green
+                .bar
+                    .url
+                        a CLUE_IP_ADDRESS/~USERNAME/output.log
+            p You will also see that there are result folders in your user folder organized by date. Inside of the each date's folder are results that you generated on that date. Go ahead and find the folder that you generated today and take a look.  You should see a result folder named something like <kbd>my_analysis.sig_quest_tool.2014072110230591/</kbd>. Click into that folder to see the results of your first query!
+            p Feel free to poke around there to get a feel for what the results look like.  If you have questions or just want to read a more complete description of the output that is generated, check out the full documentation in the tools section.
+            p Finally, if you would like to share your results, it is as easy as sending the lik to the result folder to a friend. Just simply copy and paste what you see in the browser url when you are looking at a result and send it.
+            .browser
+                .top
+                    span.red
+                    span.orange
+                    span.green
+                .bar
+                    .url
+                        a CLUE_IP_ADDRESS/~USERNAME/DATE/RESULT_FOLDER

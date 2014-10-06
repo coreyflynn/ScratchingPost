@@ -1,0 +1,95 @@
+/*
+**********
+typography base fonts and scaling
+**********
+*/
+
+// modular scale variables in em
+$base: 1.25em;
+$goldenRatio: 1.618;
+$perfectFifth: 1.5;
+
+$scale: $goldenRatio;
+
+$level1: $base * $scale;
+$level2: $level1 * $scale;
+$level3: $level2 * $scale;
+
+// type definitions
+body {
+    font-family: 'Open Sans', Arial, sans-serif;
+    font-weight: 300;
+    line-height: 1.65;
+}
+
+h1 {
+    font-family: 'Open Sans', Arial, sans-serif;
+    font-weight: 300;
+    font-size: $level2;
+    padding: 15px;
+}
+
+h2 {
+    font-family: 'Open Sans', Arial, sans-serif;
+    font-weight: 300;
+    font-size: $level1;
+    margin: 0;
+    padding-bottom: 0.1em;
+}
+
+h3 {
+    font-family: 'Open Sans', Arial, sans-serif;
+    font-size: $base;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    margin-bottom: 0;
+}
+
+p {
+    font-family: 'Roboto Slab', Cambria, serif;
+    font-size: $base;
+    margin-top: 0;
+    max-width: 50em;
+}
+
+p.intro {
+    font-family: 'Open Sans', Arial, sans-serif;
+    font-weight: 300;
+    font-size: $level2;
+    line-height: 1;
+}
+
+
+/*
+**********
+typography colors
+**********
+*/
+
+$body-copy-color: #444 ;
+$heading-color: #222 ;
+$CMapBlue: #00B9F2;
+
+body {
+    color: $body-copy-color;
+}
+
+h1 {
+    color: $CMapBlue;
+}
+
+h2{
+    color: $CMapBlue;
+}
+
+h3,
+h4,
+h5,
+h6 {
+    color: $heading-color;
+}
+
+p.header{
+    color: $CMapBlue;
+}

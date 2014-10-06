@@ -1,0 +1,64 @@
+/*
+***********
+browser cartoon styling
+***********
+adapted from http://codepen.io/jonicious/pen/inHtj
+*/
+
+.browser {
+    width: 100%;
+    /*max-width: 920px;*/
+    margin: 30px auto;
+}
+
+.browser .top {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    width: 100%;
+    background: #eaeaea;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+.browser .top span {
+    height: 13px;
+    width: 13px;
+    display: inline-block;
+    border-radius: 100%;
+}
+
+.browser .top span:first-child {
+    margin-left: 10px;
+}
+
+.browser .top .red {
+    background: #ec4641;
+}
+
+.browser .top .orange {
+    background: #efb96a;
+}
+
+.browser .top .green {
+    background: #9ecc7c;
+}
+
+.browser .bar {
+    width: 100%;
+    background: #f6f6f6;
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+
+.browser .bar .url {
+    width: 95%;
+    background: white;
+    margin: 0 auto;
+    border-radius: 4px;
+    padding-left: 1em;
+}
+
+.browser a {
+    color: #373737;
+    text-decoration: none;
+}
