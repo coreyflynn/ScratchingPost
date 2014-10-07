@@ -1,8 +1,61 @@
 include orientation_base
-.container
+.row
+    .cmap-spacer-large
+    .col-xs-offset-1.col-xs-10.col-md-offset-3.col-md-6
+        .col-xs-12
+            object(data="img/share.svg" type="image/svg+xml" class="svg-img-small")
+        h2.col-xs-12.text-center Share
+
+    //- view and sharing
+    .col-xs-offset-1.col-xs-10.col-md-offset-3.col-md-6
+        p CPW instances support viewing and sharing of results via a web browser. By default all files in your home folder are visible at the following link:
+        .browser
+            .top
+                span.red
+                span.orange
+                span.green
+            .bar
+                .url
+                    a CPW_ADDRESS/~USERNAME
+
+        p If you have run any tools on your CPW, you will see that there are result folders in your user folder organized by date. Inside of the each date's folder are results that you generated on that date.
+        p Feel free to poke around there to get a feel for what results look like.  If you have questions or just want to read a more complete description of the output that is generated, check out the full documentation in the tools section.
+        p If you would like to share your results, it is as easy as sending the link to the result folder to a friend. Just copy and paste what you see in the browser url when you are looking at a result and send it.
+        .browser
+            .top
+                span.red
+                span.orange
+                span.green
+            .bar
+                .url
+                    a CPW_ADDRESS/~USERNAME/DATE/RESULT_FOLDER
+
+    // next steps
     .row
-        .cmap-spacer-large
         .col-xs-offset-1.col-xs-10.col-md-offset-3.col-md-6
+            h3 Next Steps
+            p Take a look at the documentation for the tools included on your CPW instance.  Take a look at the raw data files and the code that libraries that are included on your CPW instance.
+    // - Tools
+    .row
+        a.col-xs-offset-1.col-xs-10.col-md-offset-3.col-md-6.card.plain_link(href="/orientation?module=cpwTools")
+            .cmap-spacer-large
             .col-xs-12
-                object(data="img/share.svg" type="image/svg+xml" class="svg-img-small")
-            h2.col-xs-12.text-center Share
+                object(data="img/tools.svg" type="image/svg+xml" class="svg-img-small")
+            h2.col-xs-12.text-center Tools
+            p The standard Connectivity Map tools built into your CPW cover common use cases of Connectivity Map data.  They provide mechanisms to slice, query, and identify the data in a variety of different ways.
+    // - Data
+    .row
+        a.col-xs-offset-1.col-xs-10.col-md-offset-3.col-md-6.card.plain_link(href="/orientation?module=cpwData")
+            .cmap-spacer-large
+            .col-xs-12
+                object(data="img/data.svg" type="image/svg+xml" class="svg-img-small")
+            h2.col-xs-12.text-center Data
+            p Connectivity Map data is provided on your CPW as matrix data files. Learn where the data is stored and about the format in which the data is stored.
+    // - Code
+    .row
+        a.col-xs-offset-1.col-xs-10.col-md-offset-3.col-md-6.card.plain_link(href="/orientation?module=cpwCode")
+            .cmap-spacer-large
+            .col-xs-12
+                object(data="img/code.svg" type="image/svg+xml" class="svg-img-small")
+            h2.col-xs-12.text-center Code
+            p Beyond the built in tools, your CPW provides code libraries for digging into the data yourself. Learn about the provided code libraries. Dive in to the data yourself using built in python libraries and learn by example.
