@@ -49,7 +49,6 @@ include orientation_base
         .col-xs-offset-1.col-xs-10.col-md-offset-3.col-md-6
             h3 Next Steps
             p Now that you are logged into your CPW instance.  Take a shot at running a tool by clicking on the Quickstart card below.  Or maybe you want to learn more about the different tools provided on your CPW.  Click on the tools card below to get an in-depth explanation of all CPW tools. Care to Share? Click the share card below to learn how you can share tour results with others.
-
     // - Quickstart
     .row
         .cmap-spacer-large
@@ -59,18 +58,6 @@ include orientation_base
                 object(data="img/quickstart.svg" type="image/svg+xml" class="svg-img-small")
             h2.col-xs-12.text-center Quick Start
             p Your CPW is already set up with standard Connectivity Map tools and data so that you can start your analyses right away. Follow this quick start guide to get flavor of what CLUE can do.
-
-
-    // - Tools
-    .row
-        a.col-xs-offset-1.col-xs-10.col-md-offset-3.col-md-6.card.plain_link(href="/orientation?module=cpwTools")
-            .cmap-spacer-large
-            .col-xs-12
-                object(data="img/tools.svg" type="image/svg+xml" class="svg-img-small")
-            h2.col-xs-12.text-center Tools
-            p The standard Connectivity Map tools built into your CPW cover common use cases of Connectivity Map data.  They provide mechanisms to slice, query, and identify the data in a variety of different ways.
-
-
     // - Share
     .row
         a.col-xs-offset-1.col-xs-10.col-md-offset-3.col-md-6.card.plain_link(href="/orientation?module=cpwShare")
@@ -79,3 +66,11 @@ include orientation_base
                 object(data="img/share.svg" type="image/svg+xml" class="svg-img-small")
             h2.col-xs-12.text-center Share
             p Once you have run a few analyses on your CPW, you'll want to share your work with others. Your CPW comes set up to share results over web.
+    // - Cluster
+    .row
+        a.col-xs-offset-1.col-xs-10.col-md-offset-3.col-md-6.card.plain_link(href="/orientation?module=cpwCluster")
+            .cmap-spacer-large
+            .col-xs-12
+                object(data="img/cluster.svg" type="image/svg+xml" class="svg-img-small")
+            h2.col-xs-12.text-center Cluster
+            p Your CPW instance is backed by a scalable compute cluster. Learn how to submit jobs, check on their progress and manage their status.
